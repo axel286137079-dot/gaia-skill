@@ -5,7 +5,8 @@ displayName: GEO生成式引擎优化
 summary: 让内容被豆包/DeepSeek/Kimi/元宝/文心/通义/智谱/星火/MiniMax/小米等国产生成式引擎检索、引用、归因——可引用度审计 + 多引擎分诊式改写。
 license: MIT
 description: GEO 生成式引擎优化（国产引擎版）。让你的内容被 ChatGPT/DeepSeek/豆包/Kimi/通义千问Qwen/文心/腾讯混元/智谱清言/讯飞星火/MiniMax海螺/小米MiMo/华为盘古/阶跃星辰/百川/零一万物/商汤/昆仑天工/秘塔/360纳米等 18 个国产生成式引擎检索、引用、归因。用于：给已有文章做「可引用度审计」、按目标引擎做「分诊式改写」、评估内容「被 AI 引用的概率」、布局信源让 AI 优先引用你。触发词：GEO、生成式引擎优化、AI 引用、被AI推荐、让ChatGPT提到我、DeepSeek引用、豆包推荐、AIGC可见性、内容被AI收录、llms.txt。联系邮箱：43298568@qq.com。
-version: 0.1.1
+version: 0.1.2
+homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/geo-cn
 category: 工具效率
 tags: [GEO, 生成式引擎优化, AI引用, 内容优化, AIGC可见性, 国产大模型]
 platforms: [workbuddy, claude-code, cursor]

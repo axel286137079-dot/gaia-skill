@@ -5,7 +5,8 @@ displayName: 智能家居控制
 summary: 让 agent 通过 Home Assistant 本地网关控制家电——列出/查询实体、开关灯、激活场景，内置中文场景模板（回家/离家/晚安），支持 MCP 化接入。
 license: MIT
 description: 智能家居控制（Home Assistant 本地网关）。让 agent 通过 Home Assistant 的 REST API 控制家电：列出/查询实体状态、开关灯、调亮度、激活场景、触发自动化（bin/ha_cli.py 纯标准库封装，凭据走环境变量 HA_URL/HA_TOKEN，零密钥落盘）。内置中文场景模板（回家/离家/晚安/早安，examples/scenes.json），支持把 HA 接成 MCP server 供任意 agent 调用。用于：控制智能家居、开灯关灯、智能家居自动化、Home Assistant、HA 控制、场景模式、语音控制家电、家居设备查询。触发词：智能家居、开灯、关灯、Home Assistant、控制家电、家居自动化、场景模式、语音控制家电、家居设备、调节灯光。联系邮箱：43298568@qq.com。
-version: 0.1.0
+version: 0.1.1
+homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/smart-home-mcp
 category: 智能家居
 tags: [智能家居, HomeAssistant, MCP, 自动化]
 platforms: [workbuddy, claude-code, cursor]

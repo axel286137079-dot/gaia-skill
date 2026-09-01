@@ -5,7 +5,8 @@ displayName: 录制成skill·技能锻造器
 summary: 把「我会做的事」口述/粘贴出来，自动生成标准、跨平台、description 优化的 SKILL.md，让普通用户也能零门槛造技能。
 license: MIT
 description: 录制成 skill（技能锻造器）。把用户「会做但写不出指令」的操作流程，通过问卷引导或 JSON 模板，结构化生成标准 SKILL.md（frontmatter + 触发词 + 工作流 + 输出格式 + 红线）。与 Anthropic Record-a-Skill 的差异：免录屏、免付费、跨平台（不锁单一 agent，生成的 SKILL.md 可通用于 WorkBuddy/Claude Code/Codex/Cursor 等 16+ agent）、description 优化（解决 skill 静默不触发的头号痛点）。用于：想把一个重复操作做成 skill、想把自己的经验沉淀成可复用/可上架的技能、想批量生产 SKILL.md。触发词：录制成skill、造 skill、生成 SKILL.md、把操作做成技能、技能锻造、skill 生成器、skill 模板、教我怎么做技能。联系邮箱：43298568@qq.com。
-version: 0.1.0
+version: 0.1.1
+homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/skill-forge
 category: 工具效率
 tags: [skill生成, 技能锻造, 元工具, SKILL.md模板, 知识沉淀]
 platforms: [workbuddy, claude-code, cursor]

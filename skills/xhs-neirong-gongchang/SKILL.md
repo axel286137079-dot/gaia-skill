@@ -5,7 +5,8 @@ displayName: 小红书内容工厂
 summary: 小红书「选题 → 文案 → 封面 → 排版 → 敏感词自查 → 发布」全流程内容生产——内置广告法极限词与平台违禁词自查，防限流封号。
 license: MIT
 description: 小红书内容工厂（全流程自动化）。把「选题 → 文案 → 封面 → 排版 → 敏感词自查 → 发布」串成一条可被 agent 调用的内容生产链路。内置广告法极限词（最/第一/顶级/国家级等）、医疗绝对化、金融诱导、引流导流、教育培训夸大五类违禁词自查（bin/xhs_sensitive_check.py，纯标准库离线可跑），交稿前先过一遍防限流封号；含爆款标题公式、口语化文案改写、封面排版要点、发布编排（委托已有 xiaohongshu skill/connector 执行发布）。用于：写小红书笔记、小红书文案、小红书选题、小红书标题、小红书封面、爆款笔记、小红书排版、敏感词自查、小红书发布、起号。触发词：小红书笔记、小红书文案、小红书选题、小红书标题、小红书封面、小红书排版、小红书发布、小红书敏感词、爆款笔记、起号、种草文案。联系邮箱：43298568@qq.com。
-version: 0.1.0
+version: 0.1.1
+homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/xhs-neirong-gongchang
 category: 内容创作
 tags: [小红书, 内容生产, 敏感词自查, 爆款文案, 种草]
 platforms: [workbuddy, claude-code, cursor]

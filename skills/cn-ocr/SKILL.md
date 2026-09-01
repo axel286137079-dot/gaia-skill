@@ -5,7 +5,8 @@ displayName: 中文OCR
 summary: 图片中文识别 + 结构化输出——提取中文文本、按行/块输出坐标与置信度，支持竖排/繁体/批量，纯本地免 API key。
 license: MIT
 description: 中文 OCR（图片文字识别 + 结构化输出）。把图片里的中文看懂并转成结构化数据：提取文本、按行/词输出坐标与置信度（JSON），支持简体横排/简体竖排(chi_sim_vert)/繁体(chi_tra)，支持批量处理文件夹，内置中文去空格清洗（去 CJK 字符间多余空格、全角归一化）。纯标准库编排 tesseract（可选 PaddleOCR 提升准确率），本地离线免 API key，数据不出本机。用于：图片文字识别、提取图片文字、OCR、扫描件转文字、发票识别、证件识别、截图转文字、竖排文字识别、繁体识别、批量识别。触发词：图片文字识别、提取图片文字、OCR、扫描件转文字、截图转文字、发票识别、证件识别、竖排文字、繁体识别、批量识别、文字识别。联系邮箱：43298568@qq.com。
-version: 0.1.0
+version: 0.1.1
+homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/cn-ocr
 category: 工具效率
 tags: [OCR, 文字识别, 图片转文字, 结构化, 中文识别]
 platforms: [workbuddy, claude-code, cursor]

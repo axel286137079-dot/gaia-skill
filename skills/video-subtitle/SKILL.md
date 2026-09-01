@@ -5,7 +5,8 @@ displayName: 视频字幕配音
 summary: 本地一站式把视频转成带时间轴的中文字幕，并把字幕合成 AI 配音——无需 API key，离线可跑。
 license: MIT
 description: 视频字幕配音（本地一站式流水线）。把视频转成带时间轴的中文字幕（whisper 转写 .srt），并把字幕文本合成 AI 配音（macOS say / edge-tts）。纯标准库编排 ffmpeg + whisper + say，无需任何 API key，离线可跑。用于：给视频加字幕、把视频语音转成文字稿、给视频配 AI 旁白、做视频本地化/翻译字幕、短视频批量上字幕。触发词：视频字幕、加字幕、字幕提取、语音转文字、视频转文字、视频配音、AI 配音、字幕生成、srt、视频转写。联系邮箱：43298568@qq.com。
-version: 0.1.0
+version: 0.1.1
+homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/video-subtitle
 category: 内容创作
 tags: [视频字幕, 语音转文字, 字幕生成, 视频配音, whisper]
 platforms: [workbuddy, claude-code, cursor]

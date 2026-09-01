@@ -5,7 +5,8 @@ displayName: 中文语音合成
 summary: 文本转自然中文语音（TTS）——14 种音色（普通话/粤语/台腔/东北/陕西口音），可调语速/音调/音量，支持批量合成，免 API key。
 license: MIT
 description: 中文语音合成（文本转语音 TTS）。把中文文本转成自然的语音音频，内置 14 种中文音色（普通话晓晓/云希/云健、粤语曉佳/雲龍、台腔曉臻/雲哲、东北晓北、陕西晓妮等），支持 --rate 语速 / --pitch 音调 / --volume 音量调节，支持批量合成（JSON manifest），单条合成走 edge-tts（免费高质量，需联网）或 macOS say（本地离线，Tingting 普通话）双引擎，纯标准库编排无 API key。用于：文字转语音、AI 配音、有声书、课程配音、视频旁白、播客、批量生成语音、语音合成、TTS、朗读。触发词：文字转语音、文本转语音、AI 配音、语音合成、有声书、课程配音、视频旁白、播客、朗读、批量语音、TTS。联系邮箱：43298568@qq.com。
-version: 0.1.0
+version: 0.1.1
+homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/cn-tts
 category: 内容创作
 tags: [语音合成, TTS, AI配音, 中文语音, 有声书]
 platforms: [workbuddy, claude-code, cursor]
