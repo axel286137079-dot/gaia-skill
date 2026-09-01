@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "gold-premarket": {
+      "command": "/绝对路径/gold-premarket-mcp/.venv/bin/python",
+      "args": [
+        "/绝对路径/gold-premarket-mcp/server.py"
+      ]
+    }
+  }
+}

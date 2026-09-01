@@ -36,24 +36,32 @@ skillhub install geo-cn --namespace user_d8f19d50
 
 ---
 
+## MCP 版（黄金盘前分析）
+
+「黄金盘前分析」额外提供标准 **MCP Server** 版（`mcp/gold-premarket-mcp/`），可接入 Claude Desktop / Cursor / WorkBuddy 等任意 MCP 客户端，直接调用实时行情、技术指标、快讯与一键盘前简报（5 个工具：`get_quote` / `get_kline` / `get_indicators` / `get_news` / `generate_report`）。详见 [`mcp/gold-premarket-mcp/README.md`](mcp/gold-premarket-mcp/README.md)。
+
+---
+
 ## 目录结构
 
 ```
 gaia-skill/
 ├── LICENSE                  # MIT
 ├── README.md                # 本文件
-└── skills/
-    ├── geo-cn/              # ① GEO 优化
-    ├── skill-forge/         # ② 录制成 skill
-    ├── video-subtitle/      # ③ 视频字幕配音
-    ├── cn-shendu-research/  # ④ 中文深度研究
-    ├── xhs-neirong-gongchang/  # ⑤ 小红书
-    ├── cn-tts/              # ⑥ 中文 TTS
-    ├── cn-ocr/              # ⑦ 中文 OCR
-    ├── cross-border-listing/ # ⑧ 跨境 Listing
-    ├── contract-review/     # ⑨ 法律合同审查
-    ├── smart-home-mcp/      # ⑩ 智能家居 MCP
-    └── gold-premarket/      # ⑪ 黄金盘前分析
+├── skills/
+│   ├── geo-cn/              # ① GEO 优化
+│   ├── skill-forge/         # ② 录制成 skill
+│   ├── video-subtitle/      # ③ 视频字幕配音
+│   ├── cn-shendu-research/  # ④ 中文深度研究
+│   ├── xhs-neirong-gongchang/  # ⑤ 小红书
+│   ├── cn-tts/              # ⑥ 中文 TTS
+│   ├── cn-ocr/              # ⑦ 中文 OCR
+│   ├── cross-border-listing/ # ⑧ 跨境 Listing
+│   ├── contract-review/     # ⑨ 法律合同审查
+│   ├── smart-home-mcp/      # ⑩ 智能家居 MCP
+│   └── gold-premarket/      # ⑪ 黄金盘前分析
+└── mcp/
+    └── gold-premarket-mcp/  # 黄金盘前分析 MCP Server 版
 ```
 
 每个技能目录自包含：`SKILL.md`（技能定义 + 使用说明）+ `README.md` + `bin/`（纯标准库脚本）+ 可选 `examples/`。

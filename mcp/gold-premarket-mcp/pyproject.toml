@@ -1,0 +1,27 @@
+[project]
+name = "gold-premarket-mcp"
+version = "0.1.0"
+description = "黄金盘前分析 MCP Server：实时行情 + 日K技术指标 + 金十快讯 + 一键盘前简报（配置型，不喊单）"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "苏格" }]
+keywords = ["mcp", "gold", "xauusd", "黄金", "盘前分析", "行情", "量化"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Office/Business :: Financial :: Investment",
+]
+dependencies = [
+    "mcp>=1.12.0",
+]
+
+[project.scripts]
+gold-premarket-mcp = "server:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["server", "gold_premarket"]
