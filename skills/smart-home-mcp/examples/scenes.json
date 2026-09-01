@@ -1,0 +1,30 @@
+{
+  "回家": {
+    "actions": [
+      {"domain": "light", "service": "turn_on", "entity": "light.living_room"},
+      {"domain": "climate", "service": "set_temperature", "entity": "climate.living_room", "data": {"temperature": 26}},
+      {"domain": "cover", "service": "open_cover", "entity": "cover.living_room"}
+    ]
+  },
+  "离家": {
+    "actions": [
+      {"domain": "light", "service": "turn_off", "entity": "all"},
+      {"domain": "climate", "service": "turn_off", "entity": "climate.living_room"},
+      {"domain": "cover", "service": "close_cover", "entity": "cover.living_room"}
+    ]
+  },
+  "晚安": {
+    "actions": [
+      {"domain": "light", "service": "turn_on", "entity": "light.bedroom_night"},
+      {"domain": "media_player", "service": "turn_off", "entity": "media_player.tv"},
+      {"domain": "lock", "service": "lock", "entity": "lock.front_door"}
+    ]
+  },
+  "早安": {
+    "actions": [
+      {"domain": "light", "service": "turn_on", "entity": "light.bedroom"},
+      {"domain": "cover", "service": "open_cover", "entity": "cover.bedroom"},
+      {"domain": "water_heater", "service": "turn_on", "entity": "water_heater.bathroom"}
+    ]
+  }
+}
