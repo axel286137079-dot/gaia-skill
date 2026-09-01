@@ -69,7 +69,7 @@ gaia-skill/
 
 ## 关于作者
 
-苏格（刘强）—— 独立开发者，专注「国产场景 AI 技能」孵化。另有技能匹配器 [skill-matcher](https://github.com/axel286137079-dot/skill-matcher) 与心态成长专家 [psych-mentor](https://github.com/axel286137079-dot/skill-matcher)。
+苏格 —— 独立开发者，专注「国产场景 AI 技能」孵化。另有技能匹配器 [skill-matcher](https://github.com/axel286137079-dot/skill-matcher) 与心态成长专家 [psych-mentor](https://github.com/axel286137079-dot/skill-matcher)。
 
 联系邮箱：43298568@qq.com
 
