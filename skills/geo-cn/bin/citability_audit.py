@@ -146,7 +146,7 @@ def score_authoritative(text: str) -> tuple:
     score = min(6, hits * 2)
     if score >= 4:
         return score, None
-    return score, "把「可能/大概/也许」改成肯定式结论，用「数据显示/研究证实」开头"
+    return score, "对有证据的结论标注「数据显示/研究表明」及来源；不确定内容保留限定语"
 
 
 def score_terms(text: str) -> tuple:
@@ -165,6 +165,18 @@ def score_simplify(text: str) -> tuple:
     if score >= 2:
         return score, None
     return score, "给 1-2 处难点加类比（「说白了，X 就像 Y」），兼顾小白读者"
+
+
+def score_unique_words(text: str) -> tuple:
+    """⑧ 词汇多样性。这是内容启发式分数，不是引用概率。"""
+    tokens = re.findall(r'[A-Za-z][A-Za-z0-9_-]*|[\u4e00-\u9fa5]{2,4}', text.lower())
+    if len(tokens) < 12:
+        return 3, "内容较短，词汇多样性分仅供参考"
+    ratio = len(set(tokens)) / len(tokens)
+    score = min(13, max(3, round(ratio * 13)))
+    if score >= 8:
+        return score, None
+    return score, "减少机械重复，但不要为追求多样性牺牲准确性"
 
 
 def score_stuffing(text: str) -> tuple:
@@ -194,10 +206,11 @@ def main():
         ("① 专家引言", 20, score_quotation(clean)),
         ("② 数据植入", 20, score_statistics(clean)),
         ("③ 引用来源", 25, score_sources(clean)),
-        ("④ 流畅度", 12, score_fluency(clean)),
-        ("⑤ 权威语气", 10, score_authoritative(clean)),
-        ("⑥ 专业术语", 8, score_terms(clean)),
-        ("⑦ 通俗简化", 5, score_simplify(clean)),
+        ("④ 流畅度", 6, score_fluency(clean)),
+        ("⑤ 证据式表达", 6, score_authoritative(clean)),
+        ("⑥ 专业术语", 6, score_terms(clean)),
+        ("⑦ 通俗简化", 4, score_simplify(clean)),
+        ("⑧ 词汇多样性", 13, score_unique_words(clean)),
     ]
 
     total = 0
@@ -230,7 +243,7 @@ def main():
     print("\n" + "=" * 56)
     print(f"总分：{total} / 100   等级：{grade}")
     print("=" * 56)
-    print("提示：可验证性 > 风格；引用 + 数据 + 来源 三者叠加效果最佳。")
+    print("提示：这是内容启发式评分，不是实际被 AI 引用的概率。")
     print("下一步：运行 multi_engine_rewrite.py 按目标引擎做分诊式改写。")
 
 

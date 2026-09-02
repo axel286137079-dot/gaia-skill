@@ -1,0 +1,4 @@
+interface:
+  display_name: "中文深度研究"
+  short_description: "多源检索、交叉验证和引用审计，产出可溯源的中文深度研究报告。"
+  default_prompt: "使用 $cn-shendu-research 按技能说明完成任务；先确认必要输入，并在任何外部写操作前取得明确授权。"

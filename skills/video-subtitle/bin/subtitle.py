@@ -75,7 +75,7 @@ def extract_audio(video, out_wav):
     subprocess.run(cmd, check=True, capture_output=True)
 
 
-def transcribe(audio, output_dir, model, language):
+def transcribe(audio, output_dir, model, language, output_stem=None):
     """whisper 转写为 srt 字幕"""
     whisper = require_tool("whisper")
     os.makedirs(output_dir, exist_ok=True)
@@ -91,7 +91,17 @@ def transcribe(audio, output_dir, model, language):
         print("     PYTHONHTTPSVERIFY=0 whisper 音频.wav --model small --language zh --output_format srt", file=sys.stderr)
         print("     或 export SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem", file=sys.stderr)
         print("  2) 视频可能无声/音频过短，导致转写无内容。", file=sys.stderr)
-        sys.exit(1)
+        return None
+    generated = os.path.join(output_dir, os.path.splitext(os.path.basename(audio))[0] + ".srt")
+    if not os.path.exists(generated):
+        print(f"✗ whisper 未生成预期字幕：{generated}", file=sys.stderr)
+        return None
+    if output_stem:
+        wanted = os.path.join(output_dir, output_stem + ".srt")
+        if os.path.abspath(generated) != os.path.abspath(wanted):
+            os.replace(generated, wanted)
+        generated = wanted
+    return generated
 
 
 def parse_srt_text(srt_path):
@@ -128,49 +138,51 @@ def srt_to_voice(srt_path, out_audio, voice, tts):
             import edge_tts
         except ImportError:
             print("✗ 未安装 edge-tts：pip install edge-tts", file=sys.stderr)
-            return False
+            return None
         import asyncio
         async def _run():
-            communicate = edge_tts.Communicate(text, "zh-CN-XiaoxiaoNeural")
+            communicate = edge_tts.Communicate(text, voice)
             await communicate.save(out_audio)
         print(f"  [3/3] edge-tts 配音 → {out_audio}")
         asyncio.run(_run())
-    return True
+    return out_audio
 
 
 # ---------------- 子命令 ----------------
 def cmd_transcribe(args):
-    ffmpeg = require_tool("ffmpeg")
+    base = os.path.splitext(os.path.basename(args.video))[0]
     with tempfile.TemporaryDirectory() as tmp:
         wav = os.path.join(tmp, "audio.wav")
         extract_audio(args.video, wav)
-        transcribe(wav, args.out, args.model, args.language)
-    base = os.path.splitext(os.path.basename(args.video))[0]
-    srt = os.path.join(args.out, base + ".srt")
+        srt = transcribe(wav, args.out, args.model, args.language, base)
+        if not srt:
+            sys.exit(1)
     print(f"\n✓ 字幕已生成：{srt}")
 
 
 def cmd_voice(args):
-    out_audio = args.out or os.path.splitext(args.srt)[0] + ".aiff"
-    ok = srt_to_voice(args.srt, out_audio, args.voice, args.tts)
-    if ok:
-        print(f"\n✓ 配音已生成：{out_audio}")
+    default_ext = ".aiff" if args.tts == "say" else ".mp3"
+    out_audio = args.out or os.path.splitext(args.srt)[0] + default_ext
+    generated = srt_to_voice(args.srt, out_audio, args.voice, args.tts)
+    if generated:
+        print(f"\n✓ 配音已生成：{generated}")
 
 
 def cmd_all(args):
     """一键：视频 → 字幕 + 配音"""
-    ffmpeg = require_tool("ffmpeg")
     os.makedirs(args.out, exist_ok=True)
     base = os.path.splitext(os.path.basename(args.video))[0]
     with tempfile.TemporaryDirectory() as tmp:
         wav = os.path.join(tmp, "audio.wav")
         extract_audio(args.video, wav)
-        transcribe(wav, args.out, args.model, args.language)
-    srt = os.path.join(args.out, base + ".srt")
+        srt = transcribe(wav, args.out, args.model, args.language, base)
+        if not srt:
+            sys.exit(1)
     if args.voice:
-        out_audio = os.path.join(args.out, base + ".aiff")
-        ok = srt_to_voice(srt, out_audio, args.voice, args.tts)
-        if ok:
+        ext = ".aiff" if args.tts == "say" else ".mp3"
+        out_audio = os.path.join(args.out, base + ext)
+        generated = srt_to_voice(srt, out_audio, args.voice, args.tts)
+        if generated:
             print(f"\n✓ 字幕：{srt}")
             print(f"✓ 配音：{out_audio}")
     else:
@@ -186,7 +198,7 @@ def main():
     p_all.add_argument("--out", default="subtitle_out", help="输出目录")
     p_all.add_argument("--model", default="small", help="whisper 模型（tiny/base/small/medium/large）")
     p_all.add_argument("--language", default="zh", help="语言（zh/en…）")
-    p_all.add_argument("--voice", default="Tingting", help="say 语音（Tingting=普通话）")
+    p_all.add_argument("--voice", default=None, help="say 音色或 edge-tts 完整音色名")
     p_all.add_argument("--tts", default="say", choices=["say", "edge-tts"], help="TTS 引擎")
     p_all.set_defaults(func=cmd_all)
 
@@ -200,7 +212,7 @@ def main():
     p_vo = sub.add_parser("voice", help="只做配音（从 srt）")
     p_vo.add_argument("srt", help="字幕文件(.srt)")
     p_vo.add_argument("--out", default=None, help="输出音频路径")
-    p_vo.add_argument("--voice", default="Tingting")
+    p_vo.add_argument("--voice", default=None)
     p_vo.add_argument("--tts", default="say", choices=["say", "edge-tts"])
     p_vo.set_defaults(func=cmd_voice)
 
@@ -208,6 +220,8 @@ def main():
     if not getattr(args, "cmd", None):
         ap.print_help()
         sys.exit(1)
+    if hasattr(args, "tts") and not args.voice:
+        args.voice = "Tingting" if args.tts == "say" else "zh-CN-XiaoxiaoNeural"
     args.func(args)
 
 

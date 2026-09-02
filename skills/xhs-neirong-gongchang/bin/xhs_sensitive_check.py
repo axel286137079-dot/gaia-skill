@@ -80,22 +80,33 @@ def check(text):
     hits = []
     lines = text.splitlines()
     for lineno, line in enumerate(lines, 1):
+        line_hits = []
         # 1) 词库精确命中
         for cat, words in RULES.items():
             for word, suggest in words:
-                if word in line:
-                    col = line.index(word) + 1
-                    hits.append({
+                for match in re.finditer(re.escape(word), line):
+                    line_hits.append({
                         "word": word, "category": cat, "suggest": suggest,
-                        "line": lineno, "col": col,
+                        "line": lineno, "col": match.start() + 1,
+                        "_start": match.start(), "_end": match.end(),
                     })
         # 2) 「最 + 形容词」前缀
         for m in SUPERLATIVE_PREFIX.finditer(line):
-            hits.append({
+            line_hits.append({
                 "word": m.group(0), "category": "广告法极限词",
                 "suggest": "→ 若表绝对化，改为「较/更」；若为日常口语（如「最近」）可忽略",
                 "line": lineno, "col": m.start() + 1,
+                "_start": m.start(), "_end": m.end(),
             })
+        kept = []
+        for candidate in sorted(line_hits, key=lambda h: (h["_start"], -(h["_end"] - h["_start"]))):
+            if any(candidate["_start"] < h["_end"] and candidate["_end"] > h["_start"] for h in kept):
+                continue
+            kept.append(candidate)
+        for item in kept:
+            item.pop("_start", None)
+            item.pop("_end", None)
+            hits.append(item)
     # 去重（同词同行只报一次）
     seen = set()
     uniq = []

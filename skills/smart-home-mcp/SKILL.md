@@ -2,10 +2,10 @@
 name: smart-home-mcp
 slug: smart-home-mcp
 displayName: 智能家居控制
-summary: 让 agent 通过 Home Assistant 本地网关控制家电——列出/查询实体、开关灯、激活场景，内置中文场景模板（回家/离家/晚安），支持 MCP 化接入。
+summary: 通过 Home Assistant REST API 查询实体并预演或执行服务调用；写操作默认 dry-run，高风险域需二次确认。
 license: MIT
-description: 智能家居控制（Home Assistant 本地网关）。让 agent 通过 Home Assistant 的 REST API 控制家电：列出/查询实体状态、开关灯、调亮度、激活场景、触发自动化（bin/ha_cli.py 纯标准库封装，凭据走环境变量 HA_URL/HA_TOKEN，零密钥落盘）。内置中文场景模板（回家/离家/晚安/早安，examples/scenes.json），支持把 HA 接成 MCP server 供任意 agent 调用。用于：控制智能家居、开灯关灯、智能家居自动化、Home Assistant、HA 控制、场景模式、语音控制家电、家居设备查询。触发词：智能家居、开灯、关灯、Home Assistant、控制家电、家居自动化、场景模式、语音控制家电、家居设备、调节灯光。联系邮箱：43298568@qq.com。
-version: 0.1.1
+description: Home Assistant REST CLI，用于列出或查询实体、调用服务和执行本地场景模板。凭据只从 HA_URL/HA_TOKEN 读取；控制命令默认仅打印计划，必须显式传入 --execute，高风险门锁、安防及自动化域还需 --confirm-dangerous。它不是 MCP server，但可作为受控后端封装。
+version: 0.1.2
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/smart-home-mcp
 category: 智能家居
 tags: [智能家居, HomeAssistant, MCP, 自动化]
@@ -14,7 +14,7 @@ platforms: [workbuddy, claude-code, cursor]
 
 # 智能家居控制
 
-让 agent 通过 **Home Assistant 本地网关**控制家电——列出/查询实体、开关灯、激活场景、触发自动化，支持 MCP 化接入。
+让 agent 通过 **Home Assistant 本地网关**查询设备，并在明确授权后执行控制。
 
 ## 何时使用
 
@@ -45,15 +45,15 @@ python3 bin/ha_cli.py get light.living_room  # 单设备状态
 
 ### 2. 控制设备（自然语言 → 服务调用）
 ```bash
-python3 bin/ha_cli.py call light turn_on --entity light.living_room
-python3 bin/ha_cli.py call light turn_on --entity light.living_room --data '{"brightness": 180}'
-python3 bin/ha_cli.py call scene turn_on --entity scene.movie
-python3 bin/ha_cli.py call automation trigger --entity automation.wakeup
+python3 bin/ha_cli.py call light turn_on --entity light.living_room             # 仅预演
+python3 bin/ha_cli.py call light turn_on --entity light.living_room --execute   # 实际执行
+python3 bin/ha_cli.py call automation trigger --entity automation.wakeup --execute --confirm-dangerous
 ```
 
 ### 3. 激活场景
 ```bash
-python3 bin/ha_cli.py scene 回家   # 用 examples/scenes.json 里的场景别名
+python3 bin/ha_cli.py scene 回家             # 仅预演
+python3 bin/ha_cli.py scene 回家 --execute   # 实际执行；含高风险域时还需 --confirm-dangerous
 ```
 
 ## 中文场景模板（examples/scenes.json）
@@ -69,7 +69,7 @@ python3 bin/ha_cli.py scene 回家   # 用 examples/scenes.json 里的场景别�
 
 ## MCP 化接入（可选）
 
-想把它接成标准 MCP server 供任意 agent 调用，可用 Home Assistant 官方 MCP 集成，或用本脚本的 `call/states/get` 命令封装成 MCP 工具。核心是：`call <domain> <service> --entity <id>` 已覆盖 90% 的设备控制需求。
+本目录没有实现 MCP server。需要 MCP 时，可使用 Home Assistant 官方支持的集成，或另行把 `call/states/get` 封装成工具，并保留本脚本的 dry-run 与确认策略。
 
 ## 边界与红线
 

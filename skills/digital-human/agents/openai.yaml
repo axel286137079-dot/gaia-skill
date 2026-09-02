@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI 数字人口播"
+  short_description: "数字人口播方案向导：检查本机环境、比较候选工具、生成 TTS 音频并给出后续驱动与部署提示。"
+  default_prompt: "使用 $digital-human 按技能说明完成任务；先确认必要输入，并在任何外部写操作前取得明确授权。"

@@ -1,0 +1,4 @@
+interface:
+  display_name: "黄金盘前分析"
+  short_description: "抓取黄金相关公开行情与快讯，计算常见技术指标并生成研究简报骨架；数据可能失效或延迟，不构成投资建议。"
+  default_prompt: "使用 $gold-premarket 按技能说明完成任务；先确认必要输入，并在任何外部写操作前取得明确授权。"

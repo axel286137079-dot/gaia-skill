@@ -49,7 +49,7 @@ FORBIDDEN_SYMBOLS = ["!", "?", "$", "&", "~", "*", "<", ">", "|", "{", "}",
                      "[", "]", "#", "@", "^", "%", "=", "+"]
 
 
-def check(text):
+def check(text, title_max=TITLE_MAX_LEN, bullet_max=BULLET_MAX_LEN):
     """扫描文本，返回问题列表。"""
     issues = []
     # 1) 违禁词（大小写不敏感，整词匹配）
@@ -79,10 +79,10 @@ def check(text):
                 break
 
     if title_line:
-        if len(title_line) > TITLE_MAX_LEN:
+        if len(title_line) > title_max:
             issues.append({"type": "标题", "word": f"长度 {len(title_line)} 字符",
                            "category": "标题规范",
-                           "suggest": f"→ 超过 {TITLE_MAX_LEN} 字符，需精简"})
+                           "suggest": f"→ 超过 {title_max} 字符，需精简"})
         for sym in FORBIDDEN_SYMBOLS:
             if sym in title_line:
                 issues.append({"type": "标题", "word": f"符号「{sym}」",
@@ -99,6 +99,15 @@ def check(text):
                        "category": "标题规范",
                        "suggest": "→ 请用「Title: xxx」或首行写标题以便检查"})
 
+    for lineno, line in enumerate(text.splitlines(), 1):
+        match = re.match(r'^\s*(?:[-*]\s+|(?:bullet\s*)?\d+[.)：:]\s*)(.+)$', line, re.I)
+        if not match:
+            continue
+        bullet = match.group(1).strip()
+        if len(bullet) > bullet_max:
+            issues.append({"type": "五点", "word": f"第 {lineno} 行长度 {len(bullet)}",
+                           "category": "长度启发式规则",
+                           "suggest": f"→ 超过当前设定 {bullet_max} 字符"})
     return issues
 
 
@@ -106,6 +115,10 @@ def main():
     ap = argparse.ArgumentParser(description="跨境 Listing（亚马逊）合规自查")
     ap.add_argument("file", help="Listing 文件路径（.md/.txt）")
     ap.add_argument("--json", action="store_true", help="JSON 输出")
+    ap.add_argument("--title-max", type=int, default=TITLE_MAX_LEN,
+                    help="标题长度阈值（默认 200，请按站点/类目调整）")
+    ap.add_argument("--bullet-max", type=int, default=BULLET_MAX_LEN,
+                    help="单条五点长度阈值（默认 500）")
     args = ap.parse_args()
 
     try:
@@ -115,7 +128,7 @@ def main():
         print(f"✗ 找不到文件：{args.file}", file=sys.stderr)
         sys.exit(1)
 
-    issues = check(text)
+    issues = check(text, args.title_max, args.bullet_max)
 
     if args.json:
         print(json.dumps({"file": args.file, "issues": issues,

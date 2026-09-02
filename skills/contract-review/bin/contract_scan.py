@@ -95,8 +95,12 @@ def scan(text, context=24):
     hits = []
     for level, groups in (("高", HIGH_RISK), ("中", MID_RISK), ("低", LOW_RISK)):
         for cat, words in groups:
-            for kw, advise in words:
+            occupied = []
+            for kw, advise in sorted(words, key=lambda item: len(item[0]), reverse=True):
                 for m in re.finditer(re.escape(kw), text):
+                    if any(m.start() < end and m.end() > start for start, end in occupied):
+                        continue
+                    occupied.append((m.start(), m.end()))
                     start = max(0, m.start() - context)
                     end = min(len(text), m.end() + context)
                     ctx = text[start:end].replace("\n", " ").strip()
@@ -105,6 +109,18 @@ def scan(text, context=24):
                         "advice": advise, "pos": m.start(),
                         "context": ctx,
                     })
+    penalty_pattern = re.compile(r'违约金[^%。；\n]{0,30}?(\d+(?:\.\d+)?)\s*%')
+    for match in penalty_pattern.finditer(text):
+        ratio = float(match.group(1))
+        if ratio <= 30:
+            continue
+        start = max(0, match.start() - context)
+        end = min(len(text), match.end() + context)
+        hits.append({
+            "level": "高", "category": "违约金过高", "keyword": f"违约金 {ratio:g}%",
+            "advice": "比例偏高，需结合实际损失、合同类型和当地法律由专业人士复核",
+            "pos": match.start(), "context": text[start:end].replace("\n", " ").strip(),
+        })
     return hits
 
 

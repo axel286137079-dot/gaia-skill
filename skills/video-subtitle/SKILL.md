@@ -2,10 +2,10 @@
 name: video-subtitle
 slug: video-subtitle
 displayName: 视频字幕配音
-summary: 本地一站式把视频转成带时间轴的中文字幕，并把字幕合成 AI 配音——无需 API key，离线可跑。
+summary: 本地将视频转写为 SRT 字幕，并可从字幕文本生成独立 AI 配音音频。
 license: MIT
-description: 视频字幕配音（本地一站式流水线）。把视频转成带时间轴的中文字幕（whisper 转写 .srt），并把字幕文本合成 AI 配音（macOS say / edge-tts）。纯标准库编排 ffmpeg + whisper + say，无需任何 API key，离线可跑。用于：给视频加字幕、把视频语音转成文字稿、给视频配 AI 旁白、做视频本地化/翻译字幕、短视频批量上字幕。触发词：视频字幕、加字幕、字幕提取、语音转文字、视频转文字、视频配音、AI 配音、字幕生成、srt、视频转写。联系邮箱：43298568@qq.com。
-version: 0.1.1
+description: 视频转写和字幕配音。用 ffmpeg 提取音频、用本地 Whisper 生成 SRT，并可用 macOS say 或需联网的 edge-tts 将字幕文本生成独立配音文件。用于视频转文字、SRT 生成、字幕提取和 AI 旁白音频制作；不负责翻译、烧录字幕或合成最终视频。
+version: 0.1.2
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/video-subtitle
 category: 内容创作
 tags: [视频字幕, 语音转文字, 字幕生成, 视频配音, whisper]
@@ -21,7 +21,6 @@ platforms: [workbuddy, claude-code, cursor]
 - 用户要给视频加字幕 / 提取字幕
 - 用户要把视频里的语音转成文字稿
 - 用户要给视频配 AI 旁白/配音
-- 用户要做视频翻译、本地化（先转字幕再翻译）
 
 ## 依赖（自动探测）
 
@@ -61,7 +60,7 @@ python3 bin/subtitle.py voice 字幕.srt --voice Tingting
 ## 边界与红线
 
 - whisper 转写可能有错别字（尤其口音/术语），生成后建议人工校对一遍再发布。
-- **whisper 中文默认输出繁体字**（如「歡迎」），需简体可后处理转换，或用 `--initial_prompt "以下是简体中文"` 引导。
+- Whisper 转写的字体和准确度受模型、语音和版本影响，需人工校对；如需简繁转换，使用独立后处理工具。
 - 首次运行会下载模型（tiny≈72MB / small≈460MB / medium≈1.5GB / large≈2.9GB）；若报 SSL 证书错误，是代理环境证书问题，先手动 `PYTHONHTTPSVERIFY=0 whisper …` 下载一次。
 - say 配音是 TTS 合成音，非真人音色，涉及商用/版权场景需自行确认合规。
 - 处理大视频时 whisper 会占较多内存/CPU，建议先用 `--model base` 快速预览，再用 `small/medium` 出精稿。

@@ -1,0 +1,4 @@
+interface:
+  display_name: "视频字幕配音"
+  short_description: "本地将视频转写为 SRT 字幕，并可从字幕文本生成独立 AI 配音音频。"
+  default_prompt: "使用 $video-subtitle 按技能说明完成任务；先确认必要输入，并在任何外部写操作前取得明确授权。"

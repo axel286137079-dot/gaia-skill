@@ -1,0 +1,4 @@
+interface:
+  display_name: "录制成skill·技能锻造器"
+  short_description: "把口述或 JSON 流程整理为可验证的 SKILL.md，支持 SkillHub 扩展字段与 Codex 严格 fro…"
+  default_prompt: "使用 $skill-forge 按技能说明完成任务；先确认必要输入，并在任何外部写操作前取得明确授权。"

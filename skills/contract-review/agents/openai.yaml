@@ -1,0 +1,4 @@
+interface:
+  display_name: "合同审查助手"
+  short_description: "对中文合同文本做启发式风险扫描，标出高频风险措辞并给出复核清单；结果仅供初筛，不构成法律意见。"
+  default_prompt: "使用 $contract-review 按技能说明完成任务；先确认必要输入，并在任何外部写操作前取得明确授权。"

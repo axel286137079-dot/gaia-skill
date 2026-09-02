@@ -20,6 +20,7 @@ ha_cli.py — Home Assistant 本地网关控制（REST API 封装）
 import argparse
 import json
 import os
+import re
 import sys
 import urllib.error
 import urllib.parse
@@ -27,6 +28,9 @@ import urllib.request
 
 DEFAULT_SCENES = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               "..", "examples", "scenes.json")
+DANGEROUS_DOMAINS = {"alarm_control_panel", "button", "cover", "lock", "siren", "valve"}
+IDENTIFIER_RE = re.compile(r"^[a-z0-9_]+$")
+ENTITY_RE = re.compile(r"^[a-z0-9_]+\.[a-z0-9_]+$")
 
 
 def _cfg():
@@ -36,6 +40,10 @@ def _cfg():
         print("✗ 未配置 HA_URL / HA_TOKEN。", file=sys.stderr)
         print("  export HA_URL=\"http://homeassistant.local:8123\"", file=sys.stderr)
         print("  export HA_TOKEN=\"你的长期访问令牌\"", file=sys.stderr)
+        sys.exit(1)
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme not in {"http", "https"} or not parsed.hostname or parsed.username or parsed.password:
+        print("✗ HA_URL 必须是无内嵌凭据的 http(s) 地址。", file=sys.stderr)
         sys.exit(1)
     return url.rstrip("/"), token
 
@@ -83,13 +91,21 @@ def cmd_states(args):
 
 
 def cmd_get(args):
+    if not ENTITY_RE.fullmatch(args.entity):
+        print("✗ entity_id 格式不合法。", file=sys.stderr)
+        sys.exit(2)
     _, token = _cfg()
     data = _request("GET", "/api/states/" + args.entity, token)
     print(json.dumps(data, ensure_ascii=False, indent=2))
 
 
 def cmd_call(args):
-    _, token = _cfg()
+    if not IDENTIFIER_RE.fullmatch(args.domain) or not IDENTIFIER_RE.fullmatch(args.service):
+        print("✗ domain/service 只能包含小写字母、数字和下划线。", file=sys.stderr)
+        sys.exit(2)
+    if args.entity and not ENTITY_RE.fullmatch(args.entity):
+        print("✗ entity_id 格式不合法。", file=sys.stderr)
+        sys.exit(2)
     body = {"entity_id": args.entity} if args.entity else {}
     if args.data:
         try:
@@ -97,7 +113,20 @@ def cmd_call(args):
         except json.JSONDecodeError:
             print("✗ --data 不是合法 JSON", file=sys.stderr)
             sys.exit(1)
+        if not isinstance(extra, dict):
+            print("✗ --data 必须是 JSON 对象", file=sys.stderr)
+            sys.exit(1)
         body.update(extra)
+    action = {"domain": args.domain, "service": args.service, "data": body}
+    if not args.execute:
+        print("试运行（未执行）：")
+        print(json.dumps(action, ensure_ascii=False, indent=2))
+        print("确认后加 --execute 才会调用 Home Assistant。")
+        return
+    if args.domain in DANGEROUS_DOMAINS and not args.confirm_dangerous:
+        print(f"✗ {args.domain} 属于高风险设备，还需 --confirm-dangerous。", file=sys.stderr)
+        sys.exit(2)
+    _, token = _cfg()
     path = f"/api/services/{args.domain}/{args.service}"
     _request("POST", path, token, body=body)
     print(f"✓ 已调用 {args.domain}.{args.service}"
@@ -116,6 +145,19 @@ def cmd_scene(args):
         print(f"✗ 场景「{args.name}」不存在。可用：{', '.join(scenes.keys())}", file=sys.stderr)
         sys.exit(1)
     scene = scenes[args.name]
+    actions = ([{"domain": "scene", "service": "turn_on", "entity": scene["scene"]}]
+               if "scene" in scene else scene.get("actions", []))
+    if not args.execute:
+        print(f"试运行场景「{args.name}」（未执行）：")
+        print(json.dumps(actions, ensure_ascii=False, indent=2))
+        print("确认后加 --execute 才会调用 Home Assistant。")
+        return
+    dangerous = sorted({step.get("domain") for step in actions
+                        if step.get("domain") in DANGEROUS_DOMAINS})
+    if dangerous and not args.confirm_dangerous:
+        print(f"✗ 场景包含高风险设备：{', '.join(dangerous)}；还需 --confirm-dangerous。",
+              file=sys.stderr)
+        sys.exit(2)
     _, token = _cfg()
     # 场景 = 一个 scene entity，或多个服务调用序列
     if "scene" in scene:
@@ -154,11 +196,17 @@ def main():
     p_call.add_argument("service", help="如 turn_on / turn_off")
     p_call.add_argument("--entity", help="entity_id")
     p_call.add_argument("--data", help="JSON 附加参数")
+    p_call.add_argument("--execute", action="store_true", help="实际执行；缺省仅试运行")
+    p_call.add_argument("--confirm-dangerous", action="store_true",
+                        help="确认门锁/安防/阀门等高风险设备")
     p_call.set_defaults(func=cmd_call)
 
     p_scene = sub.add_parser("scene", help="激活场景（用中文别名）")
     p_scene.add_argument("name", help="场景名（回家/离家/晚安/早安）")
     p_scene.add_argument("--scenes", help="场景模板 JSON 路径")
+    p_scene.add_argument("--execute", action="store_true", help="实际执行；缺省仅试运行")
+    p_scene.add_argument("--confirm-dangerous", action="store_true",
+                         help="确认场景中的高风险设备")
     p_scene.set_defaults(func=cmd_scene)
 
     args = ap.parse_args()

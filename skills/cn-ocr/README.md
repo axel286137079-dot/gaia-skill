@@ -43,13 +43,12 @@ cn-ocr/
 | 工具 | 用途 | 缺失时 |
 |---|---|---|
 | tesseract + tesseract-lang | 中文 OCR 引擎 | `brew install tesseract tesseract-lang` |
-| PaddleOCR（可选） | 准确率更高 | `pip install paddlepaddle paddleocr` |
 
 ## 边界与红线
 
 - tesseract 对手写/低清/印章/复杂表格识别率有限，关键场景需人工复核。
 - 敏感证件结果注意保管，勿外泄。
-- 高准确率场景建议 PaddleOCR。
+- 本 skill 未封装其他 OCR 引擎；若改用第三方工具，请单独评估依赖、许可与数据处理方式。
 
 ## License
 

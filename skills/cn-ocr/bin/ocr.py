@@ -25,6 +25,7 @@ import os
 import shutil
 import subprocess
 import sys
+import unicodedata
 
 DEFAULT_PATHS = {
     "tesseract": ["/opt/homebrew/bin/tesseract", "/usr/local/bin/tesseract", "/usr/bin/tesseract"],
@@ -63,6 +64,7 @@ def require_tool(name):
 
 def clean_cjk(text):
     """清洗中文 OCR 常见噪声：去掉 CJK 字符之间的多余空格、归一化全角。"""
+    text = unicodedata.normalize("NFKC", text)
     out = []
     for i, ch in enumerate(text):
         # 去掉「汉字之间」的空格（但保留中英文之间的空格）
@@ -85,6 +87,8 @@ def ocr_text(tesseract, image, lang):
     """提取纯文本"""
     cmd = [tesseract, image, "stdout", "-l", lang]
     r = subprocess.run(cmd, capture_output=True)
+    if r.returncode != 0:
+        raise RuntimeError(r.stderr.decode("utf-8", errors="replace").strip() or "tesseract 失败")
     return r.stdout.decode("utf-8", errors="replace")
 
 
@@ -92,6 +96,8 @@ def ocr_json(tesseract, image, lang):
     """提取结构化结果（按行：文本 + 坐标 + 置信度）"""
     cmd = [tesseract, image, "stdout", "-l", lang, "tsv"]
     r = subprocess.run(cmd, capture_output=True)
+    if r.returncode != 0:
+        raise RuntimeError(r.stderr.decode("utf-8", errors="replace").strip() or "tesseract 失败")
     tsv = r.stdout.decode("utf-8", errors="replace")
     rows = []
     reader = csv.DictReader(io.StringIO(tsv), delimiter="\t")
@@ -121,7 +127,7 @@ def cmd_ocr(args):
             for r in rows:
                 r["text"] = clean_cjk(r["text"])
         print(json.dumps({"file": args.image, "lang": args.lang,
-                          "lines": rows, "count": len(rows)},
+                          "words": rows, "count": len(rows)},
                          ensure_ascii=False, indent=2))
     else:
         text = ocr_text(tesseract, args.image, args.lang)
@@ -132,6 +138,9 @@ def cmd_ocr(args):
 
 def cmd_batch(args):
     tesseract = require_tool("tesseract")
+    if not os.path.isdir(args.dir):
+        print(f"✗ 找不到目录：{args.dir}", file=sys.stderr)
+        sys.exit(1)
     imgs = [f for f in os.listdir(args.dir)
             if os.path.splitext(f)[1].lower() in IMG_EXTS]
     imgs.sort()
@@ -142,7 +151,12 @@ def cmd_batch(args):
     results = []
     for i, f in enumerate(imgs, 1):
         path = os.path.join(args.dir, f)
-        text = ocr_text(tesseract, path, args.lang)
+        try:
+            text = ocr_text(tesseract, path, args.lang)
+        except RuntimeError as exc:
+            print(f"  ✗ [{i}/{len(imgs)}] {f}：{exc}", file=sys.stderr)
+            results.append({"file": f, "error": str(exc)})
+            continue
         if args.clean:
             text = clean_cjk(text)
         results.append({"file": f, "text": text.strip()})

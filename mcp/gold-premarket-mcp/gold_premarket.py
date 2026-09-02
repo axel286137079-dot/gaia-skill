@@ -25,6 +25,7 @@ import math
 import re
 import datetime
 import urllib.request
+from zoneinfo import ZoneInfo
 
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
 REFERER = "https://finance.sina.com.cn"
@@ -298,7 +299,7 @@ def session_hint(hour_utc8):
 # 6. 简报生成
 # --------------------------------------------------------------------------- #
 def build_report():
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(ZoneInfo("Asia/Shanghai"))
     quote = fetch_quote()
     kline = fetch_kline()
     ind = calc_indicators(kline)
@@ -424,7 +425,7 @@ def main(argv):
         except Exception as e:
             print("kline FAIL:", e)
         try:
-            tests["news"] = len(fetch_news(limit=3)) >= 0
+            tests["news"] = len(fetch_news(limit=3)) > 0
         except Exception as e:
             print("news FAIL:", e)
         _print_json(tests)

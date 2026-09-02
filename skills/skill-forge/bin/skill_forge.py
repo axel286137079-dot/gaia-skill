@@ -20,6 +20,7 @@ import json
 import os
 import re
 import sys
+from pathlib import Path
 
 DEFAULT_PLATFORMS = ["workbuddy", "claude-code", "cursor"]
 DEFAULT_LICENSE = "MIT"
@@ -77,36 +78,61 @@ def build_description(meta):
     # 触发词
     if meta.get("trigger"):
         parts.append("触发词：" + "、".join(meta["trigger"]) + "。")
-    # 邮箱
-    if meta.get("email"):
-        parts.append("联系邮箱：" + meta["email"] + "。")
     return "".join(parts).strip()
 
 
-def render_frontmatter(meta):
+def yaml_string(value):
+    """JSON strings are valid quoted YAML scalars and avoid YAML injection."""
+    return json.dumps(str(value), ensure_ascii=False)
+
+
+def validate_meta(meta):
+    """Validate interactive and JSON input before using it in paths or YAML."""
+    if not isinstance(meta, dict):
+        raise ValueError("输入必须是 JSON 对象")
+    required = ("name", "displayName", "summary")
+    missing = [key for key in required if not isinstance(meta.get(key), str) or not meta[key].strip()]
+    if missing:
+        raise ValueError("缺少必填文本字段：" + ", ".join(missing))
+    name = meta["name"].strip()
+    if not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?", name) or "--" in name:
+        raise ValueError("name 必须是 1-64 位 kebab-case，不得包含路径字符")
+    for key in ("trigger", "steps", "pitfalls", "tags", "platforms"):
+        if key in meta and (not isinstance(meta[key], list) or not all(isinstance(x, str) for x in meta[key])):
+            raise ValueError(f"{key} 必须是字符串数组")
+    return meta
+
+
+def render_frontmatter(meta, profile="skillhub"):
     """渲染 YAML frontmatter"""
     fm = [
         "---",
-        f"name: {meta['name']}",
-        f"slug: {meta['name']}",
-        f"displayName: {meta['displayName']}",
-        f"summary: {meta['summary']}",
-        f"license: {meta.get('license', DEFAULT_LICENSE)}",
+        f"name: {yaml_string(meta['name'])}",
     ]
+    if profile == "codex":
+        fm.append(f"description: {yaml_string(meta['description'])}")
+        fm.append("---")
+        return "\n".join(fm)
+    fm.extend([
+        f"slug: {yaml_string(meta['name'])}",
+        f"displayName: {yaml_string(meta['displayName'])}",
+        f"summary: {yaml_string(meta['summary'])}",
+        f"license: {yaml_string(meta.get('license', DEFAULT_LICENSE))}",
+    ])
     if meta.get("homepage"):
-        fm.append(f"homepage: {meta['homepage']}")
-    fm.append(f"description: {meta['description']}")
-    fm.append(f"version: {meta.get('version', '0.1.0')}")
-    fm.append(f"category: {meta.get('category', '工具效率')}")
-    fm.append("tags: [" + ", ".join(meta.get('tags', [])) + "]")
-    fm.append("platforms: [" + ", ".join(meta.get('platforms', DEFAULT_PLATFORMS)) + "]")
+        fm.append(f"homepage: {yaml_string(meta['homepage'])}")
+    fm.append(f"description: {yaml_string(meta['description'])}")
+    fm.append(f"version: {yaml_string(meta.get('version', '0.1.0'))}")
+    fm.append(f"category: {yaml_string(meta.get('category', '工具效率'))}")
+    fm.append("tags: [" + ", ".join(yaml_string(x) for x in meta.get('tags', [])) + "]")
+    fm.append("platforms: [" + ", ".join(yaml_string(x) for x in meta.get('platforms', DEFAULT_PLATFORMS)) + "]")
     fm.append("---")
     return "\n".join(fm)
 
 
-def render_skill_md(meta):
+def render_skill_md(meta, profile="skillhub"):
     """渲染完整 SKILL.md"""
-    parts = [render_frontmatter(meta), "", f"# {meta['displayName']}", ""]
+    parts = [render_frontmatter(meta, profile), "", f"# {meta['displayName']}", ""]
     if meta.get("summary"):
         parts += [meta["summary"], ""]
     parts += ["## 何时使用", ""]
@@ -182,7 +208,6 @@ def collect_interactive():
     meta["pitfalls"] = ask_multiline("有哪些坑/红线？（没有可跳过）")
     meta["category"] = ask("分类", "工具效率")
     meta["tags"] = ask_list("标签（逗号分隔）", meta["name"])
-    meta["email"] = ask("留个联系邮箱（可留空）")
     return meta
 
 
@@ -196,7 +221,31 @@ def finalize_meta(meta):
     meta.setdefault("platforms", DEFAULT_PLATFORMS)
     if not meta.get("description"):
         meta["description"] = build_description(meta)
+    validate_meta(meta)
+    if len(meta["description"]) > 1024:
+        raise ValueError("description 不得超过 1024 字符")
     return meta
+
+
+def output_dir(base, name):
+    root = Path(base).resolve()
+    target = (root / name).resolve()
+    if target.parent != root:
+        raise ValueError("输出路径越界")
+    return target
+
+
+def render_openai_yaml(meta):
+    short = meta["summary"].strip()
+    if len(short) > 64:
+        short = short[:63] + "…"
+    return "\n".join([
+        "interface:",
+        f"  display_name: {yaml_string(meta['displayName'])}",
+        f"  short_description: {yaml_string(short)}",
+        f"  default_prompt: {yaml_string('Use $' + meta['name'] + ' to help with this task.')}",
+        "",
+    ])
 
 
 def main():
@@ -208,6 +257,8 @@ def main():
     ap.add_argument("--api-key", default=None, help="OpenAI 兼容 API key")
     ap.add_argument("--base-url", default=None, help="API base url")
     ap.add_argument("--model", default=None, help="模型名")
+    ap.add_argument("--profile", choices=["skillhub", "codex"], default="skillhub",
+                    help="输出平台元数据（默认 skillhub）")
     args = ap.parse_args()
 
     # 收集元数据
@@ -226,19 +277,25 @@ def main():
             meta["description"] = llm_polish_description(meta, api_key,
                                                          args.base_url or os.environ.get("OPENAI_BASE_URL") or "https://api.deepseek.com/v1",
                                                          args.model or "deepseek-v4-flash")
+            if not meta["description"] or len(meta["description"]) > 1024:
+                raise ValueError("LLM 返回的 description 必须为 1..1024 字符")
 
     # 输出目录：以 skill 名为子目录
-    out_dir = os.path.join(args.out, meta["name"])
-    os.makedirs(out_dir, exist_ok=True)
+    out_dir = output_dir(args.out, meta["name"])
+    out_dir.mkdir(parents=True, exist_ok=True)
 
-    skill_md = render_skill_md(meta)
-    with open(os.path.join(out_dir, "SKILL.md"), "w", encoding="utf-8") as f:
+    skill_md = render_skill_md(meta, args.profile)
+    with open(out_dir / "SKILL.md", "w", encoding="utf-8") as f:
         f.write(skill_md)
+    agents_dir = out_dir / "agents"
+    agents_dir.mkdir(exist_ok=True)
+    with open(agents_dir / "openai.yaml", "w", encoding="utf-8") as f:
+        f.write(render_openai_yaml(meta))
 
-    files = ["SKILL.md"]
+    files = ["SKILL.md", "agents/openai.yaml"]
     if args.readme:
         readme = render_readme(meta)
-        with open(os.path.join(out_dir, "README.md"), "w", encoding="utf-8") as f:
+        with open(out_dir / "README.md", "w", encoding="utf-8") as f:
             f.write(readme)
         files.append("README.md")
 
@@ -250,7 +307,10 @@ def main():
     print("下一步：")
     print("  1. 检查 SKILL.md 的 description 是否准确（它决定 skill 能否被触发）")
     print("  2. 如需配套脚本，在目录里补 bin/ 并回填 SKILL.md 的调用说明")
-    print("  3. 上架 SkillHub：skillhub publish <目录>")
+    if args.profile == "skillhub":
+        print("  3. 经人工复核后，可上架 SkillHub：skillhub publish <目录>")
+    else:
+        print("  3. 用目标 Codex 环境的 skill 校验器复核，再安装生成目录")
 
 
 def llm_polish_description(meta, api_key, base_url, model):

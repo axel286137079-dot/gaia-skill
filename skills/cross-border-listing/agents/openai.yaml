@@ -1,0 +1,4 @@
+interface:
+  display_name: "跨境Listing优化"
+  short_description: "将商品信息整理成跨境电商 Listing 草稿，并离线检查常见违禁词、标题与五点长度、禁止符号和全大写问题。"
+  default_prompt: "使用 $cross-border-listing 按技能说明完成任务；先确认必要输入，并在任何外部写操作前取得明确授权。"

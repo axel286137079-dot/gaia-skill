@@ -104,9 +104,19 @@ def extract_urls(text):
     return urls
 
 
+def source_identity(domain):
+    """将子域名归并为独立站点标识，避免把同站多链接当成多信源。"""
+    domain = (domain or "").lower().split(":", 1)[0].removeprefix("www.")
+    roots = TIER_1 + TIER_2 + TIER_3 + TIER_4
+    matches = [root for root in roots if domain == root or domain.endswith("." + root)]
+    if matches:
+        return max(matches, key=len)
+    parts = domain.split(".")
+    return ".".join(parts[-2:]) if len(parts) >= 2 else domain
+
+
 def split_sentences(text):
-    """按中文句末标点/换行切句，去掉 markdown 结构行。"""
-    # 去掉代码块、表格、标题行
+    """按句末标点/换行切句，保留列表和表格里的事实陈述。"""
     lines = []
     in_code = False
     for line in text.splitlines():
@@ -116,8 +126,10 @@ def split_sentences(text):
         if in_code:
             continue
         s = line.strip()
-        if not s or s.startswith(("#", "|", "-", "*", ">", "```")):
+        if not s or re.fullmatch(r'\|?\s*(?::?-{3,}:?\s*\|?)+', s):
             continue
+        s = re.sub(r'^(?:#{1,6}|[-*+]>?|\d+[.)])\s*', '', s)
+        s = s.replace("|", " ")
         lines.append(s)
     blob = " ".join(lines)
     parts = re.split(r'(?<=[。！？；!?;])', blob)
@@ -141,7 +153,7 @@ def has_number(s):
 
 def has_citation(s):
     """句子是否带出处标记：[来源N] / [N] / [来源:xx] / (来源:xx) / URL"""
-    if re.search(r'\[(来源|source|ref)?\s*:?[^\]]{0,12}\]', s, re.I):
+    if re.search(r'\[(?:(?:来源|source|ref)\s*[:：]?[^\]]{0,20}|\d{1,3})\]', s, re.I):
         return True
     if re.search(r'[（(]\s*来源[:：]', s):
         return True
@@ -175,11 +187,12 @@ def main():
         tier_detail.append((dom, tier, label, u))
 
     total_urls = len(urls)
+    independent_sources = {source_identity(d) for d, _, _, _ in tier_detail if d}
     print("=" * 56)
     print("信源可信度审计报告")
     print("=" * 56)
     print(f"报告文件：{args.report}")
-    print(f"检测到 URL：{total_urls} 个（去重后）\n")
+    print(f"检测到 URL：{total_urls} 个｜独立站点：{len(independent_sources)} 个\n")
 
     if total_urls == 0:
         print("⚠ 报告里没有任何可点击链接——所有结论都「无出处」，请补引用。")
@@ -227,10 +240,10 @@ def main():
     else:
         print("✓ 含数字的陈述基本都有出处标注。")
 
-    if total_urls and total_urls < args.min_sources:
-        print(f"⚠ 独立信源仅 {total_urls} 个（<{args.min_sources}），核心结论疑似单一信源，需交叉验证。")
+    if total_urls and len(independent_sources) < args.min_sources:
+        print(f"⚠ 独立站点仅 {len(independent_sources)} 个（<{args.min_sources}），核心结论疑似单一信源，需交叉验证。")
     elif total_urls:
-        print(f"✓ 独立信源 {total_urls} 个，达到最低交叉验证门槛。")
+        print(f"✓ 独立站点 {len(independent_sources)} 个，达到最低交叉验证门槛。")
 
     # 三级信源占比提醒
     t3 = tier_counter.get(3, 0)
@@ -240,7 +253,7 @@ def main():
     print("\n" + "=" * 56)
     # 综合结论
     score = 0
-    if total_urls >= 2:
+    if len(independent_sources) >= 2:
         score += 2
     t1 = tier_counter.get(1, 0)
     t2 = tier_counter.get(2, 0)

@@ -1,0 +1,4 @@
+interface:
+  display_name: "小红书内容工厂"
+  short_description: "生成小红书选题、文案与排版草稿，并用离线词库提示常见高风险措辞；发布需交给独立工具并经用户确认。"
+  default_prompt: "使用 $xhs-neirong-gongchang 按技能说明完成任务；先确认必要输入，并在任何外部写操作前取得明确授权。"

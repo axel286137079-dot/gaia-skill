@@ -2,10 +2,10 @@
 name: geo-cn
 slug: geo-cn
 displayName: GEO生成式引擎优化
-summary: 让内容被豆包/DeepSeek/Kimi/元宝/文心/通义/智谱/星火/MiniMax/小米等国产生成式引擎检索、引用、归因——可引用度审计 + 多引擎分诊式改写。
+summary: 用启发式规则检查内容的可验证性与引用友好度，并为不同生成式引擎提供结构化改写建议。
 license: MIT
-description: GEO 生成式引擎优化（国产引擎版）。让你的内容被 ChatGPT/DeepSeek/豆包/Kimi/通义千问Qwen/文心/腾讯混元/智谱清言/讯飞星火/MiniMax海螺/小米MiMo/华为盘古/阶跃星辰/百川/零一万物/商汤/昆仑天工/秘塔/360纳米等 18 个国产生成式引擎检索、引用、归因。用于：给已有文章做「可引用度审计」、按目标引擎做「分诊式改写」、评估内容「被 AI 引用的概率」、布局信源让 AI 优先引用你。触发词：GEO、生成式引擎优化、AI 引用、被AI推荐、让ChatGPT提到我、DeepSeek引用、豆包推荐、AIGC可见性、内容被AI收录、llms.txt。联系邮箱：43298568@qq.com。
-version: 0.1.2
+description: 用于 GEO 内容审计和改写规划：离线脚本按引用、数据、来源、表达和术语等启发式规则给出可引用友好度评分，并提供面向多种生成式引擎的结构建议。评分不是实际收录或引用概率，也不保证任何平台结果。触发词：GEO、生成式引擎优化、AI 引用、AIGC 可见性、内容审计、llms.txt。
+version: 0.1.3
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/geo-cn
 category: 工具效率
 tags: [GEO, 生成式引擎优化, AI引用, 内容优化, AIGC可见性, 国产大模型]
@@ -31,7 +31,7 @@ platforms: [workbuddy, claude-code, cursor]
 
 ## 核心方法论：GEO 九法（Princeton GEO-bench 实测）
 
-来源：Princeton & IIT Delhi，KDD 2024，arXiv:2311.09735，1 万查询测试。按提升「被引用/归因概率」的幅度排序：
+下表以 Princeton GEO 论文（arXiv:2311.09735）的实验为方法参考；论文结果不应直接外推为任一国产引擎的实际引用概率：
 
 | 方法 | 效果 | 中文实操 |
 |---|---|---|
@@ -132,7 +132,7 @@ python3 bin/multi_engine_rewrite.py <内容> --engine doubao|deepseek|kimi|tongy
 
 - 严禁造假引用、编造数据、虚构专家引言——AI 会追溯来源，造假会反噬并可能引发平台处罚。
 - 关键词堆砌（⑨）明确有害，任何情况下不推荐。
-- 不做「保证被 AI 引用」的承诺，只做「提升可引用概率」的工程。
+- 不做「保证被 AI 引用」的承诺；脚本分数仅用于内容复核和相对比较，不是平台收录或引用概率。
 
 ## 参考
 

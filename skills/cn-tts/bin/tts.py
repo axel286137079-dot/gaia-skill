@@ -51,8 +51,7 @@ VOICES = {
 SAY_VOICES = {"婷婷": "Tingting", "美佳": "Meijia", "善怡": "Sinji"}
 
 DEFAULT_PATHS = {
-    "edge-tts": ["/Users/suge/.workbuddy/binaries/python/envs/default/bin/edge-tts",
-                 "/opt/homebrew/bin/edge-tts", "/usr/local/bin/edge-tts"],
+    "edge-tts": ["/opt/homebrew/bin/edge-tts", "/usr/local/bin/edge-tts"],
     "say": ["/usr/bin/say"],
 }
 
@@ -81,23 +80,36 @@ def synth_edge_tts(text, voice, rate, pitch, volume, out):
     if not edge:
         print("✗ 未找到 edge-tts。安装：pip install edge-tts", file=sys.stderr)
         print("  或加 --engine say 用 macOS 本地 say 回退。", file=sys.stderr)
-        return False
+        return None
     cmd = [edge, "--voice", voice, "--text", text,
            "--rate=" + rate, "--pitch=" + pitch, "--volume=" + volume,
            "--write-media", out]
-    subprocess.run(cmd, check=True)
-    return True
+    try:
+        subprocess.run(cmd, check=True)
+    except (OSError, subprocess.CalledProcessError) as exc:
+        print(f"⚠ edge-tts 失败：{exc}", file=sys.stderr)
+        return None
+    return out
 
 
 def synth_say(text, voice, out):
     say = find_tool("say")
     if not say:
         print("✗ 未找到 say（仅 macOS）。", file=sys.stderr)
-        return False
+        return None
+    root, ext = os.path.splitext(out)
+    if ext.lower() not in (".aif", ".aiff", ".wav"):
+        safe_out = root + ".aiff"
+        print(f"  ↳ say 不输出 MP3，改为：{safe_out}")
+        out = safe_out
     v = SAY_VOICES.get(voice, voice)  # 允许直接传 Tingting 等
     cmd = [say, "-v", v, "-o", out]
-    subprocess.run(cmd, input=text.encode("utf-8"), check=True)
-    return True
+    try:
+        subprocess.run(cmd, input=text.encode("utf-8"), check=True)
+    except (OSError, subprocess.CalledProcessError) as exc:
+        print(f"✗ say 失败：{exc}", file=sys.stderr)
+        return None
+    return out
 
 
 def synth(text, voice, rate, pitch, volume, out, engine):
@@ -106,10 +118,11 @@ def synth(text, voice, rate, pitch, volume, out, engine):
     if engine == "say":
         return synth_say(text, voice, out)
     if engine == "edge-tts" or (engine == "auto" and edge_voice):
-        if synth_edge_tts(text, edge_voice, rate, pitch, volume, out):
-            return True
+        generated = synth_edge_tts(text, edge_voice, rate, pitch, volume, out)
+        if generated:
+            return generated
         if engine == "edge-tts":
-            return False
+            return None
         print("  ↳ edge-tts 失败，回退 say …")
     return synth_say(text, voice, out)
 
@@ -124,10 +137,12 @@ def cmd_single(args):
         sys.exit(1)
     out = args.out or "out.mp3"
     print(f"  合成中（音色={args.voice}, 语速={args.rate}）→ {out}")
-    ok = synth(text.strip(), args.voice, args.rate, args.pitch, args.volume,
-               out, args.engine)
-    if ok:
-        print(f"✓ 音频已生成：{out}")
+    generated = synth(text.strip(), args.voice, args.rate, args.pitch, args.volume,
+                      out, args.engine)
+    if generated:
+        print(f"✓ 音频已生成：{generated}")
+        return
+    sys.exit(1)
 
 
 def cmd_batch(args):
@@ -135,21 +150,32 @@ def cmd_batch(args):
         items = json.load(f)
     os.makedirs(args.out_dir, exist_ok=True)
     total = len(items)
+    failures = []
+    generated_files = []
     for i, item in enumerate(items, 1):
         text = item.get("text", "")
         voice = item.get("voice", "晓晓")
         rate = item.get("rate", "+0%")
         pitch = item.get("pitch", "+0Hz")
         volume = item.get("volume", "+0%")
-        out = item.get("out") or os.path.join(args.out_dir, f"{i:04d}.mp3")
+        out = item.get("out") or f"{i:04d}.mp3"
         if not os.path.isabs(out):
             out = os.path.join(args.out_dir, out)
         print(f"  [{i}/{total}] 合成 → {out}")
         try:
-            synth(text.strip(), voice, rate, pitch, volume, out, args.engine)
+            if not text.strip():
+                raise ValueError("文本为空")
+            generated = synth(text.strip(), voice, rate, pitch, volume, out, args.engine)
+            if not generated:
+                raise RuntimeError("合成失败")
+            generated_files.append(generated)
         except Exception as e:
             print(f"  ✗ 第 {i} 条失败：{e}", file=sys.stderr)
-    print(f"\n✓ 批量完成：{total} 条 → {args.out_dir}")
+            failures.append(i)
+    print(f"\n批量结果：成功 {len(generated_files)} / {total} → {args.out_dir}")
+    if failures:
+        print(f"✗ 失败条目：{', '.join(map(str, failures))}", file=sys.stderr)
+        sys.exit(1)
 
 
 def cmd_list_voices(args):

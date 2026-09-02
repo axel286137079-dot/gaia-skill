@@ -1,0 +1,4 @@
+interface:
+  display_name: "GEO生成式引擎优化"
+  short_description: "用启发式规则检查内容的可验证性与引用友好度，并为不同生成式引擎提供结构化改写建议。"
+  default_prompt: "使用 $geo-cn 按技能说明完成任务；先确认必要输入，并在任何外部写操作前取得明确授权。"
