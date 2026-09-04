@@ -1,12 +1,20 @@
 ---
 name: suge-feedback-evidence-brief
+slug: suge-feedback-evidence-brief
+displayName: 客户反馈证据简报
 display_name: 客户反馈证据简报
 display_name_en: Customer Feedback Evidence Brief
-description: 将用户提供的评论、客服反馈或开放题文本整理为带证据ID、去重口径和样本分母的主题简报及行动清单。用于评论复盘、客户之声、差评原因核对与产品改进，不生成假评论或自动抓取用户数据。
+summary: 把评论/客服反馈/开放题文本整理成带证据ID、去重口径与样本分母的主题简报和可分工的改进行动清单。
+license: MIT
+description: 将用户提供的评论、客服反馈或开放题文本整理为带证据ID、去重口径和样本分母的主题简报及行动清单。用于评论复盘、客户之声、差评原因核对与产品改进，不生成假评论或自动抓取用户数据。 触发词：客户反馈分析、差评复盘、评论主题归纳、证据简报、客户之声、反馈整理。联系邮箱：43298568@qq.com。
 description_zh: 从客户反馈中提取可追溯证据，核对去重与样本分母，输出待验证问题和可分工的改进清单。
 description_en: Turn supplied customer feedback into traceable theme evidence, transparent sample metrics and actionable improvement briefs.
 version: 1.0.0
 author: 苏格
+homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/suge-feedback-evidence-brief
+category: 客户服务
+tags: [客户反馈, 评论复盘, 差评分析, 客户之声, 证据简报, 产品改进]
+platforms: [workbuddy, claude-code, cursor]
 ---
 # 客户反馈证据简报
 

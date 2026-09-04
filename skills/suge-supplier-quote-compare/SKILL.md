@@ -1,12 +1,20 @@
 ---
 name: suge-supplier-quote-compare
+slug: suge-supplier-quote-compare
+displayName: 供应商报价归一比价
 display_name: 供应商报价归一比价
 display_name_en: Supplier Quote Normalizer
-description: 对用户提供的供应商报价进行单位、包装、起订量、税费、运费和交期归一，输出带来源和排除理由的总支出比较表。用于采购比价、询价核对和报价短名单，不自动询价、采购或背书供应商。
+summary: 把多家供应商报价归一为同一需求口径（单位/包装/起订/税费/运费/交期），输出带来源与排除理由的总支出比较表。
+license: MIT
+description: 对用户提供的供应商报价进行单位、包装、起订量、税费、运费和交期归一，输出带来源和排除理由的总支出比较表。用于采购比价、询价核对和报价短名单，不自动询价、采购或背书供应商。 触发词：供应商比价、报价归一、哪家便宜、采购比价、询价核对、报价短名单、总支出比较。联系邮箱：43298568@qq.com。
 description_zh: 将多家供应商报价统一到同一需求，核算起订量、税运费及交期，并标记不具备可比条件的报价。
 description_en: Normalize supplier quotes by demand, pack size, minimum order, tax, freight and delivery constraints with evidence and exclusion reasons.
 version: 1.0.0
 author: 苏格
+homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/suge-supplier-quote-compare
+category: 商业经营
+tags: [供应商比价, 报价归一, 采购比价, 询价核对, 供应链, 采购管理]
+platforms: [workbuddy, claude-code, cursor]
 ---
 # 供应商报价归一比价
 

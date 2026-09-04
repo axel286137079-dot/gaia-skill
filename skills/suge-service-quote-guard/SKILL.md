@@ -1,12 +1,20 @@
 ---
 name: suge-service-quote-guard
+slug: suge-service-quote-guard
+displayName: 服务报价与增项测算
 display_name: 服务报价与增项测算
 display_name_en: Service Quote and Scope Guard
-description: 为设计、文案、代运营、咨询等项目核算服务报价、毛利、分期款与增项成本，并生成内外两版报价草案。用于接单报价、客户砍价、需求增加和利润复核；不是投资建议或法律审查。
+summary: 核算服务报价、毛利、分期款与增项成本，输出内部利润表和客户交付版两套报价草案，支持砍价与需求变更测算。
+license: MIT
+description: 为设计、文案、代运营、咨询等项目核算服务报价、毛利、分期款与增项成本，并生成内外两版报价草案。用于接单报价、客户砍价、需求增加和利润复核；不是投资建议或法律审查。 触发词：服务报价、增项测算、报价单、毛利核算、接单报价、客户砍价、报价方案。联系邮箱：43298568@qq.com。
 description_zh: 从工时、成本、目标毛利和新增需求生成可复核的报价与增项草案，区分内部利润表和客户交付版。
 description_en: Calculate service quotes, modeled margins, payment schedules and scope-change charges with separate internal and client-facing drafts.
 version: 1.0.0
 author: 苏格
+homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/suge-service-quote-guard
+category: 商业经营
+tags: [服务报价, 报价单, 毛利核算, 增项测算, 接单, 项目管理, 商务]
+platforms: [workbuddy, claude-code, cursor]
 ---
 # 服务报价与增项测算
 
