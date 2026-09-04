@@ -1,0 +1,22 @@
+{
+  "currency": "CNY",
+  "items": [
+    {
+      "label": "合成样例：品牌文案与设计",
+      "hours": "20",
+      "hourly_cost": "100"
+    }
+  ],
+  "fixed_cost": "500",
+  "buffer_rate": "0.2",
+  "margin_rate": "0.4",
+  "fee_rate": "0",
+  "tax_rate": "0.06",
+  "payment_ratios": [
+    "0.3",
+    "0.4",
+    "0.3"
+  ],
+  "extra_hours": "5",
+  "extra_hourly_cost": "100"
+}

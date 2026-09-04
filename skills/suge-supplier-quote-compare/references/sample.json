@@ -1,0 +1,45 @@
+{
+  "base_currency": "CNY",
+  "quantity": 100,
+  "unit": "件",
+  "as_of": "2026-09-04",
+  "required_by": "2026-09-20",
+  "quotes": [
+    {
+      "id": "A",
+      "currency": "CNY",
+      "unit": "件",
+      "spec_confirmed": true,
+      "destination_confirmed": true,
+      "source_ref": "合成报价A第1行",
+      "payment_terms": "到货后付款",
+      "valid_until": "2026-09-15",
+      "lead_days": 7,
+      "units_per_pack": 10,
+      "min_packs": 1,
+      "price_per_pack_net": "200",
+      "tax_rate": "0.1",
+      "shipping_gross": "100",
+      "setup_net": "0",
+      "other_gross": "0"
+    },
+    {
+      "id": "B",
+      "currency": "CNY",
+      "unit": "件",
+      "spec_confirmed": true,
+      "destination_confirmed": true,
+      "source_ref": "合成报价B第1行",
+      "payment_terms": "100%预付款",
+      "valid_until": "2026-09-15",
+      "lead_days": 10,
+      "units_per_pack": 10,
+      "min_packs": 20,
+      "price_per_pack_net": "150",
+      "tax_rate": "0",
+      "shipping_gross": "0",
+      "setup_net": "0",
+      "other_gross": "0"
+    }
+  ]
+}

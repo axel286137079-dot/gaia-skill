@@ -1,0 +1,44 @@
+{
+  "themes": [
+    {
+      "name": "物流",
+      "keywords": [
+        "配送",
+        "delivery"
+      ]
+    },
+    {
+      "name": "包装",
+      "keywords": [
+        "包装",
+        "package"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "R1",
+      "source": "合成反馈",
+      "text": "配送太慢，包装也有破损",
+      "rating": 1
+    },
+    {
+      "id": "R2",
+      "source": "合成反馈",
+      "text": "Delivery was late",
+      "rating": 2
+    },
+    {
+      "id": "R3",
+      "source": "合成反馈",
+      "text": "包装结实，整体满意",
+      "rating": 5
+    },
+    {
+      "id": "R4",
+      "source": "合成反馈",
+      "text": "希望增加蓝色选项",
+      "rating": null
+    }
+  ]
+}
