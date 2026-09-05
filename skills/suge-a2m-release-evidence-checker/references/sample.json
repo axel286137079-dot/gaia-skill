@@ -1,0 +1,67 @@
+{
+  "environment_label": "sandbox",
+  "claims": {
+    "production_verified": false,
+    "refund_processed": false
+  },
+  "records": [
+    {
+      "id": "req-1",
+      "phase": "payment_request",
+      "request": {"method": "POST", "url_path": "/v1/pay", "proof_present": false},
+      "response": {
+        "status": 402,
+        "payment_required": {
+          "provider": "sandbox.alipay-ai",
+          "proof_url": "https://sandbox.example/proof/p_9f2k",
+          "expires_at": "2026-09-05T19:05:00Z",
+          "resource_id": "res_12001",
+          "trade_no": "T202609050001",
+          "amount": "1.99",
+          "currency": "CNY"
+        }
+      }
+    },
+    {
+      "id": "req-2",
+      "phase": "retry_with_proof",
+      "request": {
+        "method": "POST",
+        "url_path": "/v1/pay",
+        "proof_present": true,
+        "proof_token": "sandbox_proof_p_9f2k (已脱敏占位)"
+      },
+      "response": {
+        "status": 200,
+        "delivery": {
+          "delivered": true,
+          "fulfillment": "confirmed",
+          "resource_id": "res_12001",
+          "trade_no": "T202609050001",
+          "amount": "1.99",
+          "currency": "CNY"
+        }
+      }
+    },
+    {
+      "id": "req-3",
+      "phase": "payment_validation",
+      "request": {
+        "method": "GET",
+        "url_path": "/v1/validate",
+        "proof_present": true,
+        "proof_token": "sandbox_proof_p_9f2k (已脱敏占位)"
+      },
+      "response": {
+        "status": 200,
+        "validation": {
+          "valid": true,
+          "resource_id": "res_12001",
+          "trade_no": "T202609050001",
+          "amount": "1.99",
+          "currency": "CNY"
+        }
+      }
+    }
+  ]
+}

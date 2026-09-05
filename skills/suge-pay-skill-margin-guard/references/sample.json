@@ -1,0 +1,18 @@
+{
+  "currency": "CNY",
+  "display_price": "1.99",
+  "register_price": "1.99",
+  "server_price": "1.99",
+  "avg_input_tokens": "8000",
+  "avg_output_tokens": "1500",
+  "input_price_per_mtok": "2",
+  "output_price_per_mtok": "8",
+  "monthly_fixed_cost": "300",
+  "expected_monthly_success_calls": "500",
+  "payment_fee_rate": "0.06",
+  "refund_rate": "0.02",
+  "failure_retry_rate": "0.1",
+  "tax_rate": "0.01",
+  "manual_review_cost_per_call": "0.5",
+  "target_margin_rate": "0.6"
+}

@@ -1,0 +1,7 @@
+{
+  "target": ".",
+  "max_zip_mb": 20,
+  "max_entries": 500,
+  "max_extract_mb": 100,
+  "max_file_mb": 20
+}
