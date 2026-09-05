@@ -27,6 +27,7 @@
 | S003 | medium | 内容含本机/用户主目录绝对路径（macOS、Linux 或 Windows 用户目录前缀） |
 | T001 | critical | ZIP 条目含 `../` 或绝对路径（路径穿越），拒绝解压 |
 | T002 | high | 目录或 ZIP 内含符号链接 |
+| T003 | critical | ZIP 含重复或规范化后重名的条目，拒绝解压 |
 | C001 | critical | `rm -rf /`、`shutil.rmtree('/')` 等删根命令 |
 | C002 | high | `os.system(...)`、`shell=True` |
 | C003 | critical | `curl/wget … | sh` 下载后直接执行 |
@@ -40,8 +41,8 @@
 ## 3. 判定规则
 
 - 任一 `critical` → **FAIL**（不要上传）。
-- 无 critical、有 `high` → **REVIEW**（人工确认）。
-- 其余 → **PASS**（可复跑门禁通过；不等于零漏洞，仍需人工审查）。
+- 无 critical、但有任何 `high/medium/low` → **REVIEW**（人工确认）。
+- 没有任何发现 → **PASS**（可复跑门禁通过；不等于零漏洞，仍需人工审查）。
 
 ## 4. 输出结构（run.py 打印 JSON）
 

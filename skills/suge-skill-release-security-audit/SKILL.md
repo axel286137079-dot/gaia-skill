@@ -9,7 +9,7 @@ license: MIT
 description: 面向向 WorkBuddy/SkillHub/GitHub 发布 Skill 的个人开发者与小团队：只读扫描本地 Skill 目录或 ZIP，检查路径穿越、绝对路径、符号链接、隐藏敏感文件、私钥/Token 特征、可执行脚本、shell=True、curl|sh 下载执行、危险删除命令、外部下载源、缺失或异常 frontmatter、引用文件不存在、超大文件与未声明依赖，输出机器可读的 audit.json 与中文 audit.md，逐项给规则 ID、严重级别、脱敏路径、证据摘要与修复建议；凭据只报告类型与位置、不回显原值。运行约束：不执行被扫描脚本、不联网下载、ZIP 在临时目录按大小/条目数/解压总量设上限，结果明确 PASS/FAIL/REVIEW 可作发布门禁。不自动删除或改写用户文件，不替代人工代码审查，不保证零漏洞。 触发词：技能安全审计、发布前检查、Skill 安全检查、ZIP 扫描、密钥泄露检查、shell=True 检查、发布门禁。联系邮箱：43298568@qq.com。
 description_zh: 只读静态扫描 Skill 目录或 ZIP，检查密钥、路径穿越、危险命令与引用完整性，输出可复跑的中文审计报告。
 description_en: Read-only static gate for Skill releases: secrets, traversal, dangerous commands, references, with a reproducible PASS/FAIL/REVIEW report.
-version: 1.0.0
+version: 1.0.1
 author: 苏格
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/suge-skill-release-security-audit
 category: 开发工具
@@ -34,8 +34,8 @@ platforms: [workbuddy, claude-code, cursor]
    Windows 可用 `py -3`。
 3. 看 `verdict`：
    - `FAIL`：存在 critical 级问题（路径穿越、密钥、下载执行、删根命令等），**不要上传**，按 `fix` 修复后重扫。
-   - `REVIEW`：存在 high 级问题（缺 frontmatter、符号链接、shell=True、引用缺失等），人工确认后再决定。
-   - `PASS`：未发现门禁级问题；这不等同"零漏洞"，仍需人工代码审查。
+   - `REVIEW`：存在任何非 critical 发现，人工确认后再决定。
+   - `PASS`：没有任何发现；这不等同"零漏洞"，仍需人工代码审查。
 4. 把 `findings`（已按严重级排序）整理成中文 audit.md：规则 ID / 级别 / 相对路径 / 问题 / 修复建议。凭据类只写"文件名命中 .env"这类描述，不贴原值。
 5. 把 `files`（路径+大小+SHA256）附在报告尾部，作为该版本包的指纹。
 

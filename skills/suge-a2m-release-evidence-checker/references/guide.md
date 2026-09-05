@@ -18,8 +18,8 @@
       },
       "response": {
         "status": 402,
-        "payment_required": {"provider": "...", "proof_url": "...", "expires_at": "...",
-                             "resource_id": "...", "trade_no": "...", "amount": "...", "currency": "..."},
+        "payment_required": {"provider": "...", "expires_at": "...",
+                             "resource_id": "...", "amount": "...", "currency": "..."},
         "delivery": {"delivered": true, "fulfillment": "confirmed", "resource_id": "...", "amount": "...", "currency": "...", "trade_no": "..."},
         "validation": {"valid": true, "resource_id": "...", "amount": "...", "currency": "...", "trade_no": "..."},
         "refund": {"refunded": true, "amount": "...", "trade_no": "..."},
@@ -39,7 +39,7 @@
 | 检查 | 通过条件 |
 |---|---|
 | initial_402 | 存在 status=402 且带 payment_required 数据的记录 |
-| proof_present | 402 响应含 proof_url（或请求侧证明标识）与过期时间可提取 |
+| payment_bill_complete | 402 响应含 provider、expires_at、amount、currency、resource_id；Payment-Proof 在支付后生成，不要求出现在首次 402 中 |
 | retry_with_proof | 存在携带证明的请求，且响应 200（retry/delivery/payment_request 均可） |
 | delivery_200 | 存在带 delivery 数据且 200 的交付记录 |
 | fulfillment_confirmed | delivery.delivered=true 或 fulfillment ∈ {confirmed, delivered, success, fulfilled, completed} |
@@ -62,7 +62,7 @@
 
 ## 4. 脱敏规则
 
-- `proof_token` 只回显 `前6字符…sha256前8`。
+- `proof_token` 只回显 `sha256:摘要`，不保留任何原文前缀。
 - Payment-Proof、Authorization、私钥、Access Token、完整用户标识不进入输出；只保留字段存在性、hash 或尾号。
 - 用户应在准备输入时就地脱敏；脚本侧再次只做白名单读取。
 

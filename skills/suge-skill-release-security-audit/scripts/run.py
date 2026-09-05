@@ -206,6 +206,13 @@ def scan_zip(zip_path, audit, opts):
     try:
         with zipfile.ZipFile(zip_path) as archive:
             names = archive.namelist()
+            normalized_names = [name.replace("\\", "/") for name in names]
+            duplicates = sorted({name for name in normalized_names if normalized_names.count(name) > 1})
+            if duplicates:
+                audit.add(finding("T003", "critical", "<zip>",
+                                  "ZIP 含重复条目：" + ",".join(duplicates[:5]),
+                                  "重建压缩包并确保每个规范化路径只出现一次。"))
+                return audit
             total = sum(i.file_size for i in archive.infolist())
             if len(names) > opts["max_entries"]:
                 audit.add(finding("X001", "critical", "<zip>",
@@ -218,17 +225,18 @@ def scan_zip(zip_path, audit, opts):
                                       round(total / 1048576, 1), opts["max_extract_mb"]),
                                   "压缩包疑似 zip bomb。"))
                 return audit
-            traversal = False
-            for name in names:
-                if ".." in Path(name).parts or name.startswith("/") or re.match(r"^[A-Za-z]:", name):
+            unsafe = False
+            for name, normalized in zip(names, normalized_names):
+                if ".." in Path(normalized).parts or normalized.startswith("/") or re.match(r"^[A-Za-z]:", normalized):
                     audit.add(finding("T001", "critical", name, "ZIP 条目含路径穿越/绝对路径",
                                       "重建压缩包，条目必须为相对扁平路径。", evidence="path_traversal_entry"))
-                    traversal = True
+                    unsafe = True
                 info = archive.getinfo(name)
                 if stat.S_ISLNK(info.external_attr >> 16):
                     audit.add(finding("T002", "high", name, "ZIP 条目是符号链接", "移除符号链接条目。"))
-            if traversal:
-                return audit  # do not extract a traversing archive
+                    unsafe = True
+            if unsafe:
+                return audit  # do not extract archives with unsafe entries
             tmp = Path(tempfile.mkdtemp(prefix="skill-audit-"))
             try:
                 archive.extractall(tmp)
@@ -260,7 +268,7 @@ def analyze(data):
             opts[key] = float(v)
     audit = Audit()
     if not target.exists():
-        audit.add(finding("F099", "critical", str(target), "target 路径不存在", "检查输入路径。"))
+        audit.add(finding("F099", "critical", target.name or "<target>", "target 路径不存在", "检查输入路径。"))
     elif target.is_dir():
         scan_tree(target, audit, opts)
     elif target.suffix.lower() == ".zip":
@@ -270,13 +278,13 @@ def analyze(data):
         else:
             scan_zip(target, audit, opts)
     else:
-        audit.add(finding("F099", "critical", str(target), "target 不是目录也不是 ZIP", "检查输入路径。"))
+        audit.add(finding("F099", "critical", target.name or "<target>", "target 不是目录也不是 ZIP", "检查输入路径。"))
     verdict = "FAIL" if any(f["severity"] == "critical" for f in audit.findings) else \
-              "REVIEW" if any(f["severity"] == "high" for f in audit.findings) else "PASS"
+              "REVIEW" if audit.findings else "PASS"
     return {
         "skill": "suge-skill-release-security-audit",
-        "version": "1.0.0",
-        "target": str(target),
+        "version": "1.0.1",
+        "target": target.name or ".",
         "verdict": verdict,
         "summary": {"total": len(audit.findings),
                     "by_severity": {s: sum(1 for f in audit.findings if f["severity"] == s)

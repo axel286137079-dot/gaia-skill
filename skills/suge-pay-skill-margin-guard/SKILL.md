@@ -6,10 +6,10 @@ display_name: Pay Skill 盈亏与定价守门
 display_name_en: Pay Skill Margin Guard
 summary: 用确定性的脚本核算按次付费 Skill 的单次可变成本、毛利率、盈亏平衡调用量与目标毛利最低售价，把退款、失败重试、支付费率和未知项显式列出，不做盈利承诺。
 license: MIT
-description: 面向 SkillHub/WorkBuddy 的 Pay Skill 创作者与小型 API 服务商：读取一份 JSON 成本表，区分展示价/注册价/服务端价并核对三者一致，计算模型与人工可变成本、退款与失败重试放大、毛利率、月固定成本摊销、盈亏平衡调用量以及达到目标毛利所需的最低售价，输出基础/悲观/乐观三情景与可审计公式。缺失的费率与成本进入 unknown_assumptions 而不是按 0 计算。不读取密钥、不修改平台价格、不保证盈利。 触发词：定价守门、盈亏平衡、毛利率、Pay Skill 成本、按次收费测算、售价核算、退款敏感性、失败重试成本。联系邮箱：43298568@qq.com。
+description: 面向 SkillHub/WorkBuddy 的 Pay Skill 创作者与小型 API 服务商：读取一份 JSON 成本表，区分展示价/注册价/服务端价并核对三者一致，计算模型与人工可变成本、退款与失败重试放大、毛利率、月固定成本摊销、盈亏平衡调用量以及达到目标毛利所需的最低售价，输出基础/悲观/乐观三情景与可审计公式。缺失费率与成本时明确标记 INCOMPLETE，数字只作为已知成本下界且禁止盈利声明。不读取密钥、不修改平台价格、不保证盈利。 触发词：定价守门、盈亏平衡、毛利率、Pay Skill 成本、按次收费测算、售价核算、退款敏感性、失败重试成本。联系邮箱：43298568@qq.com。
 description_zh: 用确定性脚本核算按次付费 Skill 的成本与毛利，输出三情景、盈亏平衡与目标售价，缺失项显式未知。
-description_en: Deterministically model per-call cost, margin, break-even and required price for pay-per-use skills; missing inputs stay unknown instead of zero.
-version: 1.0.0
+description_en: Deterministically model per-call cost, margin, break-even and required price; incomplete inputs yield a known-cost lower bound and forbid profitability claims.
+version: 1.0.1
 author: 苏格
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/suge-pay-skill-margin-guard
 category: 商业经营
@@ -26,7 +26,7 @@ platforms: [workbuddy, claude-code, cursor]
 
 必填字段（缺任一则拒绝计算并说明缺什么）：展示价、注册价、服务端价、平均输入/输出 token、输入/输出模型单价（每百万 token）、月固定成本、预计月成功调用量。
 
-可选但必须显式：支付费率、退款率、失败重试率、税费测算率、单次人工复核成本、目标毛利率。**这些字段缺失时不按 0 处理**：进入 `unknown_assumptions`，输出在报告里明说"未包含未知项影响"，不得宣称利润。
+可选但必须显式：支付费率、退款率、失败重试率、税费测算率、单次人工复核成本、目标毛利率。字段缺失时进入 `unknown_assumptions`；数值情景仅按已知成本计算并标为成本下界，不得宣称利润。
 
 数字来源口径必须与客户确认：服务端价是实际扣款价还是名义价？模型单价是含税结算价吗？退款是否返还平台手续费？
 

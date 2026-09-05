@@ -148,6 +148,7 @@ def analyze(data):
 
     unknown = [k for k in OPTIONAL_RATES + OPTIONAL_COSTS
                if (k not in data or data[k] is None or str(data[k]).strip() == "")]
+    complete = not unknown
 
     prices = {"display": display_price, "register": register_price, "server": server_price}
     consistent = len({money(v) for v in prices.values()}) == 1
@@ -168,20 +169,25 @@ def analyze(data):
         "optimistic": (Decimal("0.9"), Decimal("1.5"), Decimal("0.5"), Decimal("0.5")),
     }.items():
         cfg = base_cfg(pm, cm, rm, tm)
+        result = evaluate_core(cfg)
+        result["estimate_scope"] = "COMPLETE_COST_MODEL" if complete else "KNOWN_COSTS_ONLY_LOWER_BOUND"
+        result["profitability_claim_allowed"] = bool(complete and consistent)
         scenarios[name] = {
             "multipliers": {"model_price": str(pm), "expected_calls": str(cm),
                             "refund": str(rm), "failure_retry": str(tm)},
-            "result": evaluate_core(cfg)}
+            "result": result}
 
     warnings = []
     if unknown:
-        warnings.append("缺少的可选成本项已列入 unknown_assumptions，未按 0 计入；毛利不包含其影响，不能据此宣称利润。")
+        warnings.append("缺少的可选成本项已列入 unknown_assumptions；数值情景仅按已知成本计算，是成本下界估算，不能据此宣称利润。")
     if not consistent:
         warnings.append("展示价/注册价/服务端价不一致，上线前应先对齐，否则不能声称按展示价收费。")
 
     return {
         "skill": "suge-pay-skill-margin-guard",
-        "version": "1.0.0",
+        "version": "1.0.1",
+        "completeness": "COMPLETE" if complete else "INCOMPLETE",
+        "profitability_claim_allowed": bool(complete and consistent),
         "currency": currency,
         "input_echo": {
             "display_price": str(display_price), "register_price": str(register_price),
@@ -204,7 +210,7 @@ def analyze(data):
         "unknown_assumptions": unknown,
         "scenarios": scenarios,
         "warnings": warnings,
-        "note": "确定性测算，非投资建议，不保证盈利，不构成税务或法律意见；缺失项一律未知而非 0。"
+        "note": "确定性测算，非投资建议，不保证盈利，不构成税务或法律意见；缺失项保持未知，相关数字仅是已知成本下界。"
     }
 
 

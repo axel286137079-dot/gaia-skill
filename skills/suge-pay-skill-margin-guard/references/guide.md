@@ -60,8 +60,9 @@
 - `currency`、`input_echo`：原值回显，便于复核。
 - `price_consistency`：GREEN/RED 与三个价。
 - `unknown_assumptions`：缺失的可选成本字段清单。
+- `completeness` / `profitability_claim_allowed`：有未知成本时分别为 INCOMPLETE / false。
 - `scenarios.{base,pessimistic,optimistic}`：每个含 `multipliers`（回显乘数）与 `result`。
-- `result` 关键字段：`model_cost`、`model_cost_with_retry`、`variable_cost_expected`、`revenue_expected`、`gross_margin_pct`、`monthly_profit`、`break_even.{monthly_calls,state}`、`minimum_server_price_to_target`、`state`。
+- `result` 关键字段：`model_cost`、`model_cost_with_retry`、`variable_cost_expected`、`revenue_expected`、`gross_margin_pct`、`monthly_profit`、`break_even.{monthly_calls,state}`、`minimum_server_price_to_target`、`state`、`estimate_scope`、`profitability_claim_allowed`。未知项存在时数字只是 `KNOWN_COSTS_ONLY_LOWER_BOUND`。
   - `state`: `ok` / `unprofitable_revenue_zero`（退款率使收入≤0）/ `unprofitable_contribution`（单次贡献≤0）。
   - `break_even.state`: `reachable` / `unreachable_contribution_not_positive` / `cannot_compute_calls_zero` / `no_fixed_cost`。
 - `warnings`、`formula_note`、`note`。

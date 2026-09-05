@@ -9,7 +9,7 @@ license: MIT
 description: 面向接入支付宝 AI 按量付费或 HTTP 402 协议（A2M/Agentic Commerce）的 Skill、MCP、API 开发者：输入脱敏后的 HTTP 交换记录，脚本只读取白名单字段，逐跳核对 首次请求 402 → 账单字段与过期时间 → 携证明重试 → 200 交付 → 支付验证 → 交易号/资源号/金额/币种一致性 → 履约确认 → 相同证明跨资源复用（重放）→ 幂等重复 等证据是否齐全。默认完全离线，不发起网络请求、不发起付款；不替用户签约、不扫码、不上传平台。输出 evidence 报告并严格区分 LOCAL_PASS / SANDBOX_PASS / PROD_NOT_PROVEN / PROD_PASS：缺少任何一跳生产证据就不得写"已上线"，沙箱通过不等于生产上线。Payment-Proof、私钥、Access Token、完整用户标识一律拒绝进入报告，只保留字段存在性、hash 或尾号。 触发词：A2M 验收、402 证据、按量付费上线检查、支付证明链、上线门禁、履约确认、重放检查。联系邮箱：43298568@qq.com。
 description_zh: 离线逐跳核对 402→证明→交付→验证→履约证据链与金额一致性，输出四档上线门禁报告。
 description_en: Verify the full HTTP 402 proof chain offline with amount/resource consistency and replay checks; never pays or claims production without evidence.
-version: 1.0.0
+version: 1.0.1
 author: 苏格
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/suge-a2m-release-evidence-checker
 category: 开发工具

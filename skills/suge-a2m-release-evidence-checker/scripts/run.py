@@ -19,7 +19,7 @@ def token_hash(value):
     if value is None:
         return None
     text = str(value)
-    return text[:6] + "…" + hashlib.sha256(text.encode("utf-8")).hexdigest()[:8]
+    return "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
 
 
 def text_field(value, label, maximum=200):
@@ -112,7 +112,11 @@ def analyze(data):
     env = text_field(data.get("environment_label"), "environment_label")
     if env:
         env = env.lower()
-    claims = data.get("claims") if isinstance(data.get("claims"), dict) else {}
+    raw_claims = data.get("claims") if isinstance(data.get("claims"), dict) else {}
+    claims = {}
+    for key in ("production_verified", "refund_processed"):
+        if key in raw_claims:
+            claims[key] = bool_field(raw_claims[key], "claims." + key)
 
     records = [extract_record(rec) for rec in raw_records]
     checks = []
@@ -125,23 +129,32 @@ def analyze(data):
     else:
         pr = gate["payment_required"]
         provider = text_field(pick(pr, "provider", "network"), "provider")
-        proof_url = text_field(pick(pr, "proof_url", "url", "payment_url"), "proof_url")
         expires = text_field(pick(pr, "expires_at", "expires"), "expires_at")
+        amount = text_field(pick(pr, "amount", "total", "price"), "amount")
+        currency = text_field(pick(pr, "currency", "asset"), "currency")
+        resource = text_field(pick(pr, "resource_id", "resource", "order_id"), "resource_id")
         detail = "402 命中（" + gate["id"] + "）"
         if provider:
             detail += "；provider=" + provider
         if expires:
             detail += "；expires_at=" + expires
         checks.append(Ev(gate["id"]).pass_("initial_402", detail))
-        if not proof_url and not gate["proof_token"] and not gate["proof_present"]:
-            checks.append(Ev(gate["id"]).fail("proof_present", "402 响应缺少可提取的证明地址/证明标识。"))
+        missing_bill = [name for name, value in (("provider", provider), ("expires_at", expires),
+                                                  ("amount", amount), ("currency", currency),
+                                                  ("resource_id", resource)) if not value]
+        if missing_bill:
+            checks.append(Ev(gate["id"]).fail("payment_bill_complete",
+                                               "402 账单缺少字段：" + ",".join(missing_bill) + "。"))
         else:
-            checks.append(Ev(gate["id"]).pass_("proof_present", "402 响应含证明凭据（地址或标识，仅记录 hash）。"))
+            checks.append(Ev(gate["id"]).pass_("payment_bill_complete",
+                                                "402 账单含 provider/过期时间/金额/币种/资源号。"))
 
     # --- 2) retry with proof -> 200 delivery --------------------------------
-    retries = [r for r in records if r["phase"] in {"retry_with_proof", "delivery"} and r["proof_present"]]
+    retries = [r for r in records if r["phase"] in {"retry_with_proof", "delivery"}
+               and r["proof_present"] and r["status"] == 200]
     delivered = [r for r in records
-                 if r["delivery"] and (r["phase"] == "delivery" or (r["phase"] == "retry_with_proof" and r["status"] == 200))]
+                 if r["delivery"] and r["status"] == 200
+                 and r["phase"] in {"delivery", "retry_with_proof"}]
     carried = [r for r in records if r["phase"] == "payment_request" and r["proof_present"] and r["status"] == 200]
     proof_carried = retries or carried or delivered
     if not proof_carried:
@@ -149,7 +162,7 @@ def analyze(data):
     else:
         r = proof_carried[0]
         checks.append(Ev(r["id"]).pass_("retry_with_proof",
-                                        "找到携带证明的请求（" + r["id"] + "），响应状态 " + str(r["status"]) + "。"))
+                                        "找到携带证明并得到 200 的请求（" + r["id"] + "）。"))
     if not delivered:
         checks.append(Ev("-").fail("delivery_200", "缺少带 200 与交付数据的记录（delivery 阶段）。"))
     else:
@@ -237,7 +250,7 @@ def analyze(data):
 
     # --- verdict & level -----------------------------------------------------
     fails = [c for c in checks if c["status"] == "FAIL"]
-    chain_keys = {"initial_402", "proof_present", "retry_with_proof", "delivery_200",
+    chain_keys = {"initial_402", "payment_bill_complete", "retry_with_proof", "delivery_200",
                   "payment_validation", "fulfillment_confirmed"}
     chain_missing = [c["check"] for c in checks if c["check"] in chain_keys and c["status"] != "PASS"]
     if fails and any(c["check"] == "settlement_consistent" or c["check"] == "replay_guard" for c in fails):
@@ -253,7 +266,7 @@ def analyze(data):
     refund_evidence = any(r.get("phase") == "refund" for r in records)
     return {
         "skill": "suge-a2m-release-evidence-checker",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "environment_label": env or None,
         "verdict": verdict,
         "level": level,

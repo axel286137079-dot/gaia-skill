@@ -13,10 +13,8 @@
         "status": 402,
         "payment_required": {
           "provider": "sandbox.alipay-ai",
-          "proof_url": "https://sandbox.example/proof/p_9f2k",
           "expires_at": "2026-09-05T19:05:00Z",
           "resource_id": "res_12001",
-          "trade_no": "T202609050001",
           "amount": "1.99",
           "currency": "CNY"
         }
