@@ -1,0 +1,30 @@
+{
+  "as_of_date": "2026-09-06",
+  "currency": "CNY",
+  "subscriptions": [
+    {
+      "vendor": "示例云协作",
+      "plan": "团队版",
+      "seats_purchased": 20,
+      "active_users_30d": 13,
+      "unit_price": "39.00",
+      "billing_cycle": "monthly",
+      "renewal_date": "2026-09-28",
+      "auto_renew": true,
+      "minimum_seats": 10,
+      "cancellation_notice_days": 15
+    },
+    {
+      "vendor": "示例文件存储",
+      "plan": "商务版",
+      "seats_purchased": 5,
+      "active_users_30d": 5,
+      "unit_price": "68.00",
+      "billing_cycle": "yearly",
+      "renewal_date": "2026-12-01",
+      "auto_renew": false,
+      "minimum_seats": 5,
+      "cancellation_notice_days": 30
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "campaign_id": "CMP-DEMO-001",
+  "currency": "CNY",
+  "settlement_date": "2026-09-06",
+  "creators": [
+    {
+      "creator_id": "KOL-001",
+      "base_fee": "3000.00",
+      "commission_rate": "0.08",
+      "eligible_net_sales": "25000.00",
+      "refunds_pending": "2000.00",
+      "deliverables_required": 3,
+      "deliverables_accepted": 2,
+      "invoice_status": "missing",
+      "paid_amount": "0.00"
+    },
+    {
+      "creator_id": "KOL-002",
+      "base_fee": "2000.00",
+      "commission_rate": "0.08",
+      "eligible_net_sales": "10000.00",
+      "refunds_pending": "0.00",
+      "deliverables_required": 2,
+      "deliverables_accepted": 2,
+      "invoice_status": "present",
+      "refund_window_ended": true,
+      "paid_amount": "2800.00"
+    }
+  ]
+}

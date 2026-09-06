@@ -1,0 +1,51 @@
+{
+  "as_of_date": "2026-09-06",
+  "project": "秋季新品演示",
+  "assets": [
+    {
+      "asset_id": "IMG-001",
+      "asset_type": "image",
+      "source": "示例图库",
+      "license_type": "standard-commercial",
+      "proof_reference": "invoice-demo-001",
+      "permitted_channels": ["web", "social"],
+      "actual_channels": ["social"],
+      "territories": ["CN"],
+      "actual_territory": "CN",
+      "expires_on": "2027-01-01",
+      "derivative_allowed": true,
+      "attribution_required": false,
+      "attribution_present": null
+    },
+    {
+      "asset_id": "IMG-002",
+      "asset_type": "image",
+      "source": "示例图库",
+      "license_type": "standard-commercial",
+      "proof_reference": "invoice-demo-002",
+      "permitted_channels": ["web"],
+      "actual_channels": ["web", "tv"],
+      "territories": ["CN"],
+      "actual_territory": "US",
+      "expires_on": "2026-08-01",
+      "derivative_allowed": false,
+      "attribution_required": false,
+      "attribution_present": null
+    },
+    {
+      "asset_id": "FNT-001",
+      "asset_type": "font",
+      "source": "示例字体站",
+      "license_type": "desktop",
+      "proof_reference": null,
+      "permitted_channels": ["social"],
+      "actual_channels": ["social"],
+      "territories": ["CN"],
+      "actual_territory": "CN",
+      "expires_on": "perpetual",
+      "derivative_allowed": false,
+      "attribution_required": true,
+      "attribution_present": null
+    }
+  ]
+}
