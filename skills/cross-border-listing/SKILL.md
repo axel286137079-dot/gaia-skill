@@ -4,8 +4,8 @@ slug: cross-border-listing
 displayName: 跨境Listing优化
 summary: 将商品信息整理成跨境电商 Listing 草稿，并离线检查常见违禁词、标题与五点长度、禁止符号和全大写问题。
 license: MIT
-description: 用于起草亚马逊、独立站或 TikTok Shop 商品标题、五点描述和 Search Terms，并用离线脚本检查常见违禁词、绝对化或疗效宣称、标题和五点长度、禁止符号及全大写。平台类目规则会变化，发布前仍须按目标站点和类目复核。
-version: 0.1.2
+description: 用于起草亚马逊、独立站或 TikTok Shop 商品标题、五点描述和 Search Terms，并用离线脚本检查常见违禁词、绝对化或疗效宣称、75 字符标题与 Item Highlights（2026-07 亚马逊新政）长度、禁止符号及全大写。平台类目规则会变化，发布前仍须按目标站点和类目复核。
+version: 0.1.3
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/cross-border-listing
 category: 电商
 tags: [跨境电商, 亚马逊Listing, 产品文案, SEO, 合规自查]
@@ -28,12 +28,14 @@ platforms: [workbuddy, claude-code, cursor]
 - 输入：中文产品名 + 卖点 + 目标站点（默认美国站）。
 - 提炼：核心卖点、目标人群、使用场景、差异化。
 
-### 2. 生成标题（通用结构）
-- **公式**：`[核心关键词] + [品牌] + [卖点1] + [卖点2] + [规格/材质]`
-- 将核心关键词自然放在前部；长度上限使用目标站点/类目的最新规则，脚本可通过 `--title-max` 配置。
-- 禁止：全大写、特殊符号（! ? $ & 等）、促销词、夸大词。
+### 2. 生成标题（亚马逊 2026 新政）
+- **Item name ≤75 字符（含空格）**：2026-07-27 起非 Media 类目统一执行；Media（图书/影音）仍 200。
+- **公式**：`[品牌] + [核心产品词] + [关键规格] + [强区分属性]`，核心词前置（移动端仅完整展示前 50 字符）。
+- 同一实词最多出现 2 次；禁止 emoji、重复标点（!!! / …）、HTML、官方禁用符号（! $ ? _ { } ^ ¬ ¦，品牌名内含时例外）。
+- 标题放不下的材质/兼容/场景/卖点 → 写入 **Item Highlights**（≤125 字符、可搜索、随标题展示），勿堆回标题。
+- 禁止：全大写、促销词、夸大词、竞品对比。标题不要写到正好 75，留 5~10 字符冗余。
 
-### 3. 五点描述（Bullet Points）
+### 3. Item Highlights + 五点描述
 - 每点：卖点前置 + 场景化 + 量化（尺寸/材质/容量/适用人群）。
 - 结构：`[卖点词] - [一句话说明 + 场景/数据]`，每点 ≤250 字符。
 
@@ -44,8 +46,11 @@ platforms: [workbuddy, claude-code, cursor]
 ### 5. 合规自查（发布前必做）
 ```bash
 python3 bin/listing_check.py listing.md
-# 输出：违禁词 + 标题长度/符号 + 全大写 + 绝对化词 检查
+# 输出：违禁词 + 标题长度(≤75)/符号/重复词 + Item Highlights(≤125) + 全大写 检查
+# Media 类目（标题仍 200）：python3 bin/listing_check.py listing.md --title-max 200
 ```
+
+> **2026-07-27 亚马逊新政速记**：标题上限 200→75（非 Media），多出的空间由 Item Highlights（125）承接；品牌卖家对平台 AI 建议改写有 14 天复核窗口，主动先改可避免关键词/措辞失控。
 
 ## 合规红线
 
@@ -54,7 +59,8 @@ python3 bin/listing_check.py listing.md
 | 绝对化/夸大 | best、#1、100%、perfect、ultimate | 亚马逊禁，违规下架 |
 | 健康疗效宣称 | cure、treat、heal、anti-cancer、FDA approved | FDA 严查，高危 |
 | 促销/引流 | sale、discount、free shipping、官网链接 | 亚马逊禁 |
-| 标题规范 | 全大写、特殊符号、超 200 字符 | 违反格式规范 |
+| 标题规范 | 超 75 字符（2026-07 起，非 Media）、全大写、emoji/重复标点/官方禁用符号、同词超 2 次 | 违反格式规范，可能被 AI 改写 |
+| Item Highlights | 超 125 字符；承载夸大/不可验证宣称 | 违反 2026 新政 |
 
 ## 边界与红线
 

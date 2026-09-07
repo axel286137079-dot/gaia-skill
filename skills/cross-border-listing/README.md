@@ -17,9 +17,10 @@
 ### 合规自查（核心工具）
 ```bash
 python3 bin/listing_check.py 你的listing.md
-# 输出：违禁词 + 标题长度/符号 + 全大写 检查
+# 输出：违禁词 + 标题长度(≤75)/符号/重复词 + Item Highlights(≤125) + 全大写 检查
 
-python3 bin/listing_check.py 你的listing.md --json --title-max 200 --bullet-max 500
+python3 bin/listing_check.py 你的listing.md --json --title-max 75 --bullet-max 500
+# Media（图书/影音）类目标题仍为 200：--title-max 200
 ```
 
 ### 示例
@@ -34,7 +35,8 @@ python3 bin/listing_check.py examples/sample_listing.md
 | 绝对化/夸大 | best/#1/100%/perfect/ultimate | 违规下架 |
 | 健康疗效宣称 | cure/treat/heal/anti-cancer/FDA approved | FDA 严查 |
 | 促销/引流 | sale/free shipping/.com/官网链接 | 亚马逊禁 |
-| 标题/五点规范 | 全大写/特殊符号/超过配置长度 | 可能违反目标类目规则 |
+| 标题规范 | 超 75 字符（2026-07-27 新政）/全大写/emoji/重复标点/官方禁用符号/同词超 2 次 | 可能违反目标类目规则 |
+| Item Highlights | 超 125 字符 / 承载夸大宣称 | 2026 新政新增字段 |
 
 ## 目录结构
 
