@@ -1,0 +1,45 @@
+{
+  "as_of_date": "2026-09-07",
+  "currency": "CNY",
+  "campaigns": [
+    {
+      "campaign_id": "C-101",
+      "name": "秋季焕新计划-搜索词A",
+      "spend": "3000.00",
+      "attributed_revenue": "15000.00",
+      "refund_amount": "300.00",
+      "gross_margin_rate": 0.45,
+      "platform_fee": "200.00",
+      "fulfillment_cost": "900.00",
+      "conversions": 150,
+      "target_profit_margin": 0.15,
+      "attribution_lag_days": 0
+    },
+    {
+      "campaign_id": "C-102",
+      "name": "清仓活动-信息流B",
+      "spend": "5000.00",
+      "attributed_revenue": "6200.00",
+      "refund_amount": "500.00",
+      "gross_margin_rate": 0.30,
+      "platform_fee": "400.00",
+      "fulfillment_cost": "2500.00",
+      "conversions": 95,
+      "target_profit_margin": 0.20,
+      "attribution_lag_days": 0
+    },
+    {
+      "campaign_id": "C-103",
+      "name": "新品首发-视频号C",
+      "spend": "4000.00",
+      "attributed_revenue": "1800.00",
+      "refund_amount": "0.00",
+      "gross_margin_rate": 0.40,
+      "platform_fee": "300.00",
+      "fulfillment_cost": "700.00",
+      "conversions": 40,
+      "target_profit_margin": 0.20,
+      "attribution_lag_days": 6
+    }
+  ]
+}

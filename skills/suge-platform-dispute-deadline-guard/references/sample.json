@@ -1,0 +1,65 @@
+{
+  "as_of_date": "2026-09-07",
+  "currency": "CNY",
+  "timezone": "Asia/Shanghai",
+  "cases": [
+    {
+      "case_id": "D-001",
+      "platform": "示例电商平台A",
+      "case_type": "交易纠纷",
+      "notice_date": "2026-08-20",
+      "explicit_deadline": "2026-09-30",
+      "deadline_days": 30,
+      "amount_at_risk": "8500.00",
+      "required_evidence": ["order_proof", "chat_log", "refund_record"],
+      "available_evidence": ["order_proof", "chat_log"],
+      "event_timeline": [
+        {"date": "2026-08-20", "note": "买家投诉未按承诺发货，来电 13812345678 要求全额退款"},
+        {"date": "2026-08-25", "note": "平台小二介入并要求补充发货凭证"},
+        {"date": "2026-08-28", "note": "已上传快递底单，等待平台复核"}
+      ]
+    },
+    {
+      "case_id": "D-002",
+      "platform": "示例本地生活平台B",
+      "case_type": "到店核销争议",
+      "notice_date": "2026-08-25",
+      "deadline_days": 10,
+      "amount_at_risk": "12000.00",
+      "required_evidence": ["order_proof"],
+      "available_evidence": ["order_proof"],
+      "event_timeline": [
+        {"date": "2026-08-25", "note": "平台通知核销异常需申诉"},
+        {"date": "2026-08-30", "note": "已提交订单截图"}
+      ]
+    },
+    {
+      "case_id": "D-003",
+      "platform": "示例跨境电商平台C",
+      "case_type": "物流未妥投申诉",
+      "notice_date": "2026-09-01",
+      "explicit_deadline": "2026-09-07",
+      "amount_at_risk": "3000.00",
+      "required_evidence": ["tracking_number", "carrier_statement"],
+      "available_evidence": ["tracking_number", "carrier_statement"],
+      "event_timeline": [
+        {"date": "2026-09-01", "note": "买家声称未收到货发起退款"},
+        {"date": "2026-09-05", "note": "物流承运方出具妥投异常说明"}
+      ]
+    },
+    {
+      "case_id": "D-004",
+      "platform": "示例内容电商平台D",
+      "case_type": "佣金结算争议",
+      "notice_date": "2026-09-03",
+      "explicit_deadline": "2026-09-10",
+      "amount_at_risk": "5000.00",
+      "required_evidence": ["settlement_report", "commission_rule"],
+      "available_evidence": ["settlement_report", "commission_rule"],
+      "event_timeline": [
+        {"date": "2026-09-03", "note": "发现佣金明细与后台不一致，发起人工申诉"},
+        {"date": "2026-09-06", "note": "平台回复需在截止前补充规则版本截图"}
+      ]
+    }
+  ]
+}
