@@ -1,0 +1,72 @@
+{
+  "currency": "CNY",
+  "as_of": "2026-09-16T00:00:00+08:00",
+  "packages": [
+    {
+      "id": "PKG-001",
+      "kind": "quota",
+      "unit": "GB",
+      "remaining": "100",
+      "expires_at": "2026-10-16T00:00:00+08:00",
+      "applicable_products": ["对象存储", "CDN"],
+      "product": "对象存储",
+      "usage_per_day": "10",
+      "usage_evidence_days": 14,
+      "usage_observed_at": "2026-09-15T00:00:00+08:00",
+      "overage_unit_price": "0.50",
+      "forecast_days": 15
+    },
+    {
+      "id": "PKG-002",
+      "kind": "monetary",
+      "unit": "CNY",
+      "remaining": "300.00",
+      "expires_at": "2026-09-21T00:00:00+08:00",
+      "applicable_products": ["云服务器"],
+      "product": "云服务器",
+      "usage_per_day": "80.00",
+      "usage_evidence_days": 10,
+      "usage_observed_at": "2026-09-15T00:00:00+08:00",
+      "forecast_days": 30
+    },
+    {
+      "id": "PKG-003",
+      "kind": "quota",
+      "unit": "小时",
+      "remaining": "500",
+      "expires_at": "2026-12-01T00:00:00+08:00",
+      "applicable_products": ["GPU 实例"],
+      "product": "GPU 实例",
+      "usage_per_day": "0",
+      "usage_evidence_days": 20,
+      "usage_observed_at": "2026-09-15T00:00:00+08:00",
+      "forecast_days": 30
+    },
+    {
+      "id": "PKG-004",
+      "kind": "quota",
+      "unit": "GB",
+      "remaining": "200",
+      "expires_at": "2026-09-20T00:00:00+08:00",
+      "applicable_products": ["对象存储"],
+      "product": "云数据库",
+      "usage_per_day": "5",
+      "usage_evidence_days": 10,
+      "usage_observed_at": "2026-09-15T00:00:00+08:00",
+      "forecast_days": 15
+    },
+    {
+      "id": "PKG-005",
+      "kind": "monetary",
+      "unit": "USD",
+      "remaining": "50.00",
+      "expires_at": "2026-10-01T00:00:00+08:00",
+      "applicable_products": ["CDN"],
+      "product": "CDN",
+      "usage_per_day": "2.00",
+      "usage_evidence_days": 9,
+      "usage_observed_at": "2026-09-15T00:00:00+08:00",
+      "forecast_days": 30
+    }
+  ]
+}

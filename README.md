@@ -6,7 +6,7 @@
 
 ---
 
-## 技能清单（24 个）
+## 技能清单（27 个）
 
 | # | 技能 | slug | 一句话说明 |
 |---|------|------|-----------|
@@ -34,6 +34,9 @@
 | 22 | 广告投放利润底线审计 | `suge-ad-profit-floor-audit` | 净收入/ROAS/保本 ROAS/最高可承受 CPA 逐项核算，归因未闭合不下亏损结论 |
 | 23 | 云服务 SLA 补偿证据包 | `suge-cloud-sla-credit-evidence-pack` | 故障裁切去重合并、可用性与档位补偿估算，证据缺口点名 |
 | 24 | 平台争议申诉时限守门 | `suge-platform-dispute-deadline-guard` | 截止日/剩余天数/紧急度与缺证差集，无规则不猜期限 |
+| 25 | 包裹运费账单核对 | `suge-parcel-freight-bill-audit` | 体积重/计费重按步长向上取整的运费估价与差异核对，未知附加费不判多收 |
+| 26 | 订阅变更折算核对 | `suge-subscription-proration-audit` | 同周期线性折算新增/抵扣/净额，HALF_UP 到分，降配只标候选抵扣 |
+| 27 | 云额度到期与超额风险 | `suge-cloud-credit-expiry-guard` | 逐包估算到期/耗尽先后与候选超额，单包情景、只读不改云资源 |
 
 ---
 

@@ -1,0 +1,51 @@
+{
+  "currency": "CNY",
+  "shipments": [
+    {
+      "shipment_id": "P-001",
+      "actual_weight_kg": 1.2,
+      "dimensions_cm": null,
+      "volumetric_divisor": null,
+      "weight_step_kg": 0.5,
+      "first_weight_kg": 1.0,
+      "first_price": "10.00",
+      "extra_step_price": "2.00",
+      "surcharges": [
+        {"name": "偏远地区附加费", "amount": "2.00", "confirmed": true}
+      ],
+      "invoiced_amount": "14.00",
+      "rate_source": "承运商价目表示例 2026-09",
+      "rounding_mode": "ceil"
+    },
+    {
+      "shipment_id": "P-002",
+      "actual_weight_kg": 2.5,
+      "dimensions_cm": [40, 30, 20],
+      "volumetric_divisor": 5000,
+      "weight_step_kg": 0.5,
+      "first_weight_kg": 1.0,
+      "first_price": "10.00",
+      "extra_step_price": "2.00",
+      "surcharges": [],
+      "invoiced_amount": "30.00",
+      "rate_source": "承运商价目表示例 2026-09（体积重口径）",
+      "rounding_mode": "ceil"
+    },
+    {
+      "shipment_id": "P-003",
+      "actual_weight_kg": 1.2,
+      "dimensions_cm": null,
+      "volumetric_divisor": null,
+      "weight_step_kg": 0.5,
+      "first_weight_kg": 1.0,
+      "first_price": "10.00",
+      "extra_step_price": "2.00",
+      "surcharges": [
+        {"name": "燃油附加费", "amount": "3.00", "confirmed": false}
+      ],
+      "invoiced_amount": "15.00",
+      "rate_source": "承运商价目表示例 2026-09",
+      "rounding_mode": "ceil"
+    }
+  ]
+}

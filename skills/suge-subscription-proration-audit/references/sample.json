@@ -1,0 +1,44 @@
+{
+  "currency": "CNY",
+  "subscriptions": [
+    {
+      "subscription_id": "SUB-001",
+      "mode": "linear_same_cycle",
+      "billing_basis": "seconds",
+      "cycle_start": "2026-09-01T00:00:00+00:00",
+      "cycle_end": "2026-10-01T00:00:00+00:00",
+      "change_at": "2026-09-16T00:00:00+00:00",
+      "old_period_amount": "100.00",
+      "new_period_amount": "200.00",
+      "old_invoice_paid": true,
+      "invoiced_adjustment": "50.00",
+      "policy_source": "服务商价目示例：同周期线性折算、按剩余比例"
+    },
+    {
+      "subscription_id": "SUB-002",
+      "mode": "linear_same_cycle",
+      "billing_basis": "actual_days",
+      "cycle_start": "2026-09-01T00:00:00+08:00",
+      "cycle_end": "2026-10-01T00:00:00+08:00",
+      "change_at": "2026-09-16T00:00:00+08:00",
+      "old_period_amount": "200.00",
+      "new_period_amount": "100.00",
+      "old_invoice_paid": true,
+      "invoiced_adjustment": null,
+      "policy_source": "服务商价目示例：同周期线性折算、按实际天数"
+    },
+    {
+      "subscription_id": "SUB-003",
+      "mode": "linear_same_cycle",
+      "billing_basis": "seconds",
+      "cycle_start": "2026-09-01T00:00:00+00:00",
+      "cycle_end": "2026-10-01T00:00:00+00:00",
+      "change_at": "2026-09-16T00:00:00+00:00",
+      "old_period_amount": "100.00",
+      "new_period_amount": "150.00",
+      "old_invoice_paid": false,
+      "invoiced_adjustment": null,
+      "policy_source": "服务商价目示例"
+    }
+  ]
+}
