@@ -1,0 +1,550 @@
+{
+ "as_of": "2026-09-20T00:00:00+08:00",
+ "assets": [
+  {
+   "asset_id": "DB-PROD-01",
+   "criticality": "critical",
+   "target_rpo_hours": 24,
+   "target_retention_days": 30,
+   "policy_enabled": true,
+   "policy_interval_hours": 24,
+   "resource_bound": true,
+   "keep_at_least_one": true,
+   "cross_region_required": true,
+   "cross_region_observed": true,
+   "immutable_required": true,
+   "immutable_observed": true,
+   "last_restore_test_at": "2026-09-15T10:00:00+08:00",
+   "last_restore_test_result": "success",
+   "last_restore_test_evidence": "RESTORE-TEST-20260915.log",
+   "restore_points": [
+    {
+     "rp_id": "RP-00",
+     "status": "success",
+     "completed_at": "2026-08-20T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-01",
+     "status": "success",
+     "completed_at": "2026-08-21T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-02",
+     "status": "success",
+     "completed_at": "2026-08-22T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-03",
+     "status": "success",
+     "completed_at": "2026-08-23T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-04",
+     "status": "success",
+     "completed_at": "2026-08-24T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-05",
+     "status": "success",
+     "completed_at": "2026-08-25T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-06",
+     "status": "success",
+     "completed_at": "2026-08-26T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-07",
+     "status": "success",
+     "completed_at": "2026-08-27T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-08",
+     "status": "success",
+     "completed_at": "2026-08-28T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-09",
+     "status": "success",
+     "completed_at": "2026-08-29T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-10",
+     "status": "success",
+     "completed_at": "2026-08-30T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-11",
+     "status": "success",
+     "completed_at": "2026-08-31T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-12",
+     "status": "success",
+     "completed_at": "2026-09-01T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-13",
+     "status": "success",
+     "completed_at": "2026-09-02T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-14",
+     "status": "success",
+     "completed_at": "2026-09-03T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-15",
+     "status": "success",
+     "completed_at": "2026-09-04T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-16",
+     "status": "success",
+     "completed_at": "2026-09-05T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-17",
+     "status": "success",
+     "completed_at": "2026-09-06T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-18",
+     "status": "success",
+     "completed_at": "2026-09-07T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-19",
+     "status": "success",
+     "completed_at": "2026-09-08T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-20",
+     "status": "success",
+     "completed_at": "2026-09-09T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-21",
+     "status": "success",
+     "completed_at": "2026-09-10T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-22",
+     "status": "success",
+     "completed_at": "2026-09-11T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-23",
+     "status": "success",
+     "completed_at": "2026-09-12T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-24",
+     "status": "success",
+     "completed_at": "2026-09-13T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-25",
+     "status": "success",
+     "completed_at": "2026-09-14T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-26",
+     "status": "success",
+     "completed_at": "2026-09-15T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-27",
+     "status": "success",
+     "completed_at": "2026-09-16T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-28",
+     "status": "success",
+     "completed_at": "2026-09-17T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-29",
+     "status": "success",
+     "completed_at": "2026-09-18T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-30",
+     "status": "success",
+     "completed_at": "2026-09-19T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    }
+   ]
+  },
+  {
+   "asset_id": "APP-WEB-02",
+   "criticality": "high",
+   "target_rpo_hours": 24,
+   "target_retention_days": 7,
+   "policy_enabled": true,
+   "policy_interval_hours": 24,
+   "resource_bound": true,
+   "keep_at_least_one": true,
+   "cross_region_required": false,
+   "immutable_required": true,
+   "immutable_observed": true,
+   "last_restore_test_at": "2026-09-18T10:00:00+08:00",
+   "last_restore_test_result": "success",
+   "last_restore_test_evidence": "r-test.log",
+   "restore_points": [
+    {
+     "rp_id": "A1",
+     "status": "success",
+     "completed_at": "2026-09-19T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "J-A"
+    },
+    {
+     "rp_id": "A2",
+     "status": "success",
+     "completed_at": "2026-09-18T16:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "J-A"
+    },
+    {
+     "rp_id": "A3",
+     "status": "success",
+     "completed_at": "2026-09-17T16:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "J-A"
+    },
+    {
+     "rp_id": "A4",
+     "status": "success",
+     "completed_at": "2026-09-16T16:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "J-A"
+    }
+   ]
+  },
+  {
+   "asset_id": "FS-LOGS-03",
+   "criticality": "normal",
+   "target_rpo_hours": 24,
+   "target_retention_days": 30,
+   "policy_enabled": true,
+   "policy_interval_hours": 24,
+   "resource_bound": true,
+   "keep_at_least_one": true,
+   "cross_region_required": false,
+   "immutable_required": false,
+   "last_restore_test_at": "2026-09-12T09:00:00+08:00",
+   "last_restore_test_result": "success",
+   "last_restore_test_evidence": "restore-log.txt",
+   "restore_points": [
+    {
+     "rp_id": "RP-00",
+     "status": "success",
+     "completed_at": "2026-09-10T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-01",
+     "status": "success",
+     "completed_at": "2026-09-11T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-02",
+     "status": "success",
+     "completed_at": "2026-09-12T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-03",
+     "status": "success",
+     "completed_at": "2026-09-13T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-04",
+     "status": "success",
+     "completed_at": "2026-09-14T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-05",
+     "status": "success",
+     "completed_at": "2026-09-15T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-06",
+     "status": "success",
+     "completed_at": "2026-09-16T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-07",
+     "status": "success",
+     "completed_at": "2026-09-17T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-08",
+     "status": "success",
+     "completed_at": "2026-09-18T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    },
+    {
+     "rp_id": "RP-09",
+     "status": "success",
+     "completed_at": "2026-09-19T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "JOB-X"
+    }
+   ]
+  },
+  {
+   "asset_id": "VM-LEGACY-04",
+   "criticality": "low",
+   "target_rpo_hours": 24,
+   "target_retention_days": 7,
+   "policy_enabled": true,
+   "policy_interval_hours": 24,
+   "resource_bound": false,
+   "keep_at_least_one": false,
+   "cross_region_required": false,
+   "immutable_required": false,
+   "last_restore_test_at": null,
+   "last_restore_test_result": null,
+   "last_restore_test_evidence": null,
+   "restore_points": [
+    {
+     "rp_id": "V1",
+     "status": "success",
+     "completed_at": "2026-09-19T20:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "J-V"
+    }
+   ]
+  },
+  {
+   "asset_id": "DB-STAGE-05",
+   "criticality": "high",
+   "target_rpo_hours": 24,
+   "target_retention_days": 7,
+   "policy_enabled": true,
+   "policy_interval_hours": 24,
+   "resource_bound": true,
+   "keep_at_least_one": true,
+   "cross_region_required": false,
+   "immutable_required": false,
+   "last_restore_test_at": null,
+   "last_restore_test_result": null,
+   "last_restore_test_evidence": null,
+   "restore_points": [
+    {
+     "rp_id": "S00",
+     "status": "success",
+     "completed_at": "2026-09-12T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "J-S"
+    },
+    {
+     "rp_id": "S01",
+     "status": "success",
+     "completed_at": "2026-09-13T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "J-S"
+    },
+    {
+     "rp_id": "S02",
+     "status": "success",
+     "completed_at": "2026-09-14T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "J-S"
+    },
+    {
+     "rp_id": "S03",
+     "status": "success",
+     "completed_at": "2026-09-15T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "J-S"
+    },
+    {
+     "rp_id": "S04",
+     "status": "success",
+     "completed_at": "2026-09-16T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "J-S"
+    },
+    {
+     "rp_id": "S05",
+     "status": "success",
+     "completed_at": "2026-09-17T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "J-S"
+    },
+    {
+     "rp_id": "S06",
+     "status": "success",
+     "completed_at": "2026-09-18T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "J-S"
+    },
+    {
+     "rp_id": "S07",
+     "status": "success",
+     "completed_at": "2026-09-19T22:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "J-S"
+    }
+   ]
+  },
+  {
+   "asset_id": "NAS-NEW-06",
+   "criticality": "normal",
+   "target_rpo_hours": 24,
+   "target_retention_days": 30,
+   "policy_enabled": true,
+   "policy_interval_hours": 24,
+   "resource_bound": true,
+   "keep_at_least_one": false,
+   "cross_region_required": false,
+   "immutable_required": false,
+   "last_restore_test_at": "2026-09-19T08:00:00+08:00",
+   "last_restore_test_result": "success",
+   "last_restore_test_evidence": "nas-test.log",
+   "restore_points": [
+    {
+     "rp_id": "N1",
+     "status": "success",
+     "completed_at": "2026-09-19T18:00:00+08:00",
+     "expiry_at": null,
+     "region": "cn-north-1",
+     "source_job_id": "J-N"
+    }
+   ]
+  }
+ ]
+}

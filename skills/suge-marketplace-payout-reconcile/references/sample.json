@@ -1,0 +1,92 @@
+{
+  "currency": "CNY",
+  "as_of": "2026-09-20T00:00:00+08:00",
+  "payouts": [
+    {
+      "payout_id": "PO-001",
+      "status": "settled",
+      "expected_platform_payout": "77.00",
+      "bank_received_amount": "77.00",
+      "bank_received_at": "2026-09-19T09:30:00+08:00",
+      "trace_reference": "TRACE-20260919-001",
+      "tolerance": "0.01",
+      "net_formula": "gross+fee",
+      "transactions": [
+        {
+          "transaction_id": "TXN-100",
+          "type": "charge",
+          "gross": "100.00",
+          "fee": "-3.00",
+          "net": "97.00",
+          "payout_id": "PO-001",
+          "occurred_at": "2026-09-19T08:00:00+08:00",
+          "source_reference": "ORDER-9001"
+        },
+        {
+          "transaction_id": "TXN-101",
+          "type": "refund",
+          "gross": "-20.00",
+          "fee": "0.00",
+          "net": "-20.00",
+          "payout_id": "PO-001",
+          "occurred_at": "2026-09-19T08:05:00+08:00",
+          "source_reference": "REFUND-9002"
+        }
+      ]
+    },
+    {
+      "payout_id": "PO-002",
+      "status": "settled",
+      "expected_platform_payout": "77.00",
+      "bank_received_amount": "75.00",
+      "bank_received_at": "2026-09-19T10:00:00+08:00",
+      "trace_reference": "TRACE-20260919-002",
+      "tolerance": "0.00",
+      "net_formula": "gross+fee",
+      "transactions": [
+        {
+          "transaction_id": "TXN-200",
+          "type": "charge",
+          "gross": "50.00",
+          "fee": "-2.00",
+          "net": "48.00",
+          "payout_id": "PO-002",
+          "occurred_at": "2026-09-19T08:10:00+08:00",
+          "source_reference": "ORDER-9101"
+        },
+        {
+          "transaction_id": "TXN-201",
+          "type": "charge",
+          "gross": "30.00",
+          "fee": "-1.00",
+          "net": "29.00",
+          "payout_id": "PO-002",
+          "occurred_at": "2026-09-19T08:15:00+08:00",
+          "source_reference": "ORDER-9102"
+        }
+      ]
+    },
+    {
+      "payout_id": "PO-003",
+      "status": "pending",
+      "expected_platform_payout": "12.50",
+      "bank_received_amount": null,
+      "bank_received_at": null,
+      "trace_reference": null,
+      "tolerance": "0.01",
+      "net_formula": "gross+fee",
+      "transactions": [
+        {
+          "transaction_id": "TXN-300",
+          "type": "charge",
+          "gross": "12.50",
+          "fee": "0.00",
+          "net": "12.50",
+          "payout_id": "PO-003",
+          "occurred_at": "2026-09-19T09:00:00+08:00",
+          "source_reference": "ORDER-9201"
+        }
+      ]
+    }
+  ]
+}

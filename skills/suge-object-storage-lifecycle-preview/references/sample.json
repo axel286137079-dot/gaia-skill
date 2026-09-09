@@ -1,0 +1,105 @@
+{
+  "provider": "ALIYUN",
+  "as_of": "2026-09-20T00:00:00+08:00",
+  "currency": "CNY",
+  "policy_profile": {
+    "min_billable_bytes": 65536,
+    "minimum_storage_days": 30,
+    "small_object_threshold_bytes": 0,
+    "conflict_priority": "review",
+    "time_rounding": "day"
+  },
+  "price_table": {
+    "effective_at": "2026-09-01T00:00:00+08:00",
+    "source": "用户提供示例费率（非实时报价）",
+    "classes": {
+      "STANDARD": {"storage_gb_month": "0.12"},
+      "IA": {"storage_gb_month": "0.05", "transition_per_1000_objects": "0.10"},
+      "GLACIER": {"storage_gb_month": "0.02", "transition_per_1000_objects": "0.15"}
+    }
+  },
+  "rules": [
+    {
+      "rule_id": "RULE-IA",
+      "action": "transition",
+      "days": 30,
+      "target_class": "IA",
+      "filters": {"min_bytes": 1048576}
+    },
+    {
+      "rule_id": "RULE-GLACIER",
+      "action": "transition",
+      "days": 60,
+      "target_class": "GLACIER",
+      "filters": {"min_bytes": 4194304}
+    },
+    {
+      "rule_id": "RULE-E",
+      "action": "expiration",
+      "days": 120,
+      "filters": {"max_bytes": 1048575}
+    }
+  ],
+  "object_cohorts": [
+    {
+      "cohort_id": "COH-SMALL-UNVER",
+      "object_count": 500,
+      "total_bytes": 52428800,
+      "min_object_bytes": 20480,
+      "max_object_bytes": 102400,
+      "avg_object_bytes": 104857,
+      "current_class": "STANDARD",
+      "last_modified_at": "2026-04-01T00:00:00+08:00",
+      "versioning_state": "unversioned",
+      "expected_delete_or_overwrite_at": null
+    },
+    {
+      "cohort_id": "COH-SMALL-VER",
+      "object_count": 300,
+      "total_bytes": 157286400,
+      "min_object_bytes": 204800,
+      "max_object_bytes": 524288,
+      "avg_object_bytes": 524288,
+      "current_class": "STANDARD",
+      "last_modified_at": "2026-03-01T00:00:00+08:00",
+      "versioning_state": "versioned",
+      "expected_delete_or_overwrite_at": null
+    },
+    {
+      "cohort_id": "COH-MED-COST",
+      "object_count": 200,
+      "total_bytes": 419430400,
+      "min_object_bytes": 1048576,
+      "max_object_bytes": 3145728,
+      "avg_object_bytes": 2097152,
+      "current_class": "STANDARD",
+      "last_modified_at": "2026-08-10T00:00:00+08:00",
+      "versioning_state": "versioned",
+      "expected_delete_or_overwrite_at": "2026-09-28T00:00:00+08:00"
+    },
+    {
+      "cohort_id": "COH-BIG-CONFLICT",
+      "object_count": 100,
+      "total_bytes": 524288000,
+      "min_object_bytes": 4194304,
+      "max_object_bytes": 8388608,
+      "avg_object_bytes": 5242880,
+      "current_class": "STANDARD",
+      "last_modified_at": "2026-06-01T00:00:00+08:00",
+      "versioning_state": "unversioned",
+      "expected_delete_or_overwrite_at": null
+    },
+    {
+      "cohort_id": "COH-NOAGE-UNKNOWN",
+      "object_count": 1000,
+      "total_bytes": 2097152000,
+      "min_object_bytes": 1048576,
+      "max_object_bytes": 4194304,
+      "avg_object_bytes": 2097152,
+      "current_class": "STANDARD",
+      "last_modified_at": null,
+      "versioning_state": "unknown",
+      "expected_delete_or_overwrite_at": null
+    }
+  ]
+}
