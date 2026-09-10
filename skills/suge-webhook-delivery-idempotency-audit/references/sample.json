@@ -1,0 +1,216 @@
+{
+  "as_of": "2026-09-20T12:00:00+08:00",
+  "expected_event_ids": [
+    "EV-100", "EV-101", "EV-102", "EV-103", "EV-104",
+    "EV-105", "EV-106", "EV-108", "EV-109", "EV-200"
+  ],
+  "policy": {
+    "success_status_min": 200,
+    "success_status_max": 299,
+    "max_response_seconds": 10,
+    "dedup_key": ["object_id", "event_type"],
+    "allow_out_of_order": true,
+    "observation_window_seconds": 86400,
+    "timezone": "Asia/Shanghai"
+  },
+  "deliveries": [
+    {
+      "delivery_id": "DL-1001",
+      "event_id": "EV-100",
+      "event_type": "order.created",
+      "object_id": "OBJ-1001",
+      "attempt_no": 1,
+      "sent_at": "2026-09-20T09:00:00+08:00",
+      "http_status": 500,
+      "response_at": "2026-09-20T09:00:01+08:00",
+      "manual_resend": false,
+      "signature_verified": true
+    },
+    {
+      "delivery_id": "DL-1002",
+      "event_id": "EV-100",
+      "event_type": "order.created",
+      "object_id": "OBJ-1001",
+      "attempt_no": 2,
+      "sent_at": "2026-09-20T09:00:30+08:00",
+      "http_status": 200,
+      "response_at": "2026-09-20T09:00:31+08:00",
+      "manual_resend": false,
+      "signature_verified": true
+    },
+    {
+      "delivery_id": "DL-1003",
+      "event_id": "EV-101",
+      "event_type": "order.paid",
+      "object_id": "OBJ-1002",
+      "attempt_no": 1,
+      "sent_at": "2026-09-20T09:05:00+08:00",
+      "http_status": 200,
+      "response_at": "2026-09-20T09:05:01+08:00",
+      "manual_resend": false,
+      "signature_verified": true
+    },
+    {
+      "delivery_id": "DL-1004",
+      "event_id": "EV-102",
+      "event_type": "order.shipped",
+      "object_id": "OBJ-1003",
+      "attempt_no": 1,
+      "sent_at": "2026-09-20T09:10:00+08:00",
+      "http_status": 200,
+      "response_at": "2026-09-20T09:10:02+08:00",
+      "manual_resend": false,
+      "signature_verified": true
+    },
+    {
+      "delivery_id": "DL-1005",
+      "event_id": "EV-103",
+      "event_type": "order.cancelled",
+      "object_id": "OBJ-1004",
+      "attempt_no": 1,
+      "sent_at": "2026-09-20T09:15:00+08:00",
+      "http_status": 503,
+      "response_at": "2026-09-20T09:15:01+08:00",
+      "manual_resend": false,
+      "signature_verified": true
+    },
+    {
+      "delivery_id": "DL-1006",
+      "event_id": "EV-103",
+      "event_type": "order.cancelled",
+      "object_id": "OBJ-1004",
+      "attempt_no": 2,
+      "sent_at": "2026-09-20T09:16:00+08:00",
+      "http_status": 503,
+      "response_at": "2026-09-20T09:16:01+08:00",
+      "manual_resend": true,
+      "signature_verified": true
+    },
+    {
+      "delivery_id": "DL-1007",
+      "event_id": "EV-104",
+      "event_type": "invoice.issued",
+      "object_id": "OBJ-1005",
+      "attempt_no": 1,
+      "sent_at": "2026-09-20T09:20:00+08:00",
+      "http_status": 200,
+      "response_at": "2026-09-20T09:20:01+08:00",
+      "manual_resend": false,
+      "signature_verified": null
+    },
+    {
+      "delivery_id": "DL-1008",
+      "event_id": "EV-105",
+      "event_type": "order.updated",
+      "object_id": "OBJ-1006",
+      "attempt_no": 1,
+      "sent_at": "2026-09-20T10:00:00+08:00",
+      "http_status": 200,
+      "response_at": "2026-09-20T10:00:01+08:00",
+      "manual_resend": false,
+      "signature_verified": true
+    },
+    {
+      "delivery_id": "DL-1009",
+      "event_id": "EV-106",
+      "event_type": "order.fulfilled",
+      "object_id": "OBJ-1006",
+      "attempt_no": 1,
+      "sent_at": "2026-09-20T10:20:00+08:00",
+      "http_status": 200,
+      "response_at": "2026-09-20T10:20:01+08:00",
+      "manual_resend": false,
+      "signature_verified": true
+    },
+    {
+      "delivery_id": "DL-1011",
+      "event_id": "EV-108",
+      "event_type": "order.refunded",
+      "object_id": "OBJ-1007",
+      "attempt_no": 1,
+      "sent_at": "2026-09-20T09:40:00+08:00",
+      "http_status": 200,
+      "response_at": "2026-09-20T09:40:01+08:00",
+      "manual_resend": false,
+      "signature_verified": true
+    },
+    {
+      "delivery_id": "DL-1012",
+      "event_id": "EV-109",
+      "event_type": "order.refunded",
+      "object_id": "OBJ-1007",
+      "attempt_no": 1,
+      "sent_at": "2026-09-20T09:40:20+08:00",
+      "http_status": 200,
+      "response_at": "2026-09-20T09:40:21+08:00",
+      "manual_resend": false,
+      "signature_verified": true
+    }
+  ],
+  "processing_records": [
+    {
+      "event_id": "EV-100",
+      "object_id": "OBJ-1001",
+      "event_type": "order.created",
+      "processing_status": "succeeded",
+      "processed_at": "2026-09-20T09:00:32+08:00",
+      "side_effect_reference": "SE-1001"
+    },
+    {
+      "event_id": "EV-102",
+      "object_id": "OBJ-1003",
+      "event_type": "order.shipped",
+      "processing_status": "succeeded",
+      "processed_at": "2026-09-20T09:10:05+08:00",
+      "side_effect_reference": "SE-1003A"
+    },
+    {
+      "event_id": "EV-102",
+      "object_id": "OBJ-1003",
+      "event_type": "order.shipped",
+      "processing_status": "succeeded",
+      "processed_at": "2026-09-20T09:10:09+08:00",
+      "side_effect_reference": "SE-1003B"
+    },
+    {
+      "event_id": "EV-104",
+      "object_id": "OBJ-1005",
+      "event_type": "invoice.issued",
+      "processing_status": "succeeded",
+      "processed_at": "2026-09-20T09:20:03+08:00",
+      "side_effect_reference": "SE-1005"
+    },
+    {
+      "event_id": "EV-105",
+      "object_id": "OBJ-1006",
+      "event_type": "order.updated",
+      "processing_status": "succeeded",
+      "processed_at": "2026-09-20T10:30:00+08:00",
+      "side_effect_reference": "SE-1006"
+    },
+    {
+      "event_id": "EV-106",
+      "object_id": "OBJ-1006",
+      "event_type": "order.fulfilled",
+      "processing_status": "succeeded",
+      "processed_at": "2026-09-20T10:25:00+08:00",
+      "side_effect_reference": "SE-1007"
+    },
+    {
+      "event_id": "EV-108",
+      "object_id": "OBJ-1007",
+      "event_type": "order.refunded",
+      "processing_status": "succeeded",
+      "processed_at": "2026-09-20T09:40:05+08:00",
+      "side_effect_reference": "SE-1008"
+    },
+    {
+      "event_id": "EV-109",
+      "object_id": "OBJ-1007",
+      "event_type": "order.refunded",
+      "processing_status": "succeeded",
+      "processed_at": "2026-09-20T09:40:25+08:00",
+      "side_effect_reference": "SE-1009"
+    }
+  ]
+}
