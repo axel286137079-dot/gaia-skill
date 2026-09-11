@@ -1,12 +1,12 @@
 # 盖亚-skill（Gaia Skills）
 
-> 33 个面向中国用户的实用 AI 技能合集 —— 每个都能独立安装、独立使用，覆盖内容创作、研究、电商、法律、办公自动化、智能家居、金融投资等高频场景。
+> 36 个面向中国用户的实用 AI 技能合集 —— 每个都能独立安装、独立使用，覆盖内容创作、研究、电商、法律、办公自动化、智能家居、金融投资等高频场景。
 
 **品牌定位**：不追热点、不堆参数，只做「装上就能干活」的国产场景技能。全部开源（MIT）、零第三方依赖（纯 Python 标准库优先）、可离线回退。
 
 ---
 
-## 技能清单（33 个）
+## 技能清单（36 个）
 
 | # | 技能 | slug | 一句话说明 |
 |---|------|------|-----------|
@@ -43,6 +43,9 @@
 | 31 | Webhook 投递与幂等核对 | `suge-webhook-delivery-idempotency-audit` | 重试≠重复执行、2xx≠已处理，按去重键核对投递/处理并给重放前核对清单 |
 | 32 | TLS 证书续期部署覆盖审计 | `suge-tls-renewal-deployment-coverage-audit` | 四维分开看：到期风险/续期流程/替代证书签发/部署覆盖，已续费≠已签发 |
 | 33 | API 限额余量与退避预演 | `suge-api-rate-limit-headroom-planner` | 逐维度核算余量不合并，retry-after 优先，主限额有余量但出现 429 仍要降速 |
+| 34 | LLM API 用量成本与缓存账单复核 | `suge-llm-api-usage-cost-reconcile` | 按日期选唯一生效价目，缓存命中/未命中与批处理分开计价，缺价不硬算 |
+| 35 | DNS 切换 TTL 与回滚窗口预演 | `suge-dns-cutover-ttl-rollback-plan` | TTL 下调须早一个旧 TTL，理论过期≠传播完成，代理记录 TTL 固定 |
+| 36 | CI Runner 与 Artifact 用量账单审计 | `suge-ci-usage-billing-audit` | UTC→账户时区判账期、独立复核 gross−discount=net、额度不二次抵扣 |
 
 ---
 

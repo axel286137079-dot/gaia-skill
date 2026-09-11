@@ -1,0 +1,63 @@
+{
+  "as_of": "2026-09-11T19:00:00+08:00",
+  "planned_cutover_at": "2026-09-13T03:00:00+08:00",
+  "planned_rollback_at": "2026-09-13T06:00:00+08:00",
+  "policy": {
+    "proxied_ttl_seconds": 300,
+    "max_observation_age_hours": 24,
+    "timezone": "Asia/Shanghai"
+  },
+  "preconditions": {
+    "health_check_ready": true,
+    "rollback_plan_ready": true,
+    "observation_evidence_ready": true
+  },
+  "records": [
+    {"record_id": "REC-A", "name": "api.example.com", "type": "A",
+     "old_value": "203.0.113.10", "new_value": "198.51.100.20",
+     "current_ttl": 300, "provider_min_ttl": 60, "proxied": false},
+    {"record_id": "REC-B", "name": "www.example.com", "type": "A",
+     "old_value": "203.0.113.11", "new_value": "198.51.100.21",
+     "current_ttl": 86400, "provider_min_ttl": 60, "proxied": false},
+    {"record_id": "REC-C", "name": "cdn.example.com", "type": "CNAME",
+     "old_value": "origin-a.example.net", "new_value": "origin-b.example.net",
+     "current_ttl": 300, "provider_min_ttl": 60, "proxied": true},
+    {"record_id": "REC-D1", "name": "dup.example.com", "type": "A",
+     "old_value": "203.0.113.30", "new_value": "198.51.100.30",
+     "current_ttl": 600, "provider_min_ttl": 60, "proxied": false},
+    {"record_id": "REC-D2", "name": "dup.example.com", "type": "A",
+     "old_value": "203.0.113.31", "new_value": "198.51.100.31",
+     "current_ttl": 600, "provider_min_ttl": 60, "proxied": false},
+    {"record_id": "REC-E1", "name": "mixed.example.com", "type": "CNAME",
+     "old_value": "t1.example.net", "new_value": "t2.example.net",
+     "current_ttl": 300, "provider_min_ttl": 60, "proxied": false},
+    {"record_id": "REC-E2", "name": "mixed.example.com", "type": "A",
+     "old_value": "203.0.113.40", "new_value": "198.51.100.40",
+     "current_ttl": 300, "provider_min_ttl": 60, "proxied": false},
+    {"record_id": "REC-F", "name": "lowttl.example.com", "type": "A",
+     "old_value": "203.0.113.50", "new_value": "198.51.100.50",
+     "current_ttl": 30, "provider_min_ttl": 300, "proxied": false},
+    {"record_id": "REC-G", "name": "unknown.example.com", "type": "A",
+     "old_value": null, "new_value": "198.51.100.60",
+     "current_ttl": 300, "provider_min_ttl": 60, "proxied": false},
+    {"record_id": "REC-H", "name": "bad.example.com", "type": "A",
+     "old_value": "203.0.113.70", "new_value": "198.51.100.70",
+     "current_ttl": 0, "provider_min_ttl": 60, "proxied": false}
+  ],
+  "ttl_lowerings": [
+    {"record_id": "REC-A", "lowered_at": "2026-09-10T02:00:00+08:00", "from_ttl": 86400, "to_ttl": 300},
+    {"record_id": "REC-B", "lowered_at": "2026-09-12T20:00:00+08:00", "from_ttl": 86400, "to_ttl": 300},
+    {"record_id": "REC-C", "lowered_at": "2026-09-10T00:00:00+08:00", "from_ttl": 86400, "to_ttl": 300},
+    {"record_id": "REC-G", "lowered_at": "2026-09-09T00:00:00+08:00", "from_ttl": 3600, "to_ttl": 300}
+  ],
+  "observations": [
+    {"record_id": "REC-A", "resolver": "8.8.8.8", "observed_value": "198.51.100.20",
+     "observed_at": "2026-09-11T18:30:00+08:00", "observed_ttl": 300, "source_id": "dig-a"},
+    {"record_id": "REC-A", "resolver": "1.1.1.1", "observed_value": "198.51.100.20",
+     "observed_at": "2026-09-11T18:35:00+08:00", "observed_ttl": 300, "source_id": "dig-b"},
+    {"record_id": "REC-C", "resolver": "8.8.8.8", "observed_value": "origin-a.example.net",
+     "observed_at": "2026-09-11T18:00:00+08:00", "observed_ttl": 300, "source_id": "dig-c"},
+    {"record_id": "REC-G", "resolver": "8.8.8.8", "observed_value": "198.51.100.60",
+     "observed_at": "2026-09-11T18:40:00+08:00", "observed_ttl": 300, "source_id": "dig-g"}
+  ]
+}
