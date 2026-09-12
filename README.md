@@ -1,12 +1,12 @@
 # 盖亚-skill（Gaia Skills）
 
-> 36 个面向中国用户的实用 AI 技能合集 —— 每个都能独立安装、独立使用，覆盖内容创作、研究、电商、法律、办公自动化、智能家居、金融投资等高频场景。
+> 39 个面向中国用户的实用 AI 技能合集 —— 每个都能独立安装、独立使用，覆盖内容创作、研究、电商、法律、办公自动化、智能家居、金融投资等高频场景。
 
 **品牌定位**：不追热点、不堆参数，只做「装上就能干活」的国产场景技能。全部开源（MIT）、零第三方依赖（纯 Python 标准库优先）、可离线回退。
 
 ---
 
-## 技能清单（36 个）
+## 技能清单（39 个）
 
 | # | 技能 | slug | 一句话说明 |
 |---|------|------|-----------|
@@ -46,6 +46,9 @@
 | 34 | LLM API 用量成本与缓存账单复核 | `suge-llm-api-usage-cost-reconcile` | 按日期选唯一生效价目，缓存命中/未命中与批处理分开计价，缺价不硬算 |
 | 35 | DNS 切换 TTL 与回滚窗口预演 | `suge-dns-cutover-ttl-rollback-plan` | TTL 下调须早一个旧 TTL，理论过期≠传播完成，代理记录 TTL 固定 |
 | 36 | CI Runner 与 Artifact 用量账单审计 | `suge-ci-usage-billing-audit` | UTC→账户时区判账期、独立复核 gross−discount=net、额度不二次抵扣 |
+| 37 | DMARC 聚合报告异常与发信源审计 | `suge-dmarc-aggregate-source-audit` | 按 report_id+组织+时间窗去重，消息数≠记录数，分层呈现未知来源与认证失败 |
+| 38 | OpenAPI 破坏性变更影响门禁 | `suge-openapi-breaking-change-gate` | 两份 JSON 规范离线比对，破坏性分级 + 调用方影响面 + 带期限豁免，远程 $ref 不取回 |
+| 39 | 泄露密钥轮换与撤销证据闭环 | `suge-secret-rotation-evidence-closure` | 按 incident 建状态机，只关告警不等于已撤销，量化旧凭据仍可能有效的窗口 |
 
 ---
 
