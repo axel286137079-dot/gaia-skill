@@ -1,0 +1,171 @@
+{
+  "as_of": "2026-09-13T09:00:00+08:00",
+  "incremental_window": {"from": "2026-09-12T00:00:00+08:00", "to": "2026-09-12T23:59:59+08:00"},
+  "tolerance": {"row_count_abs": 0, "row_count_rel_pct": "0.10"},
+  "table_mappings": [
+    {"source_table_id": "SRC-ORDERS", "target_table_id": "TGT-ORDERS"},
+    {"source_table_id": "SRC-USERS", "target_table_id": "TGT-USERS"},
+    {"source_table_id": "SRC-EVENTS", "target_table_id": "TGT-EVENTS"},
+    {"source_table_id": "SRC-PAY", "target_table_id": "TGT-PAY"},
+    {"source_table_id": "SRC-LOG", "target_table_id": "TGT-LOG"},
+    {"source_table_id": "SRC-CFG", "target_table_id": "TGT-CFG"},
+    {"source_table_id": "SRC-ARCHIVE", "target_table_id": "TGT-ARCHIVE"}
+  ],
+  "exclusions": [
+    {"exclusion_id": "EX-003", "table_id": "SRC-EVENTS", "check": "ROW_COUNT", "owner": "data-eng", "reason": "尾部延迟已知，观察期结束前不阻断", "expires_at": "2026-09-10T00:00:00+08:00"},
+    {"exclusion_id": "EX-004", "table_id": "SRC-PAY", "check": "DISTINCT_COUNT", "column": "channel", "owner": "data-eng", "reason": "渠道映射调整期，去重口径暂缓", "expires_at": "2026-09-30T00:00:00+08:00"},
+    {"exclusion_id": "EX-005", "table_id": "SRC-CFG", "check": "HASH", "reason": "临时口头豁免，未登记负责人与到期日"},
+    {"exclusion_id": "EX-900", "table_id": "SRC-NOPE", "check": "HASH", "owner": "data-eng", "reason": "指向不存在的表", "expires_at": "2026-09-30T00:00:00+08:00"}
+  ],
+  "source_tables": [
+    {
+      "table_id": "SRC-ORDERS", "captured_at": "2026-09-13T08:00:00+08:00", "row_count": 1200,
+      "schema": [
+        {"column": "order_id", "type": "bigint", "nullable": false, "key": true},
+        {"column": "amount", "type": "decimal(12,2)", "nullable": false},
+        {"column": "note", "type": "varchar(200)", "nullable": true}
+      ],
+      "null_counts": {"note": 30}, "distinct_counts": {"order_id": 1200},
+      "min_max": {"amount": ["1.00", "9999.00"]},
+      "hash": {"algorithm": "sha256", "salt_id": "SALT-1", "normalization": "trim_lower",
+               "buckets": [{"bucket": "b0", "count": 600}, {"bucket": "b1", "count": 600}]}
+    },
+    {
+      "table_id": "SRC-USERS", "captured_at": "2026-09-13T08:00:00+08:00", "row_count": 300,
+      "schema": [
+        {"column": "user_id", "type": "int", "nullable": false, "key": true},
+        {"column": "email", "type": "varchar(120)", "nullable": true},
+        {"column": "legacy_flag", "type": "boolean", "nullable": true},
+        {"column": "created_at", "type": "timestamp", "nullable": false}
+      ],
+      "null_counts": {"email": 5}, "distinct_counts": {"user_id": 300}, "min_max": {},
+      "hash": {"algorithm": "sha256", "salt_id": "SALT-1", "normalization": "trim_lower",
+               "buckets": [{"bucket": "b0", "count": 150}, {"bucket": "b1", "count": 150}]}
+    },
+    {
+      "table_id": "SRC-EVENTS", "captured_at": "2026-09-13T08:30:00+08:00",
+      "watermark": "2026-09-12T23:00:00+08:00", "row_count": 5000,
+      "schema": [
+        {"column": "event_id", "type": "bigint", "nullable": false, "key": true},
+        {"column": "payload", "type": "text", "nullable": true}
+      ],
+      "null_counts": {"payload": 100}, "distinct_counts": {"event_id": 5000}, "min_max": {},
+      "hash": {"algorithm": "sha256", "salt_id": "SALT-2", "normalization": "trim_lower",
+               "buckets": [{"bucket": "b0", "count": 2500}, {"bucket": "b1", "count": 2500}]}
+    },
+    {
+      "table_id": "SRC-PAY", "captured_at": "2026-09-13T08:00:00+08:00", "row_count": 800,
+      "schema": [
+        {"column": "pay_id", "type": "bigint", "nullable": false, "key": true},
+        {"column": "channel", "type": "varchar(20)", "nullable": true},
+        {"column": "amount", "type": "decimal(12,2)", "nullable": false}
+      ],
+      "null_counts": {"channel": 12}, "distinct_counts": {"channel": 6},
+      "min_max": {"amount": ["10.00", "5000.00"]},
+      "hash": {"algorithm": "sha256", "salt_id": "SALT-1", "normalization": "trim_lower",
+               "buckets": [{"bucket": "b0", "count": 400}, {"bucket": "b1", "count": 400}]}
+    },
+    {
+      "table_id": "SRC-LOG", "captured_at": "2026-09-13T08:00:00+08:00",
+      "watermark": "2026-09-12T10:00:00+08:00", "row_count": 20000,
+      "schema": [
+        {"column": "log_id", "type": "bigint", "nullable": false, "key": true},
+        {"column": "message", "type": "text", "nullable": true}
+      ],
+      "null_counts": {"message": 0}, "distinct_counts": {"log_id": 20000}, "min_max": {},
+      "hash": {"algorithm": "sha256", "salt_id": "SALT-3", "normalization": "trim_lower",
+               "buckets": [{"bucket": "b0", "count": 10000}, {"bucket": "b1", "count": 10000}]}
+    },
+    {
+      "table_id": "SRC-CFG", "captured_at": "2026-09-13T08:00:00+08:00", "row_count": 40,
+      "schema": [
+        {"column": "cfg_key", "type": "varchar(64)", "nullable": false, "key": true},
+        {"column": "cfg_value", "type": "text", "nullable": true}
+      ],
+      "null_counts": {"cfg_value": 2}, "distinct_counts": {"cfg_key": 40}, "min_max": {},
+      "hash": {"algorithm": "sha256", "salt_id": "SALT-1", "normalization": "trim_lower",
+               "buckets": [{"bucket": "b0", "count": 20}, {"bucket": "b1", "count": 20}]}
+    },
+    {
+      "table_id": "SRC-ARCHIVE", "captured_at": "2026-09-13T08:00:00+08:00", "row_count": 100,
+      "schema": [{"column": "archive_id", "type": "bigint", "nullable": false, "key": true}],
+      "null_counts": {}, "distinct_counts": {"archive_id": 100}, "min_max": {},
+      "hash": {"algorithm": "sha256", "salt_id": "SALT-1", "normalization": "trim_lower",
+               "buckets": [{"bucket": "b0", "count": 50}, {"bucket": "b1", "count": 50}]}
+    }
+  ],
+  "target_tables": [
+    {
+      "table_id": "TGT-ORDERS", "captured_at": "2026-09-13T08:00:00+08:00", "row_count": 1200,
+      "schema": [
+        {"column": "order_id", "type": "bigint", "nullable": false, "key": true},
+        {"column": "amount", "type": "decimal(12,2)", "nullable": false},
+        {"column": "note", "type": "varchar(200)", "nullable": true}
+      ],
+      "null_counts": {"note": 30}, "distinct_counts": {"order_id": 1200},
+      "min_max": {"amount": ["1.00", "9999.00"]},
+      "hash": {"algorithm": "sha256", "salt_id": "SALT-1", "normalization": "trim_lower",
+               "buckets": [{"bucket": "b0", "count": 600}, {"bucket": "b1", "count": 600}]}
+    },
+    {
+      "table_id": "TGT-USERS", "captured_at": "2026-09-13T08:00:00+08:00", "row_count": 300,
+      "schema": [
+        {"column": "user_id", "type": "bigint", "nullable": false, "key": true},
+        {"column": "email", "type": "varchar(255)", "nullable": false},
+        {"column": "created_at", "type": "timestamp", "nullable": false}
+      ],
+      "null_counts": {"email": 5}, "distinct_counts": {"user_id": 300}, "min_max": {},
+      "hash": {"algorithm": "sha256", "salt_id": "SALT-1", "normalization": "trim_lower",
+               "buckets": [{"bucket": "b0", "count": 150}, {"bucket": "b1", "count": 150}]}
+    },
+    {
+      "table_id": "TGT-EVENTS", "captured_at": "2026-09-13T08:30:00+08:00",
+      "watermark": "2026-09-12T23:00:00+08:00", "row_count": 5007,
+      "schema": [
+        {"column": "event_id", "type": "bigint", "nullable": false, "key": true},
+        {"column": "payload", "type": "text", "nullable": true}
+      ],
+      "null_counts": {"payload": 100}, "distinct_counts": {"event_id": 5007}, "min_max": {},
+      "hash": {"algorithm": "sha256", "salt_id": "SALT-2", "normalization": "trim_lower",
+               "buckets": [{"bucket": "b0", "count": 2500}, {"bucket": "b1", "count": 2507}]}
+    },
+    {
+      "table_id": "TGT-PAY", "captured_at": "2026-09-13T08:00:00+08:00", "row_count": 800,
+      "schema": [
+        {"column": "pay_id", "type": "bigint", "nullable": false, "key": true},
+        {"column": "channel", "type": "varchar(20)", "nullable": true},
+        {"column": "amount", "type": "decimal(12,2)", "nullable": false}
+      ],
+      "null_counts": {"channel": 15}, "distinct_counts": {"channel": 9},
+      "min_max": {"amount": ["10.00", "5000.00"]},
+      "hash": {"algorithm": "sha256", "salt_id": "SALT-1", "normalization": "trim_lower",
+               "buckets": [{"bucket": "b0", "count": 400}, {"bucket": "b1", "count": 400}]}
+    },
+    {
+      "table_id": "TGT-LOG", "captured_at": "2026-09-13T08:00:00+08:00",
+      "watermark": "2026-09-13T02:00:00+08:00", "row_count": 20000,
+      "schema": [
+        {"column": "log_id", "type": "bigint", "nullable": false, "key": true},
+        {"column": "message", "type": "text", "nullable": true}
+      ],
+      "null_counts": {"message": 0}, "distinct_counts": {"log_id": 20000}, "min_max": {},
+      "hash": {"algorithm": "sha256", "salt_id": "SALT-3", "normalization": "trim_lower",
+               "buckets": [{"bucket": "b0", "count": 10000}, {"bucket": "b1", "count": 10000}]}
+    },
+    {
+      "table_id": "TGT-CFG", "captured_at": "2026-09-13T08:00:00+08:00", "row_count": 40,
+      "schema": [
+        {"column": "cfg_key", "type": "varchar(64)", "nullable": false, "key": true},
+        {"column": "cfg_value", "type": "text", "nullable": true}
+      ],
+      "null_counts": {"cfg_value": 2}, "distinct_counts": {"cfg_key": 40}, "min_max": {},
+      "hash": {"algorithm": "sha256", "salt_id": "SALT-9", "normalization": "trim_lower",
+               "buckets": [{"bucket": "b0", "count": 20}, {"bucket": "b1", "count": 20}]}
+    },
+    {
+      "table_id": "TGT-STAGING", "captured_at": "2026-09-13T08:00:00+08:00", "row_count": 10,
+      "schema": [{"column": "staging_id", "type": "int", "nullable": false}],
+      "null_counts": {}, "distinct_counts": {"staging_id": 10}, "min_max": {}
+    }
+  ]
+}
