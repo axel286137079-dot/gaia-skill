@@ -9,6 +9,8 @@ listing_check.py — 跨境 Listing（亚马逊）合规自查
      同一实词不超 2 次、禁 emoji/重复标点/官方禁用符号）
   3. Item Highlights 字段（2026 新政新增，≤125 字符，可搜索）
   4. 五点长度、全大写
+  5. 后端 Search Terms 字节上限（249 bytes US/UK/EU）
+  6. 商品描述长度（2000 字符纯文本）与 HTML 残留
 
 纯标准库，无 API key，离线可跑。
 
@@ -46,6 +48,23 @@ RULES = {
     ],
 }
 
+# ---------------- 2026 亚马逊政策提示（随自查结果输出） ----------------
+POLICY_NOTES_2026 = [
+    "标题：2026-07-27 起非 Media 类目 Item name ≤75 字符，新增 Item Highlights（≤125）承接溢出信息；"
+    "旧标题不会自动下架，超长会在你提交更新时被平台拆分/改写。",
+    "AI 生成人物图：含写实 AI 生成人物的商品图与 A+ 视频，须在上传前于 XMP dc:subject 字段写入 "
+    "contains-synthetic-performer（2026-07-27 生效）；真人、非写实形象、无人物图免于此要求。",
+    "后端 Search Terms 按字节计（US/UK/EU 249、JP 500、IN 200），超 1 字节即可能静默取消索引。",
+    "商品描述 2000 字符纯文本（HTML 自 2021 起已移除）；五点建议 ≤200~255 字符，禁 emoji/保证性措辞/不可验证宣称。",
+    "平台可对不合规的标题/五点/描述执行 AI 改写——违规不只是不排名，内容可能被替换成你未写的版本。",
+    "Featured Offer（Buy Box）自 2026-07 起取消独立卖家资格门槛，改为持续评估价格/时效/绩效，"
+    "竞争加剧，勿为抢位牺牲毛利。",
+    "Seller Fulfilled Prime 门槛提高：标准尺寸 1 日达 40%、2 日达 75%（原 70%）、5 日达 90%，"
+    "需周末发货且准时率约 93.5%。",
+    "BSA 更新（2026-08-24 生效）：禁止转让协议权利义务，或将其（含未来亚马逊拨款）作为质押/担保。",
+    "各国站点与类目规则不同，发布前请以目标站点 Seller Central 通知为准人工复核。",
+]
+
 # ---------------- 标题规范（2026-07-27 亚马逊新政） ----------------
 # 非 Media 类目 Item name 上限 75 字符（含空格）；Media（图书/影音/CD）类目仍为 200（用 --title-max 调整）。
 TITLE_MAX_LEN = 75
@@ -55,6 +74,12 @@ BULLET_MAX_LEN = 500      # 单点描述建议上限（各站点/类目可能更
 
 # 亚马逊标题官方禁用符号（品牌名内含时可例外；2025-01 生效、2026 延续）
 FORBIDDEN_SYMBOLS = ["!", "$", "?", "_", "{", "}", "^", "¬", "¦"]
+
+# 后端 Search Terms 字节上限（按【字节】而非字符计；超出 1 字节即可能静默取消该词索引）
+# 美国/英国/欧盟 249 bytes，日本 500 bytes，印度 200 bytes。默认取最严的 249。
+SEARCH_TERMS_MAX_BYTES = 249
+# 商品描述（Standard Product Description）上限：2000 字符、纯文本（HTML 自 2021 起已移除）
+DESCRIPTION_MAX_LEN = 2000
 
 # emoji / 装饰字符（2026 明确禁止 emoji 与 ASCII art）
 EMOJI_RE = re.compile("[\U0001F000-\U0001FAFF\u2600-\u27BF\u2B00-\u2BFF\uFE0F]")
@@ -165,6 +190,38 @@ def check(text, title_max=TITLE_MAX_LEN, bullet_max=BULLET_MAX_LEN,
                        "suggest": "→ 标题溢出/材质/兼容/场景信息可写入 Item Highlights "
                                   "（≤125 字符、可搜索）。用「Highlights: xxx」行可启用其长度检查"})
 
+    # 2.7 后端 Search Terms 字节上限（249 bytes US/UK/EU；JP 500；IN 200）
+    for line in text.splitlines():
+        m = re.match(r'^\s*(?:search\s*terms?|backend\s*keywords?|后端搜索词|搜索词)\s*[:：]\s*(.+)$',
+                     line.strip(), re.I)
+        if not m:
+            continue
+        terms = m.group(1).strip()
+        nbytes = len(terms.encode("utf-8"))
+        if nbytes > SEARCH_TERMS_MAX_BYTES:
+            issues.append({"type": "搜索词", "word": f"{nbytes} 字节",
+                           "category": "后端 Search Terms",
+                           "suggest": f"→ 超过 {SEARCH_TERMS_MAX_BYTES} 字节（US/UK/EU 上限；JP 500 / IN 200）。"
+                                      f"按字节计，超 1 字节即可能静默取消该词索引"})
+        break
+
+    # 2.8 商品描述长度（2000 字符、纯文本）
+    for line in text.splitlines():
+        m = re.match(r'^\s*(?:description|product\s*description|描述|商品描述)\s*[:：]\s*(.+)$',
+                     line.strip(), re.I)
+        if not m:
+            continue
+        desc = m.group(1).strip()
+        if len(desc) > DESCRIPTION_MAX_LEN:
+            issues.append({"type": "描述", "word": f"长度 {len(desc)} 字符",
+                           "category": "商品描述",
+                           "suggest": f"→ 超过 {DESCRIPTION_MAX_LEN} 字符上限（纯文本，HTML 自 2021 起已移除）"})
+        if HTML_TAG_RE.search(desc):
+            issues.append({"type": "描述", "word": "HTML 标签",
+                           "category": "商品描述",
+                           "suggest": "→ 描述字段仅支持纯文本，HTML 自 2021 起已移除"})
+        break
+
     # 3) 五点描述长度
     for lineno, line in enumerate(text.splitlines(), 1):
         match = re.match(r'^\s*(?:[-*]\s+|(?:bullet\s*)?\d+[.)：:]\s*)(.+)$', line, re.I)
@@ -199,7 +256,8 @@ def main():
 
     if args.json:
         print(json.dumps({"file": args.file, "issues": issues,
-                          "count": len(issues)}, ensure_ascii=False, indent=2))
+                          "count": len(issues),
+                          "notes": POLICY_NOTES_2026}, ensure_ascii=False, indent=2))
         return
 
     print("=" * 56)
@@ -210,20 +268,20 @@ def main():
 
     if not issues:
         print("✓ 未发现明显违规（仍建议人工对照目标站点最新规则复核）。")
-        return
-
-    cat_counter = Counter(i["category"] for i in issues)
-    for cat, n in cat_counter.most_common():
-        print(f"【{cat}】{n} 处")
-        for i in issues:
-            if i["category"] != cat:
-                continue
-            print(f"  · {i['word']} {i['suggest']}")
-        print()
+    else:
+        cat_counter = Counter(i["category"] for i in issues)
+        for cat, n in cat_counter.most_common():
+            print(f"【{cat}】{n} 处")
+            for i in issues:
+                if i["category"] != cat:
+                    continue
+                print(f"  · {i['word']} {i['suggest']}")
+            print()
 
     print("-" * 56)
-    print("提示：标题规则按 2026-07-27 亚马逊新政（Item name ≤75 / Item Highlights ≤125）；")
-    print("      各国站点与类目规则不同，发布前请以目标站点 Seller Central 通知为准人工复核。")
+    print("【2026 亚马逊政策提示】")
+    for note in POLICY_NOTES_2026:
+        print(f"  · {note}")
 
 
 if __name__ == "__main__":
