@@ -8,6 +8,7 @@ mismatches.  Strictly offline and read-only: no IP geolocation lookup, no DNS
 change, no mail sent, no file or URL opened.
 """
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -616,20 +617,91 @@ def analyze(data):
                 "不打开路径或 URL、不解析外部实体。记录条数不是邮件量，消息数与记录数分别统计。"
                 "聚合统计不构成单封邮件证据，也不建议直接从 p=none 跳到 reject。",
     }
-    result["markdown_summary"] = build_markdown(result)
+    result["markdown_summary"], result["injection_flagged"] = build_markdown(result)
     return result
 
 
-def md_table(rows):
-    head = rows[0]
-    out = ["| " + " | ".join(head) + " |", "|" + "|".join(["---"] * len(head)) + "|"]
-    for row in rows[1:]:
-        out.append("| " + " | ".join(str(cell) for cell in row) + " |")
+# --- Markdown safety --------------------------------------------------------
+# Untrusted input reaches the report through org_domain, expected-source labels
+# and the XML-derived identifiers.  None of it may reshape the Markdown skeleton.
+MD_PLACEHOLDER = "［已屏蔽：疑似提示注入文本］"
+MD_ESCAPE = re.compile(r"([\\`*_\[\]<>|~])")
+MD_WHITESPACE = re.compile(r"\s+")
+MD_MAX_TEXT = 240
+MD_MAX_CELL = 120
+INJECTION_RULES = (
+    ("INSTRUCTION_OVERRIDE",
+     re.compile(r"ignore\s+(?:all\s+|any\s+)*(?:(?:previous|prior|above|earlier|these)\s+)*"
+                r"(?:instructions?|prompts?|rules?|directions?)", re.IGNORECASE)),
+    ("INSTRUCTION_OVERRIDE_ZH",
+     re.compile(r"(?:忽略|无视|不必理会|不用理会|不要理会|无需理会)[^\n。；;]{0,12}?"
+                r"(?:指令|指示|规则|提示词|提示语|要求)")),
+    ("ROLE_HIJACK",
+     re.compile(r"(?:you\s+are\s+now\b|from\s+now\s+on\s+you\b|从现在起你是|你现在是)",
+                re.IGNORECASE)),
+    ("PROMPT_EXFIL",
+     re.compile(r"(?:系统提示词|系统提示|system\s*prompt|developer\s*message)\s*[:：]",
+                re.IGNORECASE)),
+)
+
+
+class MdSafe(str):
+    """Already-rendered Markdown fragment; never escaped twice."""
+    __slots__ = ()
+
+
+def md_flat(value):
+    """Collapse any value to a single plain line (no newline can start a new block)."""
+    if value is None:
+        return ""
+    text = value if isinstance(value, str) else str(value)
+    for marker in ("\r\n", "\r", "\n", "\t", "\v", "\f"):
+        text = text.replace(marker, " ")
+    return MD_WHITESPACE.sub(" ", text).strip()
+
+
+def md_safe(value, location, flagged, maximum=MD_MAX_TEXT):
+    """Return a single-line, structure-escaped, length-limited Markdown fragment.
+
+    Obvious prompt-injection text is replaced with a fixed placeholder; the
+    evidence records where it was, how long it was and a hash of it, so the
+    original text is never copied back into the report.
+    """
+    if isinstance(value, MdSafe):
+        return value
+    text = md_flat(value)
+    for rule, pattern in INJECTION_RULES:
+        if pattern.search(text):
+            flagged.append({"location": location, "rule": rule, "chars": len(text),
+                            "sha256_prefix": hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]})
+            return MdSafe(MD_PLACEHOLDER)
+    if len(text) > maximum:
+        text = text[:maximum].rstrip() + "…"
+    return MdSafe(MD_ESCAPE.sub(r"\\\1", text))
+
+
+def md_cell(value, location, flagged):
+    if isinstance(value, MdSafe):
+        return value
+    return md_safe(value, location, flagged, MD_MAX_CELL)
+
+
+def md_table(rows, flagged, section):
+    """Render a table; every cell is forced onto one escaped line."""
+    width = len(rows[0])
+    out = ["| " + " | ".join(str(md_cell(cell, section + ".header", flagged)) for cell in rows[0]) + " |",
+           "|" + "|".join(["---"] * width) + "|"]
+    for index, row in enumerate(rows[1:]):
+        cells = [str(md_cell(cell, "%s[%d].col%d" % (section, index, col), flagged))
+                 for col, cell in enumerate(row)]
+        out.append("| " + " | ".join(cells) + " |")
     return "\n".join(out)
 
 
 def build_markdown(result):
-    lines = ["# DMARC 聚合报告异常与发信源审计（%s）\n\n" % result["org_domain"]]
+    flagged = []
+    lines = ["# DMARC 聚合报告异常与发信源审计（%s）\n\n"
+             % md_safe(result["org_domain"], "markdown.org_domain", flagged)]
     lines.append("基准时间 %s。报告 %d 份（有效 %d / 重复 %d / 无效 %d），"
                  "覆盖 %s ~ %s。\n\n" % (
                      result["as_of"], result["report_count"], result["valid_report_count"],
@@ -641,26 +713,33 @@ def build_markdown(result):
                  % (result["dmarc_pass_rate_pct"] or "—", result["auth_failure_message_total"],
                     result["unverifiable_message_total"]))
     rows = [["来源 IP", "期望来源", "消息数", "记录数", "DMARC 通过", "认证失败", "状态"]]
-    for source in result["sources"]:
-        rows.append([source["source_ip"],
-                     ", ".join(source["expected_labels"]) if source["expected"] else "未声明",
-                     source["message_count"], source["record_count"],
+    for index, source in enumerate(result["sources"]):
+        if source["expected"]:
+            # Each label is rendered (and injection-checked) on its own so the
+            # evidence can point at the exact source; join keeps it pre-rendered.
+            labels = MdSafe(", ".join(
+                md_cell(label, "markdown.sources[%d].expected_labels" % index, flagged)
+                for label in source["expected_labels"]))
+        else:
+            labels = "未声明"
+        rows.append([source["source_ip"], labels, source["message_count"], source["record_count"],
                      source["dmarc_pass_messages"], source["auth_failure_messages"],
                      source["status"]])
-    lines.append(md_table(rows))
+    lines.append(md_table(rows, flagged, "markdown.sources"))
     lines.append("\n\n总体判定：**%s**。\n" % result["status"])
     if result["unknown_sources"]:
         lines.append("\n未知来源：" + ", ".join(
-            "%s（%d 封）" % (item["source_ip"], item["message_count"])
+            "%s（%d 封）" % (md_safe(item["source_ip"], "markdown.unknown_sources", flagged),
+                             item["message_count"])
             for item in result["unknown_sources"]) + "。\n")
     if result["policy_mismatches"]:
         lines.append("\n策略与实际 disposition 不一致 %d 条。\n" % len(result["policy_mismatches"]))
     lines.append("\n人工核对清单：\n")
-    for item in result["manual_checklist"]:
-        lines.append("- " + item + "\n")
+    for index, item in enumerate(result["manual_checklist"]):
+        lines.append("- " + md_safe(item, "markdown.manual_checklist[%d]" % index, flagged) + "\n")
     lines.append("\n本技能不查询 IP 归属、不修改 DNS、不建议直接从 p=none 跳到 reject，"
                  "聚合统计不当作单封邮件证据。")
-    return "".join(lines)
+    return "".join(lines), flagged
 
 
 def main():

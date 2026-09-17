@@ -9,7 +9,7 @@ license: MIT
 description: 面向独立站、电商、SaaS、邮件运营与小型 IT 团队：对一批 DMARC 聚合报告做离线异常与发信源审计。输入基准时间（带时区）、组织域、允许的发信源映射 expected_sources[]（source_id/ip/label，允许同一 IP 多个来源名）、一份或多份 xml_reports[]（source_id + XML 字符串）与可选阈值（auth_failure_rate_pct/unknown_source_min_messages/min_sample_messages）。脚本只解析用户提供的 XML：拒绝 DOCTYPE/ENTITY 与外部 SYSTEM/PUBLIC 标识、拒绝控制字符、限制单份报告与总份数、不解析文件路径与 URL、不取回外部实体；XML 结构不完整时逐份标 INVALID 并尽量保留 report_id，不让一个坏报告吞掉全部结果。按 report_id + org + 时间窗去重（保留首份，重复份标 DUPLICATE）；按来源 IP 跨报告聚合消息数与记录数，**禁止把记录条数当邮件量**；DMARC 通过要求 SPF 与 DKIM 对齐同时 pass，缺 alignment 的记录单列为无法判定并排除在通过率分母外；策略声明为 quarantine/reject 且 pct=100 却实际 disposition=none 记 POLICY_MISMATCH；策略跨报告变化标 POLICY_CHANGED；时间窗重叠单独列出。输出 PASS / ATTENTION / UNKNOWN_SOURCE / AUTH_FAILURE / POLICY_MISMATCH / PARTIAL / INVALID，附报告覆盖时间、来源汇总、SPF/DKIM/DMARC 通过率、未知来源、Top 失败源、重复报告、缺字段与人工核对清单。不查询 IP 归属、不修改 DNS、不建议直接从 p=none 跳到 reject、不把聚合统计当单封邮件证据。触发词：DMARC、RUA、聚合报告、发信源、SPF、DKIM、对齐、仿冒邮件、邮件认证。联系邮箱：43298568@qq.com。
 description_zh: "离线审计一批 DMARC 聚合报告：去重、按来源聚合、消息数与记录数分开统计、区分期望/未知来源与认证失败、识别策略与实际 disposition 不一致，坏报告逐份标错。"
 description_en: "Offline DMARC aggregate (RUA) report anomaly and sending-source audit: dedupes reports by report_id + org + window, keeps message counts and record counts separate, aggregates across reports per source IP, and layers expected sources, unknown sources, SPF/DKIM alignment failures and policy-vs-disposition mismatches. Broken reports are flagged individually instead of swallowing the batch. Outputs PASS/ATTENTION/UNKNOWN_SOURCE/AUTH_FAILURE/POLICY_MISMATCH/PARTIAL/INVALID. Read-only: no IP geolocation lookup, no DNS changes, no external entity resolution, no single-message claims."
-version: 1.0.0
+version: 1.0.1
 author: 苏格
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/suge-dmarc-aggregate-source-audit
 category: it-ops-security
@@ -50,6 +50,7 @@ DMARC 聚合报告最容易被误读的地方有三处：**把记录条数当成
 ## 运行约束
 
 - 只做离线审计：不查询 IP 归属、不修改 DNS、不发送邮件、不打开路径或 URL、不解析外部实体。
+- `markdown_summary` 里所有来自输入或 XML 的字符串（`org_domain`、`expected_sources[].label`、来源 IP）都按**不可信文本**渲染：压成单行、转义 `\` `` ` `` `*` `_` `[` `]` `<` `>` `|` `~`、限制长度，因此 `|` 不会多出表格列、换行不会新开标题或列表。明显提示注入文本替换为固定占位符，并在 `injection_flagged` 里只给定位、长度和哈希（`markdown.<section>[<行号>].<字段>`），不回显原文。细节见 @references/guide.md 第 8 节。
 - 期望来源、阈值必须由用户提供；缺失时保留 `UNKNOWN`，**不套用记忆中的默认发信源**。
 - 拒绝 `DOCTYPE`/`ENTITY` 与外部 `SYSTEM`/`PUBLIC` 标识；拒绝控制字符；单份报告与总份数都有上限。
 - 缺失值保留 unknown，**不为 0**；`count` 必须是非负整数。

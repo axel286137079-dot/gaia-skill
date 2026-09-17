@@ -90,6 +90,24 @@
 
 `reports[]`、`sources[]`、`unknown_sources[]`、`auth_failures[]`、`policy_mismatches[]`、`coverage`、`window_overlaps[]`、`attention[]`、`manual_checklist[]`、`markdown_summary`。所有比例以 `xx.xx%` 字符串给出；无法计算时为 `null` 而不是 0。
 
-## 8. 不做什么
+## 8. Markdown 安全渲染与定位边界
+
+`markdown_summary` 是给人看的，因此其中所有来自输入或 XML 的字符串都按**不可信文本**渲染：
+
+- **保持单行**：`\r\n`、`\r`、`\n`、`\t`、`\v`、`\f` 与连续空白折叠为单个空格，值不可能新开标题、列表或表格行。
+- **转义结构字符**：`\` `` ` `` `*` `_` `[` `]` `<` `>` `|` `~` 前加 `\`，所以 `|` 不会多出表格列，也不会形成链接、强调或 HTML 标签。
+- **限制长度**：表格单元格 120 字符、其余正文片段 240 字符，超出部分截断并以 `…` 结尾。
+- **提示注入不回显**：命中明显指令覆盖/角色劫持/提示词窃取短语时，该位置输出固定占位符 `［已屏蔽：疑似提示注入文本］`。
+
+定位边界：
+
+- 只有 `markdown_summary` 被改写；`reports[]`、`sources[]`、`expected_source_ids`、`expected_labels`、XML 字段等 JSON 结构化值**原样保留**，统计与状态判定完全不变。
+- `injection_flagged[]` 是唯一证据来源，每条为 `{"location", "rule", "chars", "sha256_prefix"}`：
+  - `location` 是渲染位置（如 `markdown.sources[1].expected_labels`），用行号与字段名定位，不复制原文；
+  - `chars` 是折叠后原文的字符数，`sha256_prefix` 是原文 SHA-256 的前 16 位十六进制——可用于与自己的输入比对确认是哪条，而报告本身不落原文。
+- 占位符表示"这里有一句话没被回显"，不表示该输入被拒绝：JSON 结果照常产出，是否采纳仍由人判断。
+- 该渲染不影响 XML 大小/份数上限、`DOCTYPE`/`ENTITY` 拒收、控制字符拒收与离线只读边界。
+
+## 9. 不做什么
 
 不查询 IP 归属、不修改 DNS、不发送或拦截邮件、不打开路径或 URL、不解析外部实体、不建议直接从 `p=none` 跳到 `reject`、不把聚合统计当作单封邮件证据。

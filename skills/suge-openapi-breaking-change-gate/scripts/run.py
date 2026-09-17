@@ -632,22 +632,93 @@ def analyze(data):
                 "也不宣称语义兼容性已被完全证明。新增可选字段默认非破坏，"
                 "additionalProperties/oneOf/allOf/nullable 等复杂语义一律保守标人工复核。",
     }
-    result["markdown_summary"] = build_markdown(result)
+    result["markdown_summary"], result["injection_flagged"] = build_markdown(result)
     return result
 
 
-def md_table(rows):
-    head = rows[0]
-    out = ["| " + " | ".join(head) + " |", "|" + "|".join(["---"] * len(head)) + "|"]
-    for row in rows[1:]:
-        out.append("| " + " | ".join(str(cell) for cell in row) + " |")
+# --- Markdown safety --------------------------------------------------------
+# Spec versions, path keys and change details are untrusted input.  None of them
+# may add a table column, open a new block or smuggle in an instruction.
+MD_PLACEHOLDER = "［已屏蔽：疑似提示注入文本］"
+MD_ESCAPE = re.compile(r"([\\`*_\[\]<>|~])")
+MD_WHITESPACE = re.compile(r"\s+")
+MD_MAX_TEXT = 240
+MD_MAX_CELL = 120
+INJECTION_RULES = (
+    ("INSTRUCTION_OVERRIDE",
+     re.compile(r"ignore\s+(?:all\s+|any\s+)*(?:(?:previous|prior|above|earlier|these)\s+)*"
+                r"(?:instructions?|prompts?|rules?|directions?)", re.IGNORECASE)),
+    ("INSTRUCTION_OVERRIDE_ZH",
+     re.compile(r"(?:忽略|无视|不必理会|不用理会|不要理会|无需理会)[^\n。；;]{0,12}?"
+                r"(?:指令|指示|规则|提示词|提示语|要求)")),
+    ("ROLE_HIJACK",
+     re.compile(r"(?:you\s+are\s+now\b|from\s+now\s+on\s+you\b|从现在起你是|你现在是)",
+                re.IGNORECASE)),
+    ("PROMPT_EXFIL",
+     re.compile(r"(?:系统提示词|系统提示|system\s*prompt|developer\s*message)\s*[:：]",
+                re.IGNORECASE)),
+)
+
+
+class MdSafe(str):
+    """Already-rendered Markdown fragment; never escaped twice."""
+    __slots__ = ()
+
+
+def md_flat(value):
+    """Collapse any value to a single plain line (no newline can start a new block)."""
+    if value is None:
+        return ""
+    text = value if isinstance(value, str) else str(value)
+    for marker in ("\r\n", "\r", "\n", "\t", "\v", "\f"):
+        text = text.replace(marker, " ")
+    return MD_WHITESPACE.sub(" ", text).strip()
+
+
+def md_safe(value, location, flagged, maximum=MD_MAX_TEXT):
+    """Return a single-line, structure-escaped, length-limited Markdown fragment.
+
+    Obvious prompt-injection text is replaced with a fixed placeholder; the
+    evidence records where it was, how long it was and a hash of it, so the
+    original text is never copied back into the report.
+    """
+    if isinstance(value, MdSafe):
+        return value
+    text = md_flat(value)
+    for rule, pattern in INJECTION_RULES:
+        if pattern.search(text):
+            flagged.append({"location": location, "rule": rule, "chars": len(text),
+                            "sha256_prefix": hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]})
+            return MdSafe(MD_PLACEHOLDER)
+    if len(text) > maximum:
+        text = text[:maximum].rstrip() + "…"
+    return MdSafe(MD_ESCAPE.sub(r"\\\1", text))
+
+
+def md_cell(value, location, flagged):
+    if isinstance(value, MdSafe):
+        return value
+    return md_safe(value, location, flagged, MD_MAX_CELL)
+
+
+def md_table(rows, flagged, section):
+    """Render a table; every cell is forced onto one escaped line."""
+    width = len(rows[0])
+    out = ["| " + " | ".join(str(md_cell(cell, section + ".header", flagged)) for cell in rows[0]) + " |",
+           "|" + "|".join(["---"] * width) + "|"]
+    for index, row in enumerate(rows[1:]):
+        cells = [str(md_cell(cell, "%s[%d].col%d" % (section, index, col), flagged))
+                 for col, cell in enumerate(row)]
+        out.append("| " + " | ".join(cells) + " |")
     return "\n".join(out)
 
 
 def build_markdown(result):
+    flagged = []
     lines = ["# OpenAPI 破坏性变更影响门禁\n\n"]
     lines.append("版本 %s → %s，基准时间 %s。共 %d 处差异。\n\n"
-                 % (result["old_version"] or "—", result["new_version"] or "—",
+                 % (md_safe(result["old_version"] or "—", "markdown.old_version", flagged),
+                    md_safe(result["new_version"] or "—", "markdown.new_version", flagged),
                     result["as_of"], result["change_count"]))
     lines.append("**总体判定：%s**。\n\n" % result["status"])
     lines.append("状态分布：" + ", ".join("%s=%d" % (key, value)
@@ -656,22 +727,26 @@ def build_markdown(result):
     for entry in result["changes"]:
         rows.append([entry["severity"], entry["method"].upper(), entry["path"],
                      entry["kind"], entry["detail"], entry["status"]])
-    lines.append(md_table(rows))
+    lines.append(md_table(rows, flagged, "markdown.changes"))
     if result["consumer_impact"]:
         lines.append("\n\n调用方影响：\n")
-        for impact in result["consumer_impact"]:
-            lines.append("- %s：%s%s\n" % (impact["client_id"], impact["status"],
-                                           ("；" + "；".join(impact["reasons"])) if impact["reasons"] else ""))
+        for index, impact in enumerate(result["consumer_impact"]):
+            lines.append("- %s：%s%s\n" % (
+                md_safe(impact["client_id"], "markdown.consumer_impact[%d].client_id" % index, flagged),
+                impact["status"],
+                md_safe("；".join(impact["reasons"]),
+                        "markdown.consumer_impact[%d].reasons" % index, flagged)
+                if impact["reasons"] else ""))
     if result["waivers"]["applied"] or result["waivers"]["expired"] or result["waivers"]["unmatched"]:
         lines.append("\n豁免：已生效 %d、已过期 %d、未匹配 %d。已过期豁免不抑制破坏性判定。\n"
                      % (len(result["waivers"]["applied"]), len(result["waivers"]["expired"]),
                         len(result["waivers"]["unmatched"])))
     lines.append("\n迁移清单：\n")
-    for item in result["migration_checklist"]:
-        lines.append("- " + item + "\n")
+    for index, item in enumerate(result["migration_checklist"]):
+        lines.append("- " + md_safe(item, "markdown.migration_checklist[%d]" % index, flagged) + "\n")
     lines.append("\n本技能不运行代码生成、不访问远程 $ref、不修改规范，"
                  "也不宣称语义兼容性已被完全证明。")
-    return "".join(lines)
+    return "".join(lines), flagged
 
 
 def main():

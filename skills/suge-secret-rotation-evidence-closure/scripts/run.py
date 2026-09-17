@@ -9,6 +9,7 @@ validates or revokes a real key, never touches GitHub or a cloud console, never
 rewrites history and never closes a security alert.
 """
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -180,7 +181,7 @@ def analyze(data):
             "note": "没有任何 incident 可审计，判定为 INVALID。本技能不验证或撤销真实密钥、"
                     "不访问 GitHub/云平台、不改历史、不自动关闭安全告警。",
         }
-        result["markdown_summary"] = build_markdown(result)
+        result["markdown_summary"], result["injection_flagged"] = build_markdown(result)
         return result
 
     incidents = []
@@ -515,26 +516,97 @@ def analyze(data):
                 "不改历史、不自动关闭安全告警；从代码删除或关闭告警都不等于供应商侧撤销。"
                 "dependency_updated/deployment_verified 事件建议带 service_id 才能精确归属到具体依赖。",
     }
-    result["markdown_summary"] = build_markdown(result)
+    result["markdown_summary"], result["injection_flagged"] = build_markdown(result)
     return result
 
 
-def md_table(rows):
-    head = rows[0]
-    out = ["| " + " | ".join(head) + " |", "|" + "|".join(["---"] * len(head)) + "|"]
-    for row in rows[1:]:
-        out.append("| " + " | ".join(str(cell) for cell in row) + " |")
+# --- Markdown safety --------------------------------------------------------
+# incident ids, providers, environments, owners, service ids and generated
+# actions are untrusted.  None of them may add a heading, a bullet or a table
+# column, and obvious injection text is never echoed back.
+MD_PLACEHOLDER = "［已屏蔽：疑似提示注入文本］"
+MD_ESCAPE = re.compile(r"([\\`*_\[\]<>|~])")
+MD_WHITESPACE = re.compile(r"\s+")
+MD_MAX_TEXT = 240
+MD_MAX_CELL = 120
+INJECTION_RULES = (
+    ("INSTRUCTION_OVERRIDE",
+     re.compile(r"ignore\s+(?:all\s+|any\s+)*(?:(?:previous|prior|above|earlier|these)\s+)*"
+                r"(?:instructions?|prompts?|rules?|directions?)", re.IGNORECASE)),
+    ("INSTRUCTION_OVERRIDE_ZH",
+     re.compile(r"(?:忽略|无视|不必理会|不用理会|不要理会|无需理会)[^\n。；;]{0,12}?"
+                r"(?:指令|指示|规则|提示词|提示语|要求)")),
+    ("ROLE_HIJACK",
+     re.compile(r"(?:you\s+are\s+now\b|from\s+now\s+on\s+you\b|从现在起你是|你现在是)",
+                re.IGNORECASE)),
+    ("PROMPT_EXFIL",
+     re.compile(r"(?:系统提示词|系统提示|system\s*prompt|developer\s*message)\s*[:：]",
+                re.IGNORECASE)),
+)
+
+
+class MdSafe(str):
+    """Already-rendered Markdown fragment; never escaped twice."""
+    __slots__ = ()
+
+
+def md_flat(value):
+    """Collapse any value to a single plain line (no newline can start a new block)."""
+    if value is None:
+        return ""
+    text = value if isinstance(value, str) else str(value)
+    for marker in ("\r\n", "\r", "\n", "\t", "\v", "\f"):
+        text = text.replace(marker, " ")
+    return MD_WHITESPACE.sub(" ", text).strip()
+
+
+def md_safe(value, location, flagged, maximum=MD_MAX_TEXT):
+    """Return a single-line, structure-escaped, length-limited Markdown fragment.
+
+    Obvious prompt-injection text is replaced with a fixed placeholder; the
+    evidence records where it was, how long it was and a hash of it, so the
+    original text is never copied back into the report.
+    """
+    if isinstance(value, MdSafe):
+        return value
+    text = md_flat(value)
+    for rule, pattern in INJECTION_RULES:
+        if pattern.search(text):
+            flagged.append({"location": location, "rule": rule, "chars": len(text),
+                            "sha256_prefix": hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]})
+            return MdSafe(MD_PLACEHOLDER)
+    if len(text) > maximum:
+        text = text[:maximum].rstrip() + "…"
+    return MdSafe(MD_ESCAPE.sub(r"\\\1", text))
+
+
+def md_cell(value, location, flagged):
+    if isinstance(value, MdSafe):
+        return value
+    return md_safe(value, location, flagged, MD_MAX_CELL)
+
+
+def md_table(rows, flagged, section):
+    """Render a table; every cell is forced onto one escaped line."""
+    width = len(rows[0])
+    out = ["| " + " | ".join(str(md_cell(cell, section + ".header", flagged)) for cell in rows[0]) + " |",
+           "|" + "|".join(["---"] * width) + "|"]
+    for index, row in enumerate(rows[1:]):
+        cells = [str(md_cell(cell, "%s[%d].col%d" % (section, index, col), flagged))
+                 for col, cell in enumerate(row)]
+        out.append("| " + " | ".join(cells) + " |")
     return "\n".join(out)
 
 
 def build_markdown(result):
+    flagged = []
     lines = ["# 泄露密钥轮换与撤销证据闭环\n\n"]
     lines.append("基准时间 %s，共 %d 个 incident。**总体判定：%s**。\n\n"
                  % (result["as_of"], result["incident_count"], result["status"]))
     if not result["incidents"]:
         lines.append("没有任何 incident 可审计。\n")
         lines.append("\n本技能不验证或撤销真实密钥、不访问 GitHub/云平台、不改历史、不自动关闭安全告警。")
-        return "".join(lines)
+        return "".join(lines), flagged
     lines.append("状态分布：" + ", ".join("%s=%d" % (key, value)
                                           for key, value in sorted(result["status_counts"].items())) + "。\n\n")
     rows = [["incident", "严重度", "状态", "暴露窗口(h)", "依赖覆盖", "旧凭据窗口"]]
@@ -545,31 +617,39 @@ def build_markdown(result):
                      "%d/%d 更新 · %d/%d 验证" % (coverage["updated"], coverage["total"],
                                                   coverage["verified"], coverage["total"]),
                      "仍可能有效" if row["old_secret_valid_window_open"] else "已撤销"])
-    lines.append(md_table(rows))
+    lines.append(md_table(rows, flagged, "markdown.incidents"))
     lines.append("\n\n")
-    for row in result["incidents"]:
-        lines.append("## %s（%s）\n\n" % (row["incident_id"], row["status"]))
+    for index, row in enumerate(result["incidents"]):
+        lines.append("## %s（%s）\n\n" % (
+            md_safe(row["incident_id"], "markdown.incidents[%d].incident_id" % index, flagged),
+            row["status"]))
         lines.append("- 供应商 %s / 类型 %s / 环境 %s / 负责人 %s\n"
-                     % (row["provider"] or "—", row["secret_type"] or "—",
-                        row["environment"] or "—", row["owner"] or "—"))
+                     % (md_safe(row["provider"] or "—", "markdown.incidents[%d].provider" % index, flagged),
+                        md_safe(row["secret_type"] or "—", "markdown.incidents[%d].secret_type" % index, flagged),
+                        md_safe(row["environment"] or "—", "markdown.incidents[%d].environment" % index, flagged),
+                        md_safe(row["owner"] or "—", "markdown.incidents[%d].owner" % index, flagged)))
         lines.append("- 暴露窗口 %s 小时；旧凭据是否仍可能有效：%s\n"
                      % (row["exposure_window_hours"] or "—",
                         "是" if row["old_secret_valid_window_open"] else "否"))
         lines.append("- 依赖覆盖：更新 %d/%d，验证 %d/%d；未更新 %s；已更新未验证 %s\n"
                      % (row["dependency_coverage"]["updated"], row["dependency_coverage"]["total"],
                         row["dependency_coverage"]["verified"], row["dependency_coverage"]["total"],
-                        ", ".join(row["dependency_coverage"]["never_updated"]) or "无",
-                        ", ".join(row["dependency_coverage"]["updated_but_unverified"]) or "无"))
+                        md_safe(", ".join(row["dependency_coverage"]["never_updated"]) or "无",
+                                "markdown.incidents[%d].dependency_coverage.never_updated" % index, flagged),
+                        md_safe(", ".join(row["dependency_coverage"]["updated_but_unverified"]) or "无",
+                                "markdown.incidents[%d].dependency_coverage.updated_but_unverified" % index,
+                                flagged)))
         if row["review_flags"]:
             lines.append("- 标记：" + ", ".join(row["review_flags"]) + "\n")
         if row["missing_actions"]:
             lines.append("- 待办：\n")
-            for action in row["missing_actions"]:
-                lines.append("  - " + action + "\n")
+            for position, action in enumerate(row["missing_actions"]):
+                lines.append("  - " + md_safe(action, "markdown.incidents[%d].missing_actions[%d]"
+                                             % (index, position), flagged) + "\n")
         lines.append("\n")
     lines.append("本技能不验证或撤销真实密钥、不访问 GitHub/云平台、不改历史、不自动关闭安全告警；"
                  "从代码删除或关闭告警都不等于供应商侧撤销。")
-    return "".join(lines)
+    return "".join(lines), flagged
 
 
 def main():
