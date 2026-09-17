@@ -9,7 +9,7 @@ license: MIT
 description: 面向站长、SRE、小型 SaaS 与域名迁移负责人：在真正切换 DNS 之前先做一次离线预演。输入基准时间（带时区）、计划切换/回滚时间（带时区）、记录集 records[]（record_id/name/type/old_value/new_value/current_ttl/provider_min_ttl/proxied）、TTL 下调事件 ttl_lowerings[]（record_id/lowered_at/from_ttl/to_ttl）、解析器观测样本 observations[]（record_id/resolver/observed_value/observed_at/observed_ttl/source_id）、用户声明的健康检查与回滚前置条件 preconditions 以及 policy（proxied_ttl_seconds/max_observation_age_hours/timezone）。脚本只读预演：有效 TTL 在 proxied 时取固定值（**代理记录无法靠下调 TTL 缩短传播**）；理论最晚过期取所有下调事件 lowered_at+from_ttl 的最大值；要求理论最晚过期**不晚于**计划切换时间，否则标 TOO_LATE_TO_LOWER_TTL 并给出最早建议人工切换时刻；观测需新鲜（超过 max_observation_age_hours 即陈旧）；**传播已确认**必须同时满足有下调、窗口已走完、有新鲜观测确认新值、且无新鲜观测仍返回旧值——**不把理论过期当全球传播完成**；同名重复记录、CNAME 与其他类型共存、缺 new_value、TTL 低于服务商下限标 RECORD_CONFLICT；缺计划切换时间或旧值、前置条件声明为未就绪标 UNKNOWN。输出 READY_FOR_HUMAN_REVIEW / TOO_LATE_TO_LOWER_TTL / OBSERVATION_GAP / RECORD_CONFLICT / UNKNOWN / INVALID，附逐记录时间线、最早建议人工切换时刻、回滚完全生效时刻与理论暴露窗口、观测新旧值差异、缺失证据清单与人工检查清单，并给出按最早可切换时刻排序的人工切换顺序。纯本地只读：不执行 dig/curl、不访问域名、不连接解析器、不修改任何解析记录。触发词：DNS 切换、TTL 下调、回滚窗口、域名迁移、传播时间、CNAME 冲突、proxied TTL、cutover 预演。联系邮箱：43298568@qq.com。
 description_zh: 用用户提供的 DNS 快照离线预演切换：核对 TTL 下调是否提前一个旧 TTL、给出理论过期与回滚暴露窗口、区分代理固定 TTL 与同名冲突，只有新鲜观测确认新值才算传播完成。
 description_en: "Offline DNS cutover dry-run from user-supplied snapshots: verifies TTL was lowered at least one old TTL ahead, computes the theoretical cache-expiry window and rollback exposure, flags proxy fixed TTL, duplicate records and CNAME conflicts, and refuses to treat theoretical expiry as global propagation. Outputs READY_FOR_HUMAN_REVIEW / TOO_LATE_TO_LOWER_TTL / OBSERVATION_GAP / RECORD_CONFLICT / UNKNOWN / INVALID with per-record timeline and human checklist. Never runs dig/curl, never touches DNS."
-version: 1.0.0
+version: 1.0.1
 author: 苏格
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/suge-dns-cutover-ttl-rollback-plan
 category: 企业效率
@@ -43,6 +43,18 @@ platforms: [workbuddy, claude-code, cursor]
 4. 对每条记录看 `latest_cache_expiry_at` 与 `ttl_lowering_lead_seconds`：**负值代表 TTL 下调已经晚了**，需要推迟切换。
 5. 看 `observation.confirmed_new` 与 `still_old`：`still_old > 0` 说明还有解析器在返回旧值。
 6. 用 `recommended_cutover_order` 安排人工执行顺序，并把 `human_checklist` 当作执行前检查表——**本技能不会代你切换**。
+7. 看顶层 `injection_flagged`：非空说明有用户文本疑似提示注入，报告里已用占位符替换，结构化 JSON 保留原值并标 `PROMPT_INJECTION_IGNORED`——**它不影响任何状态与时间线判定**。
+
+## Markdown 安全渲染与提示注入
+
+`markdown_summary` 是脚本唯一渲染的报告面，所有进入其中的用户自由文本都经过统一安全处理，因此"输入只当数据"这条承诺在报告层同样成立：
+
+1. **单行化**：控制字符与换行替换为空格、连续空白压缩，自由文本永远只占一行，无法插入新的标题或列表行。
+2. **结构字符转义**：反斜杠 `\`、竖线 `|`、反引号、方括号、圆括号、`#`、`!`、`<`、`>` 逐字符转义。输入无法拆分表格列、伪造标题、注入链接/图片或原始 HTML。
+3. **提示注入检测**：对中文/英文疑似提示注入（"忽略以上所有指令"、"ignore all previous instructions"、"系统提示词"、"你现在是"、"无条件"等）做检测。命中后该值在 `markdown_summary` 中渲染为固定占位符「已隐藏疑似提示注入文本」，结构化 JSON 仍保留原值并标 `PROMPT_INJECTION_IGNORED`。
+4. **可定位来源**：顶层 `injection_flagged` 列出命中来源——记录的 `record_id`、观测所属 `record_id`、`preconditions` 的键名、`policy`。若定位符本身即注入源，则回退为位置名（如 `records[0]`、`observations[2]`），**不回显载荷**。
+
+该机制只影响报告渲染与风险标注，**不改变 TTL、时间线、状态与切换顺序的既有口径**；普通业务文字（含"忽略""指令"等词但并非针对模型的指令）不误报。
 
 ## 运行约束
 
@@ -50,4 +62,5 @@ platforms: [workbuddy, claude-code, cursor]
 - 不把理论过期时间当全球传播完成；不使用"通常几分钟生效"这类经验值。
 - 时间必须带时区；缺失值保留 unknown，**不为 0**；零/负 TTL、重复矛盾记录、`NaN`/`Infinity`、恶意 URL 与命令字符串安全处理。
 - 疑似凭据（`sk-` 长串、AKIA、PEM 私钥）与控制字符直接拒绝。
+- 进入 `markdown_summary` 的用户自由文本一律单行化并转义 Markdown 结构字符；疑似提示注入替换为占位符并记入顶层 `injection_flagged`，结构化 JSON 保留原值并标 `PROMPT_INJECTION_IGNORED`。
 - 输出只是变更前预演，**不保证传播时间、不保证切换成功、不保证零中断**。

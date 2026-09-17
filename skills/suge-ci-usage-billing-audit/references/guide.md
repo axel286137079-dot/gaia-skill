@@ -64,7 +64,7 @@
 
 ```
 as_of, as_of_local, period{start_date,end_date,account_timezone}, plan_currency,
-line_count, in_period_countable_lines, status, status_counts,
+line_count, in_period_countable_lines, status, status_counts, injection_flagged[],
 lines[] {line_id, date_utc, local_date, product, sku, unit_type, quantity,
          gross_amount, discount_amount, net_amount, expected_net, arithmetic_difference,
          currency, repository, workflow_path, runner_type, os, status, review_flags, reasons},
@@ -80,7 +80,18 @@ artifacts {stored_count, expired_count, exposure_gb_days,
 markdown_summary, note
 ```
 
-## 5. 边界与安全
+`injection_flagged[]` 记录疑似提示注入的来源定位：账单行的 `line_id`、Artifact 的 `artifact_id`、`plan`（币种或 `known_skus`）、`period`、`policy`。定位符本身即注入源时回退为位置名（`billing_lines[i]` / `artifacts[i]`），不回声载荷。
+
+## 5. Markdown 安全渲染与提示注入
+
+`markdown_summary` 由脚本渲染，所有进入其中的用户自由文本都经统一处理：
+
+- **单行化**：控制字符与换行 → 空格，连续空白压缩，自由文本只占一行。
+- **结构转义**：`\` `|` 反引号 `[ ] ( ) # ! < >` 逐字符转义，输入无法拆分表格列、伪造标题、注入链接/图片或原始 HTML。
+- **注入检测**：中文/英文疑似提示注入（如"忽略以上所有指令"、"ignore all previous instructions"、"系统提示词"、"你现在是"）命中后，摘要渲染固定占位符「已隐藏疑似提示注入文本」；结构化 JSON 保留原值并在该行/条目 `review_flags` 标 `PROMPT_INJECTION_IGNORED`。
+- 该机制**不改变**金额、账期归属、时区、状态与排序口径；普通业务文字不误报。
+
+## 6. 边界与安全
 
 - **纯离线**：不登录 CI 平台、不调用 API、不删除 Artifact、不修改 workflow、不改预算与套餐。
 - 套餐额度、价目、折扣与预算**必须由用户提供**；缺失时保留 `UNKNOWN`，**不套用记忆中的公开价格**。

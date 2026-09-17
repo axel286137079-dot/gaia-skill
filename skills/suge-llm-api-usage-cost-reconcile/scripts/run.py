@@ -27,6 +27,75 @@ UNITS = {"per_million_tokens": Decimal("1000000"), "per_1k_tokens": Decimal("100
 BLOCKED_ROW_STATUSES = {"UNKNOWN_MODEL", "PRICE_NOT_EFFECTIVE", "PRICE_OVERLAP",
                         "UNPRICED", "FX_MISSING", "CHARGED_NOT_OBSERVED"}
 
+# Chinese/English prompt-injection probes. Any free text that reaches
+# markdown_summary is scanned with these; a hit never changes a computed value,
+# it only switches the rendered text to a fixed placeholder and adds a risk flag.
+INJECTION_PATTERNS = (
+    re.compile(r"忽略(以上|之前|所有)?(指令|规则|要求)"),
+    re.compile(r"忽略.{0,8}(指令|规则|要求)"),
+    re.compile(r"ignore (all )?(previous|above) instructions", re.IGNORECASE),
+    re.compile(r"系统提示词"),
+    re.compile(r"system prompt", re.IGNORECASE),
+    re.compile(r"你现在是"),
+    re.compile(r"无条件"),
+    re.compile(r"直接把钱"),
+)
+
+# Rendered in place of any field whose text looks like a prompt injection.
+INJECTION_PLACEHOLDER = "已隐藏疑似提示注入文本"
+PROMPT_INJECTION_FLAG = "PROMPT_INJECTION_IGNORED"
+
+# Characters that can turn one line of text into Markdown structure (heading,
+# list, table column, link/image, raw HTML). Backslash and pipe must always be
+# escaped: the pipe splits a table row and the backslash would otherwise undo the
+# escaping itself. Everything else is neutralised by collapsing the text to a
+# single line first.
+MD_STRUCTURE_CHARS = frozenset("\\|`[]()#!<>")
+
+
+def find_injection(text):
+    if not isinstance(text, str):
+        return False
+    return any(pattern.search(text) for pattern in INJECTION_PATTERNS)
+
+
+def md_escape(value):
+    """Untrusted text -> single-line, structure-neutral Markdown text."""
+    if value is None:
+        return None
+    text = value if isinstance(value, str) else str(value)
+    text = "".join(" " if (ord(char) < 32 or ord(char) == 127) else char for char in text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return "".join(("\\" + char) if char in MD_STRUCTURE_CHARS else char for char in text)
+
+
+def md_field(value, fallback="—"):
+    """The only entry point for untrusted values into markdown_summary.
+
+    A value that looks like a prompt injection never reaches the summary; it is
+    replaced by a fixed placeholder. Everything else is structure-escaped. The
+    structured JSON keeps the original value plus PROMPT_INJECTION_IGNORED.
+    """
+    if value is None:
+        return fallback
+    text = value if isinstance(value, str) else str(value)
+    if find_injection(text):
+        return INJECTION_PLACEHOLDER
+    escaped = md_escape(text)
+    return escaped if escaped else fallback
+
+
+def safe_ref(identifier, fallback):
+    """A locator for injection_flagged.
+
+    Locators are part of structured output, so an identifier that is itself the
+    injection source cannot be used as its own locator; fall back to a positional
+    name instead of echoing the payload.
+    """
+    if isinstance(identifier, str) and identifier and not find_injection(identifier):
+        return identifier
+    return fallback
+
 
 def clean_text(value, label, maximum=200, allow_empty=False):
     if value is None:
@@ -140,7 +209,10 @@ def parse_fx(item, seen_keys):
     if key in seen_keys:
         raise ValueError("duplicate fx rate for %s->%s" % (src, dst))
     seen_keys.add(key)
-    return {"from": src, "to": dst, "rate": rate, "source": source, "effective_at": effective_at}
+    return {"from": src, "to": dst, "rate": rate, "source": source, "effective_at": effective_at,
+            "injection_fields": sorted(
+                name for name, value in (("from", src), ("to", dst), ("source", source))
+                if find_injection(value))}
 
 
 def parse_price_card(item, seen_keys):
@@ -173,7 +245,12 @@ def parse_price_card(item, seen_keys):
     seen_keys.add(key)
     return {"provider": provider, "model": model, "service_tier": tier, "currency": currency,
             "unit": unit, "divisor": UNITS[unit], "effective_from": effective_from,
-            "effective_to": effective_to, "rates": rates}
+            "effective_to": effective_to, "rates": rates,
+            "injection_fields": sorted(
+                name for name, value in (("provider", provider), ("model", model),
+                                         ("service_tier", tier), ("currency", currency),
+                                         ("unit", unit))
+                if find_injection(value))}
 
 
 def parse_usage(item, seen_ids):
@@ -211,7 +288,12 @@ def parse_usage(item, seen_ids):
     async_allowed = parse_bool(async_raw, "usage.async_allowed") if async_raw is not None else False
     return {"usage_id": usage_id, "date": day, "provider": provider, "model": model,
             "service_tier": tier, "currency": currency, "tokens": tokens,
-            "charged_amount": charged, "async_allowed": async_allowed}
+            "charged_amount": charged, "async_allowed": async_allowed,
+            "injection_fields": sorted(
+                name for name, value in (("usage_id", usage_id), ("provider", provider),
+                                         ("model", model), ("service_tier", tier),
+                                         ("currency", currency))
+                if find_injection(value))}
 
 
 def select_card(cards, row):
@@ -265,7 +347,12 @@ def price_row(row, card, fx_index):
 def evaluate_row(row, cards, fx_index, policy, settlement_currency):
     flags = []
     reasons = []
+    if row["injection_fields"]:
+        # Risk marker only: pricing, tolerance and status are untouched.
+        flags.append(PROMPT_INJECTION_FLAG)
     card, problem = select_card(cards, row)
+    if card is not None and card["injection_fields"]:
+        flags.append(PROMPT_INJECTION_FLAG)
     expected = None
     priced = {}
     used_fx = None
@@ -350,7 +437,7 @@ def build_markdown(result):
                      tokens["output"], tokens["reasoning"],
                      row["expected_amount"] or "—", row["charged_amount"] or "—",
                      row["difference"] or "—", row["status"]])
-    head = ["# LLM API 用量成本与缓存账单复核（基准 %s）\n\n" % result["as_of"]]
+    head = ["# LLM API 用量成本与缓存账单复核（基准 %s）\n\n" % md_field(result["as_of"])]
     head.append("口径：按日期选择**唯一**生效价目，按 token 类别与单位逐项 Decimal 计价；"
                 "缓存命中/未命中、同步/批处理、reasoning 分开计价；缺价、重叠价、未知模型、"
                 "负 token、跨币种无汇率一律**不硬算**。\n\n")
@@ -358,10 +445,11 @@ def build_markdown(result):
     head.append("\n\n状态分布：" + ", ".join("%s=%d" % (k, v) for k, v in sorted(result["status_counts"].items())) + "。\n")
     totals = result["totals"]
     head.append("\n结算币种 %s 合计：期望 %s，已收费 %s，差异 %s。\n"
-                % (result["settlement_currency"], totals["expected"] or "—",
+                % (md_field(result["settlement_currency"]), totals["expected"] or "—",
                    totals["charged"] or "—", totals["difference"] or "—"))
     if totals["excluded_currencies"]:
-        head.append("未纳入合计的币种（非结算币种）：%s。\n" % ", ".join(totals["excluded_currencies"]))
+        head.append("未纳入合计的币种（非结算币种）：%s。\n"
+                    % ", ".join(md_field(item) for item in totals["excluded_currencies"]))
     cache = result["cache_hit_ratio"]
     if cache["ratio_pct"] is not None:
         head.append("\n缓存命中占比（仅事实）：%s（cache_read %d / (input %d + cache_read %d)）。\n"
@@ -375,6 +463,10 @@ def build_markdown(result):
                     % (len(batch["usage_ids"]), batch["tokens_total"]))
     else:
         head.append("未标明可异步的调用，本次不给出批处理候选量。\n")
+    head.append("\n提示注入命中：%s。命中字段在摘要中以固定占位文本替代，"
+                "原始值仍保留在结构化 JSON 的对应字段中并带 %s 标记。\n"
+                % ("、".join(md_field(ref) for ref in result["injection_flagged"])
+                   if result["injection_flagged"] else "无", PROMPT_INJECTION_FLAG))
     head.append("\n本技能只做离线复核：不调用任何 provider API、不抓取价格页、不修改账单。")
     return "".join(head)
 
@@ -383,7 +475,7 @@ def md_table(rows):
     head = rows[0]
     out = ["| " + " | ".join(head) + " |", "|" + "|".join(["---"] * len(head)) + "|"]
     for row in rows[1:]:
-        out.append("| " + " | ".join(str(cell) for cell in row) + " |")
+        out.append("| " + " | ".join(str(md_field(cell)) for cell in row) + " |")
     return "\n".join(out)
 
 
@@ -478,11 +570,29 @@ def analyze(data):
              "reason": r["reasons"][0] if r["reasons"] else ""}
             for r in rows if r["status"] in BLOCKED_ROW_STATUSES or r["status"] == "INVALID"]
 
+    injection_flagged = []
+    for index, row in enumerate(usage):
+        if row["injection_fields"]:
+            injection_flagged.append(safe_ref(row["usage_id"], "usage[%d]" % index))
+    for index, item in enumerate(cards):
+        if item["injection_fields"]:
+            locator = "%s/%s/%s" % (item["provider"], item["model"], item["service_tier"])
+            injection_flagged.append(safe_ref(locator, "price_cards[%d]" % index))
+    for index, item in enumerate(fx_list):
+        if item["injection_fields"]:
+            injection_flagged.append(
+                safe_ref("%s->%s" % (item["from"], item["to"]), "fx_rates[%d]" % index))
+    if find_injection(settlement_currency):
+        injection_flagged.append("settlement_currency")
+    if find_injection(policy["timezone"]):
+        injection_flagged.append("policy")
+
     result = {
         "as_of": as_of.isoformat(),
         "settlement_currency": settlement_currency,
         "usage_count": len(rows),
         "status": overall,
+        "injection_flagged": sorted(set(injection_flagged)),
         "status_counts": status_counts,
         "groups": group_list,
         "rows": rows,

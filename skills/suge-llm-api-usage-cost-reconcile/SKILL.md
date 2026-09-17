@@ -9,7 +9,7 @@ license: MIT
 description: 面向独立开发者、AI 应用团队与模型 API 采购/财务人员：核对 LLM API 用量成本、缓存计费与批处理折扣是否与价目一致。输入基准时间（带时区）、结算币种、价目表 price_cards[]（provider/model/service_tier/currency/unit/effective_from/effective_to/rates）、用量行 usage[]（usage_id/date/provider/model/service_tier/currency/charged_amount/tokens{input,cache_read,cache_write,output,reasoning}/async_allowed）、可选汇率表 fx_rates[]（from/to/rate/source/effective_at）与 policy（tolerance_abs/tolerance_pct/timezone）。脚本只读核算：按 provider+model+tier 与日期选择**唯一**生效价目；按 token 类别与单位逐项 Decimal 计价，缓存命中与未命中用不同单价，batch 档使用 batch_* 单价，reasoning 与其他 SKU 分开；无任何同组合价目标 UNKNOWN_MODEL，有价目但无一条覆盖该日期标 PRICE_NOT_EFFECTIVE，同一日期多条价目生效标 PRICE_OVERLAP，某非零类别缺单价标 UNPRICED，跨币种缺汇率标 FX_MISSING——以上均**不硬算**；未提供 charged_amount 只输出期望金额并标 CHARGED_NOT_OBSERVED。已收费与期望金额在用户给定容差内标 MATCH，超出标 VARIANCE。输出 MATCH / VARIANCE / PARTIAL / UNKNOWN / INVALID，附逐 provider/model/tier 成本、价目版本与生效期、expected/charged/difference、未计价 usage 清单、缓存命中占比（仅事实、不参与判定）、可转批处理候选量（仅在用户标明 async_allowed 时）与证据缺口清单。纯离线只读：不调用任何 provider API、不抓取价格页、不读取账户、不修改账单。触发词：API 账单、用量成本、缓存计费、token 计价、批处理折扣、LLM 成本对账、price card、cost reconcile。联系邮箱：43298568@qq.com。
 description_zh: 用用户提供的价目快照与汇率离线重算 LLM API 期望成本，与 provider 已收费金额分层核对；缓存命中/未命中、同步/批处理、reasoning 分开计价，缺价/重叠价/未知模型/跨币种无汇率不硬算。
 description_en: "Offline LLM API usage and cache-billing reconciliation: pick the unique effective price card per date, price each token category (cache hit/miss, sync/batch, reasoning) with Decimal, never hard-compute on missing or overlapping prices, missing FX or unknown models, and compare against the provider-charged amount within a user-given tolerance. Outputs MATCH/VARIANCE/PARTIAL/UNKNOWN/INVALID with per-model cost, price-card version, evidence gaps, factual cache-hit ratio and optional batch candidates. Read-only: no provider calls, no price scraping, no billing changes."
-version: 1.0.0
+version: 1.0.1
 author: 苏格
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/suge-llm-api-usage-cost-reconcile
 category: 数据分析
@@ -43,11 +43,24 @@ platforms: [workbuddy, claude-code, cursor]
 4. 再看 `groups[]`，逐 provider/model/tier 的 `expected_total` 与 `charged_total`。**只有可比较的行才进合计**，所以合计与账单总额不等时先看 `evidence_gaps`。
 5. 看 `rows[]` 的 `review_flags`：`UNPRICED`/`PRICE_NOT_EFFECTIVE`/`PRICE_OVERLAP`/`UNKNOWN_MODEL`/`FX_MISSING` 都是"证据不够"，不是"账单错了"。
 6. `cache_hit_ratio` 与 `batch_candidate` 是**事实性参考**，不参与状态判定；`batch_candidate` 只在用户明确标了 `async_allowed` 时才给出，且不承诺任何折扣。
+7. 看顶层 `injection_flagged`：非空说明有用户文本疑似提示注入，报告里已用占位符替换，结构化 JSON 保留原值并标 `PROMPT_INJECTION_IGNORED`——**它不影响任何成本与状态判定**。
+
+## Markdown 安全渲染与提示注入
+
+`markdown_summary` 是脚本唯一渲染的报告面，所有进入其中的用户自由文本都经过统一安全处理，因此"输入只当数据"这条承诺在报告层同样成立：
+
+1. **单行化**：控制字符与换行替换为空格、连续空白压缩，自由文本永远只占一行，无法插入新的标题或列表行。
+2. **结构字符转义**：反斜杠 `\`、竖线 `|`、反引号、方括号、圆括号、`#`、`!`、`<`、`>` 逐字符转义。输入无法拆分表格列、伪造标题、注入链接/图片或原始 HTML。
+3. **提示注入检测**：对中文/英文疑似提示注入（"忽略以上所有指令"、"ignore all previous instructions"、"系统提示词"、"你现在是"、"无条件"等）做检测。命中后该值在 `markdown_summary` 中渲染为固定占位符「已隐藏疑似提示注入文本」，结构化 JSON 仍保留原值并标 `PROMPT_INJECTION_IGNORED`。
+4. **可定位来源**：顶层 `injection_flagged` 列出命中来源——`usage_id`、价目的 `provider/model/service_tier`、汇率的 `from->to`、`settlement_currency`、`policy`。若定位符本身即注入源，则回退为位置名（如 `usage[0]`、`price_cards[1]`），**不回显载荷**。
+
+该机制只影响报告渲染与风险标注，**不改变金额、币种、容差、状态与排序的既有口径**；普通业务文字（含"忽略""指令"等词但并非针对模型的指令）不误报。
 
 ## 运行约束
 
 - 只做离线复核：不调用任何 provider API、不抓取价格页、不读取账户、不修改账单。
 - 价目、汇率、折扣、额度必须由用户提供来源与生效时间；缺失标 `UNKNOWN`/`FX_MISSING`，不套用过期价格、不猜汇率。
 - 缺失值保留 unknown，**不为 0**；重复 `usage_id`、负数 token、`NaN`/`Infinity`、疑似凭据与提示注入文本安全处理。
+- 进入 `markdown_summary` 的用户自由文本一律单行化并转义 Markdown 结构字符；疑似提示注入替换为占位符并记入顶层 `injection_flagged`，结构化 JSON 保留原值并标 `PROMPT_INJECTION_IGNORED`。
 - 时间必须带时区；`unit` 与 `service_tier` 不符时先澄清再算。
 - 输出只是复核线索，**不构成账单准确性、节省金额或迁移成功承诺**。

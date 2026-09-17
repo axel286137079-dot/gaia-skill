@@ -70,6 +70,7 @@
 
 ```
 as_of, settlement_currency, usage_count, status, status_counts,
+injection_flagged[],
 groups[] {provider, model, service_tier, row_count, status,
           expected_total, charged_total, difference_total, review_flags},
 rows[] {usage_id, date, provider, model, service_tier, currency, tokens, async_allowed,
@@ -83,7 +84,18 @@ totals {expected, charged, difference, excluded_currencies[]},
 markdown_summary, note
 ```
 
-## 5. 边界与安全
+`injection_flagged[]` 记录疑似提示注入的来源定位：`usage_id`、价目的 `provider/model/service_tier`、汇率的 `from->to`、`settlement_currency`、`policy`。定位符本身即注入源时回退为位置名（`usage[i]` / `price_cards[i]` / `fx_rates[i]`），不回声载荷。
+
+## 5. Markdown 安全渲染与提示注入
+
+`markdown_summary` 由脚本渲染，所有进入其中的用户自由文本都经统一处理：
+
+- **单行化**：控制字符与换行 → 空格，连续空白压缩，自由文本只占一行。
+- **结构转义**：`\` `|` 反引号 `[ ] ( ) # ! < >` 逐字符转义，输入无法拆分表格列、伪造标题、注入链接/图片或原始 HTML。
+- **注入检测**：中文/英文疑似提示注入（如"忽略以上所有指令"、"ignore all previous instructions"、"系统提示词"、"你现在是"）命中后，摘要渲染固定占位符「已隐藏疑似提示注入文本」；结构化 JSON 保留原值并在该行/条目 `review_flags` 标 `PROMPT_INJECTION_IGNORED`。
+- 该机制**不改变**金额、币种、容差、状态与排序口径；普通业务文字不误报。
+
+## 6. 边界与安全
 
 - 纯离线：不调用任何 provider API、不抓取价格页、不读取账户、不修改账单。
 - 价格、汇率、折扣、额度**必须由用户提供来源与生效时间**；缺失或过期时标 `UNKNOWN`/`FX_MISSING`，**不套用过期价格、不猜汇率**。

@@ -9,7 +9,7 @@ license: MIT
 description: 面向使用 GitHub Actions 或同类 CI 的小型研发团队、平台工程与财务：对账期内的 CI 用量账单做离线归因审计。输入基准时间（带时区）、账期与账户时区、套餐 plan（币种/包含分钟数/包含存储 GB-天/超额单价/预算/已知 SKU 清单）、账单行 billing_lines[]（line_id/date(UTC)/product/sku/quantity/unit_type/gross_amount/discount_amount/net_amount/repository/workflow_path/runner_type/os/currency）、可选 Artifact 清单 artifacts[]（artifact_id/size_bytes/created_at/expires_at/retention_days）与 policy（tolerance_abs/quota_applied_in_discount/timezone）。脚本只读审计：账单行日期按 **UTC** 记录，**先换算到账户时区再判定是否落在账期**（跨日边界以本地日期为准）；`gross_amount − discount_amount` 与 `net_amount` 独立复核，**不以账单自报 net 为基准**；按 repository/workflow_path/sku/os/runner_type 分别聚合净额与用量；币种不一致或不在账期内的行不并入合计，但单列出来；额度是否已在 discount 中体现由用户声明，**声明为是时不做二次抵扣**，声明为否时按用户提供的额度与单价做直线超额估算；月末值按已过天数外推到账期末，**明确是直线情景不是预测**，超出预算标 BUDGET_RISK。Artifact 侧只统计未过期对象的存储暴露（GB-天），并标出"声明保留期短于既有到期时间"的对象——**保留期调整不追溯既有对象**。输出 MATCH / BILLING_DIFFERENCE / BUDGET_RISK / PARTIAL / UNKNOWN / INVALID，附账期汇总、按仓库/工作流/SKU/OS/Runner 的成本贡献、月末情景区间、Artifact 存储暴露、异常行与缺字段清单、可人工复核的工作流清单。纯离线只读：不登录 CI 平台、不调用 API、不删除 Artifact、不修改 workflow 或预算。触发词：CI 账单、Actions 用量、Runner 分钟数、Artifact 存储、月末预估、预算告警、billing report、用量归因。联系邮箱：43298568@qq.com。
 description_zh: 离线审计 CI 用量账单：按账户时区判定账期归属、独立复核 gross−discount=net、按仓库/工作流/SKU/OS/Runner 归因、给出月末直线情景与 Artifact 存储暴露，额度二次抵扣由用户声明控制。
 description_en: "Offline CI runner and artifact usage billing audit: maps UTC billing dates into the account timezone for period attribution, independently re-checks gross−discount=net, attributes cost by repository/workflow/SKU/OS/runner, projects a straight-line month-end scenario (not a forecast), quantifies artifact storage exposure, and honours the user's declaration that quota is already reflected in discounts. Outputs MATCH/BILLING_DIFFERENCE/BUDGET_RISK/PARTIAL/UNKNOWN/INVALID. Read-only: no CI login, no API calls, no artifact deletion, no workflow or budget changes."
-version: 1.0.0
+version: 1.0.1
 author: 苏格
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/suge-ci-usage-billing-audit
 category: 企业效率
@@ -45,6 +45,18 @@ CI 账单最容易出问题的不是单价，而是三件事：**UTC 与账户�
 5. 看 `by_repository` / `by_workflow` / `by_sku` / `by_runner_type` 找出主要成本贡献者。
 6. 看 `run_rate` 的 `month_end_run_rate` 与 `budget_risk`，**把它当情景而不是预测**；看 `overage_estimate` 是否 `applicable`。
 7. 看 `artifacts.exposure_gb_days` 与 `artifacts.items[].review_flags`，确认存储暴露与保留期追溯问题。
+8. 看顶层 `injection_flagged`：非空说明有用户文本疑似提示注入，报告里已用占位符替换，结构化 JSON 保留原值并标 `PROMPT_INJECTION_IGNORED`——**它不影响任何金额、账期与状态判定**。
+
+## Markdown 安全渲染与提示注入
+
+`markdown_summary` 是脚本唯一渲染的报告面，所有进入其中的用户自由文本都经过统一安全处理，因此"输入只当数据"这条承诺在报告层同样成立：
+
+1. **单行化**：控制字符与换行替换为空格、连续空白压缩，自由文本永远只占一行，无法插入新的标题或列表行。
+2. **结构字符转义**：反斜杠 `\`、竖线 `|`、反引号、方括号、圆括号、`#`、`!`、`<`、`>` 逐字符转义。输入无法拆分表格列、伪造标题、注入链接/图片或原始 HTML。
+3. **提示注入检测**：对中文/英文疑似提示注入（"忽略以上所有指令"、"ignore all previous instructions"、"系统提示词"、"你现在是"、"无条件"等）做检测。命中后该值在 `markdown_summary` 中渲染为固定占位符「已隐藏疑似提示注入文本」，结构化 JSON 仍保留原值并标 `PROMPT_INJECTION_IGNORED`。
+4. **可定位来源**：顶层 `injection_flagged` 列出命中来源——账单行的 `line_id`、Artifact 的 `artifact_id`、`plan`（币种或 `known_skus`）、`period`、`policy`。若定位符本身即注入源，则回退为位置名（如 `billing_lines[0]`、`artifacts[1]`），**不回显载荷**。
+
+该机制只影响报告渲染与风险标注，**不改变金额、账期归属、时区、状态与排序的既有口径**；普通业务文字（含"忽略""指令"等词但并非针对模型的指令）不误报。
 
 ## 运行约束
 
@@ -53,4 +65,5 @@ CI 账单最容易出问题的不是单价，而是三件事：**UTC 与账户�
 - 公开/私有仓库、托管/自托管 Runner 的口径差异由输入字段决定，不替用户假设。
 - 负数金额按退款/调整行处理；重复 `line_id`、`NaN`/`Infinity`、非法 `unit_type`、未知时区安全处理。
 - 时间必须带时区；缺失值保留 unknown，**不为 0**。
+- 进入 `markdown_summary` 的用户自由文本一律单行化并转义 Markdown 结构字符；疑似提示注入替换为占位符并记入顶层 `injection_flagged`，结构化 JSON 保留原值并标 `PROMPT_INJECTION_IGNORED`。
 - 月末直线值只是情景外推，**不保证账单金额、不保证节省、不代表平台最终结算**。

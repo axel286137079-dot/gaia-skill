@@ -25,6 +25,75 @@ RECORD_TYPES = ("A", "AAAA", "CNAME", "TXT", "MX", "NS", "SRV", "CAA")
 SEVERITY = ["INVALID", "RECORD_CONFLICT", "TOO_LATE_TO_LOWER_TTL",
             "OBSERVATION_GAP", "UNKNOWN", "READY_FOR_HUMAN_REVIEW"]
 
+# Chinese/English prompt-injection probes. Any free text that reaches
+# markdown_summary is scanned with these; a hit never changes a computed value,
+# it only switches the rendered text to a fixed placeholder and adds a risk flag.
+INJECTION_PATTERNS = (
+    re.compile(r"忽略(以上|之前|所有)?(指令|规则|要求)"),
+    re.compile(r"忽略.{0,8}(指令|规则|要求)"),
+    re.compile(r"ignore (all )?(previous|above) instructions", re.IGNORECASE),
+    re.compile(r"系统提示词"),
+    re.compile(r"system prompt", re.IGNORECASE),
+    re.compile(r"你现在是"),
+    re.compile(r"无条件"),
+    re.compile(r"直接把钱"),
+)
+
+# Rendered in place of any field whose text looks like a prompt injection.
+INJECTION_PLACEHOLDER = "已隐藏疑似提示注入文本"
+PROMPT_INJECTION_FLAG = "PROMPT_INJECTION_IGNORED"
+
+# Characters that can turn one line of text into Markdown structure (heading,
+# list, table column, link/image, raw HTML). Backslash and pipe must always be
+# escaped: the pipe splits a table row and the backslash would otherwise undo the
+# escaping itself. Everything else is neutralised by collapsing the text to a
+# single line first.
+MD_STRUCTURE_CHARS = frozenset("\\|`[]()#!<>")
+
+
+def find_injection(text):
+    if not isinstance(text, str):
+        return False
+    return any(pattern.search(text) for pattern in INJECTION_PATTERNS)
+
+
+def md_escape(value):
+    """Untrusted text -> single-line, structure-neutral Markdown text."""
+    if value is None:
+        return None
+    text = value if isinstance(value, str) else str(value)
+    text = "".join(" " if (ord(char) < 32 or ord(char) == 127) else char for char in text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return "".join(("\\" + char) if char in MD_STRUCTURE_CHARS else char for char in text)
+
+
+def md_field(value, fallback="—"):
+    """The only entry point for untrusted values into markdown_summary.
+
+    A value that looks like a prompt injection never reaches the summary; it is
+    replaced by a fixed placeholder. Everything else is structure-escaped. The
+    structured JSON keeps the original value plus PROMPT_INJECTION_IGNORED.
+    """
+    if value is None:
+        return fallback
+    text = value if isinstance(value, str) else str(value)
+    if find_injection(text):
+        return INJECTION_PLACEHOLDER
+    escaped = md_escape(text)
+    return escaped if escaped else fallback
+
+
+def safe_ref(identifier, fallback):
+    """A locator for injection_flagged.
+
+    Locators are part of structured output, so an identifier that is itself the
+    injection source cannot be used as its own locator; fall back to a positional
+    name instead of echoing the payload.
+    """
+    if isinstance(identifier, str) and identifier and not find_injection(identifier):
+        return identifier
+    return fallback
+
 
 def clean_text(value, label, maximum=200, allow_empty=False):
     if value is None:
@@ -146,7 +215,11 @@ def parse_record(item, seen_ids):
     proxied = parse_bool(proxied_raw, "record.proxied") if proxied_raw is not None else False
     return {"record_id": record_id, "name": name, "type": rtype, "old_value": old_value,
             "new_value": new_value, "current_ttl": current_ttl,
-            "provider_min_ttl": provider_min_ttl, "proxied": proxied}
+            "provider_min_ttl": provider_min_ttl, "proxied": proxied,
+            "injection_fields": sorted(
+                name_label for name_label, value in (("record_id", record_id), ("name", name),
+                                                     ("old_value", old_value), ("new_value", new_value))
+                if find_injection(value))}
 
 
 def parse_lowering(item, records):
@@ -175,7 +248,12 @@ def parse_observation(item, records):
         if observed_ttl_raw is not None and str(observed_ttl_raw).strip() != "" else None
     source_id = clean_text(item.get("source_id"), "observation.source_id", maximum=120)
     return {"record_id": record_id, "resolver": resolver, "observed_value": observed_value,
-            "observed_at": observed_at, "observed_ttl": observed_ttl, "source_id": source_id}
+            "observed_at": observed_at, "observed_ttl": observed_ttl, "source_id": source_id,
+            "injection_fields": sorted(
+                name_label for name_label, value in (("resolver", resolver),
+                                                     ("observed_value", observed_value),
+                                                     ("source_id", source_id))
+                if find_injection(value))}
 
 
 def evaluate_record(record, lowerings, observations, policy, planned_cutover_at, planned_rollback_at,
@@ -209,6 +287,9 @@ def evaluate_record(record, lowerings, observations, policy, planned_cutover_at,
 
     obs = sorted([item for item in observations if item["record_id"] == record["record_id"]],
                  key=lambda item: item["observed_at"])
+    if record["injection_fields"] or any(item["injection_fields"] for item in obs):
+        # Risk marker only: TTL, timezone, ordering and status are untouched.
+        flags.append(PROMPT_INJECTION_FLAG)
     cutoff = as_of - timedelta(hours=float(policy["max_observation_age_hours"]))
     fresh = [item for item in obs if item["observed_at"] >= cutoff]
     confirmed_new = [item for item in fresh if item["observed_value"] == record["new_value"]]
@@ -377,16 +458,21 @@ def build_markdown(result):
                      rec["effective_ttl_seconds"], rec["latest_cache_expiry_at"] or "—",
                      rec["earliest_safe_cutover_at"] or "—",
                      "%d/%d" % (obs["confirmed_new"], obs["still_old"]), rec["status"]])
-    head = ["# DNS 切换 TTL 与回滚窗口预演（基准 %s）\n\n" % result["as_of"]]
+    head = ["# DNS 切换 TTL 与回滚窗口预演（基准 %s）\n\n" % md_field(result["as_of"])]
     head.append("口径：**只根据你提供的快照预演**，不执行 dig/curl、不访问域名、不修改解析。"
                 "TTL 下调必须早于计划切换时间至少一个旧 TTL，否则标 TOO_LATE_TO_LOWER_TTL；"
                 "**理论过期不等于全球传播完成**，必须有新鲜观测确认新值生效。\n\n")
     head.append(md_table(rows))
     head.append("\n\n状态分布：" + ", ".join("%s=%d" % (k, v) for k, v in sorted(result["status_counts"].items())) + "。\n")
-    head.append("\n总体判定：**%s**（按最严重记录优先给出）。\n" % result["status"])
+    head.append("\n总体判定：**%s**（按最严重记录优先给出）。\n" % md_field(result["status"]))
     order = result["recommended_cutover_order"]
     if order:
-        head.append("\n建议人工切换顺序（按最早可切换时刻）：%s。\n" % " → ".join(order))
+        head.append("\n建议人工切换顺序（按最早可切换时刻）：%s。\n"
+                    % " → ".join(md_field(ref) for ref in order))
+    head.append("\n提示注入命中：%s。命中字段在摘要中以固定占位文本替代，"
+                "原始值仍保留在结构化 JSON 的对应字段中并带 %s 标记。\n"
+                % ("、".join(md_field(ref) for ref in result["injection_flagged"])
+                   if result["injection_flagged"] else "无", PROMPT_INJECTION_FLAG))
     head.append("\n本技能不执行任何解析操作，也不修改任何 DNS 记录。")
     return "".join(head)
 
@@ -395,7 +481,7 @@ def md_table(rows):
     head = rows[0]
     out = ["| " + " | ".join(head) + " |", "|" + "|".join(["---"] * len(head)) + "|"]
     for row in rows[1:]:
-        out.append("| " + " | ".join(str(cell) for cell in row) + " |")
+        out.append("| " + " | ".join(str(md_field(cell)) for cell in row) + " |")
     return "\n".join(out)
 
 
@@ -472,6 +558,20 @@ def analyze(data):
     ordered = sorted([record for record in evaluated if record["earliest_safe_cutover_at"]],
                      key=lambda record: record["earliest_safe_cutover_at"])
 
+    injection_flagged = []
+    for index, record in enumerate(record_list):
+        if record["injection_fields"]:
+            injection_flagged.append(safe_ref(record["record_id"], "records[%d]" % index))
+    for index, observation in enumerate(observations):
+        if observation["injection_fields"]:
+            injection_flagged.append(safe_ref(observation["record_id"], "observations[%d]" % index))
+    if preconditions is not None:
+        for key in preconditions:
+            if find_injection(key):
+                injection_flagged.append(safe_ref(key, "preconditions"))
+    if find_injection(policy["timezone"]):
+        injection_flagged.append("policy")
+
     result = {
         "as_of": as_of.isoformat(),
         "planned_cutover_at": None if planned_cutover_at is None else planned_cutover_at.isoformat(),
@@ -479,6 +579,7 @@ def analyze(data):
         "record_count": len(evaluated),
         "observation_count": len(observations),
         "status": overall,
+        "injection_flagged": sorted(set(injection_flagged)),
         "status_counts": status_counts,
         "records": evaluated,
         "recommended_cutover_order": [record["record_id"] for record in ordered],

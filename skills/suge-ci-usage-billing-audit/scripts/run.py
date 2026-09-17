@@ -33,6 +33,75 @@ UNIT_ALIASES = {"minutes": "minutes", "minute": "minutes", "gb_days": "gb_days",
                 "gb-days": "gb_days", "gbdays": "gb_days", "gigabyte_days": "gb_days"}
 SEVERITY = ["INVALID", "BILLING_DIFFERENCE", "BUDGET_RISK", "PARTIAL", "UNKNOWN", "MATCH"]
 
+# Chinese/English prompt-injection probes. Any free text that reaches
+# markdown_summary is scanned with these; a hit never changes a computed value,
+# it only switches the rendered text to a fixed placeholder and adds a risk flag.
+INJECTION_PATTERNS = (
+    re.compile(r"忽略(以上|之前|所有)?(指令|规则|要求)"),
+    re.compile(r"忽略.{0,8}(指令|规则|要求)"),
+    re.compile(r"ignore (all )?(previous|above) instructions", re.IGNORECASE),
+    re.compile(r"系统提示词"),
+    re.compile(r"system prompt", re.IGNORECASE),
+    re.compile(r"你现在是"),
+    re.compile(r"无条件"),
+    re.compile(r"直接把钱"),
+)
+
+# Rendered in place of any field whose text looks like a prompt injection.
+INJECTION_PLACEHOLDER = "已隐藏疑似提示注入文本"
+PROMPT_INJECTION_FLAG = "PROMPT_INJECTION_IGNORED"
+
+# Characters that can turn one line of text into Markdown structure (heading,
+# list, table column, link/image, raw HTML). Backslash and pipe must always be
+# escaped: the pipe splits a table row and the backslash would otherwise undo the
+# escaping itself. Everything else is neutralised by collapsing the text to a
+# single line first.
+MD_STRUCTURE_CHARS = frozenset("\\|`[]()#!<>")
+
+
+def find_injection(text):
+    if not isinstance(text, str):
+        return False
+    return any(pattern.search(text) for pattern in INJECTION_PATTERNS)
+
+
+def md_escape(value):
+    """Untrusted text -> single-line, structure-neutral Markdown text."""
+    if value is None:
+        return None
+    text = value if isinstance(value, str) else str(value)
+    text = "".join(" " if (ord(char) < 32 or ord(char) == 127) else char for char in text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return "".join(("\\" + char) if char in MD_STRUCTURE_CHARS else char for char in text)
+
+
+def md_field(value, fallback="—"):
+    """The only entry point for untrusted values into markdown_summary.
+
+    A value that looks like a prompt injection never reaches the summary; it is
+    replaced by a fixed placeholder. Everything else is structure-escaped. The
+    structured JSON keeps the original value plus PROMPT_INJECTION_IGNORED.
+    """
+    if value is None:
+        return fallback
+    text = value if isinstance(value, str) else str(value)
+    if find_injection(text):
+        return INJECTION_PLACEHOLDER
+    escaped = md_escape(text)
+    return escaped if escaped else fallback
+
+
+def safe_ref(identifier, fallback):
+    """A locator for injection_flagged.
+
+    Locators are part of structured output, so an identifier that is itself the
+    injection source cannot be used as its own locator; fall back to a positional
+    name instead of echoing the payload.
+    """
+    if isinstance(identifier, str) and identifier and not find_injection(identifier):
+        return identifier
+    return fallback
+
 
 def clean_text(value, label, maximum=300, allow_empty=False):
     if value is None:
@@ -211,13 +280,21 @@ def parse_line(item, seen_ids, period):
     discount = number(item.get("discount_amount", 0), "line.discount_amount")
     net = number(item.get("net_amount"), "line.net_amount")
     currency = clean_text(item.get("currency"), "line.currency", maximum=16).upper()
+    repository = optional_text(item.get("repository"), "line.repository", 200)
+    workflow_path = optional_text(item.get("workflow_path"), "line.workflow_path", 300)
+    runner_type = optional_text(item.get("runner_type"), "line.runner_type", 60)
+    os_name = optional_text(item.get("os"), "line.os", 60)
     return {"line_id": line_id, "date": when, "product": product, "sku": sku, "unit_type": unit_type,
             "quantity": quantity, "gross_amount": gross, "discount_amount": discount, "net_amount": net,
             "currency": currency,
-            "repository": optional_text(item.get("repository"), "line.repository", 200),
-            "workflow_path": optional_text(item.get("workflow_path"), "line.workflow_path", 300),
-            "runner_type": optional_text(item.get("runner_type"), "line.runner_type", 60),
-            "os": optional_text(item.get("os"), "line.os", 60),
+            "repository": repository, "workflow_path": workflow_path,
+            "runner_type": runner_type, "os": os_name,
+            "injection_fields": sorted(
+                name for name, value in (("line_id", line_id), ("product", product), ("sku", sku),
+                                         ("repository", repository), ("workflow_path", workflow_path),
+                                         ("runner_type", runner_type), ("os", os_name),
+                                         ("currency", currency))
+                if find_injection(value)),
             "local_date": when.astimezone(period["tz"]).date()}
 
 
@@ -232,9 +309,14 @@ def parse_artifact(item, seen_ids):
     created_at = parse_dt(item.get("created_at"), "artifact.created_at")
     expires_at = parse_dt(item.get("expires_at"), "artifact.expires_at")
     retention_days = nonneg(item.get("retention_days", 0), "artifact.retention_days", Decimal("3650"))
+    repository = optional_text(item.get("repository"), "artifact.repository", 200)
+    workflow_path = optional_text(item.get("workflow_path"), "artifact.workflow_path", 300)
     return {"artifact_id": artifact_id,
-            "repository": optional_text(item.get("repository"), "artifact.repository", 200),
-            "workflow_path": optional_text(item.get("workflow_path"), "artifact.workflow_path", 300),
+            "repository": repository, "workflow_path": workflow_path,
+            "injection_fields": sorted(
+                name for name, value in (("artifact_id", artifact_id), ("repository", repository),
+                                         ("workflow_path", workflow_path))
+                if find_injection(value)),
             "size_bytes": size_bytes, "size_gb": size_bytes / GIB, "created_at": created_at,
             "expires_at": expires_at, "retention_days": retention_days}
 
@@ -242,6 +324,9 @@ def parse_artifact(item, seen_ids):
 def audit_line(line, plan, period, policy):
     flags = []
     reasons = []
+    if line["injection_fields"]:
+        # Risk marker only: the computed amount, status and ordering are untouched.
+        flags.append(PROMPT_INJECTION_FLAG)
     in_period = period["start_date"] <= line["local_date"] <= period["end_date"]
     if not in_period:
         flags.append("OUT_OF_PERIOD")
@@ -317,16 +402,16 @@ def build_markdown(result):
                      row["gross_amount"], row["discount_amount"], row["net_amount"],
                      row["expected_net"], row["repository"] or "—", row["status"]])
     head = ["# CI Runner 与 Artifact 用量账单审计（账期 %s ~ %s，账户时区 %s）\n\n"
-            % (result["period"]["start_date"], result["period"]["end_date"],
-               result["period"]["account_timezone"])]
+            % (md_field(result["period"]["start_date"]), md_field(result["period"]["end_date"]),
+               md_field(result["period"]["account_timezone"]))]
     head.append("口径：账单行日期按 UTC 记录，**按账户时区换算后再判定是否落在账期内**；"
                 "`gross − discount = net` 独立复核；额度是否已在 discount 中体现**由用户声明**，"
                 "声明为是时不再二次抵扣；月末值为**直线情景**，不是预测。\n\n")
     head.append(md_table(rows))
     head.append("\n\n行状态分布：" + ", ".join("%s=%d" % (k, v) for k, v in sorted(result["status_counts"].items())) + "。\n")
-    head.append("\n总体判定：**%s**。\n" % result["status"])
+    head.append("\n总体判定：**%s**。\n" % md_field(result["status"]))
     head.append("\n账期内净额合计（%s）：%s；月末直线情景：%s（已过 %d / 共 %d 天）。\n"
-                % (result["plan_currency"], result["totals"]["net_total"],
+                % (md_field(result["plan_currency"]), result["totals"]["net_total"],
                    result["run_rate"]["month_end_run_rate"] or "—",
                    result["run_rate"]["elapsed_days"], result["run_rate"]["total_days"]))
     overage = result["overage_estimate"]
@@ -337,6 +422,10 @@ def build_markdown(result):
         head.append("额度已声明包含在 discount 中，**不做二次抵扣**，因此不给出超额估算。\n")
     head.append("\nArtifact 存储暴露：在存 %d 个，合计 %s GB-天。\n"
                 % (result["artifacts"]["stored_count"], result["artifacts"]["exposure_gb_days"]))
+    head.append("\n提示注入命中：%s。命中字段在摘要中以固定占位文本替代，"
+                "原始值仍保留在结构化 JSON 的对应字段中并带 %s 标记。\n"
+                % ("、".join(md_field(ref) for ref in result["injection_flagged"])
+                   if result["injection_flagged"] else "无", PROMPT_INJECTION_FLAG))
     head.append("\n本技能不登录 CI 平台、不调用 API、不删除 Artifact、不修改 workflow 或预算。")
     return "".join(head)
 
@@ -345,7 +434,7 @@ def md_table(rows):
     head = rows[0]
     out = ["| " + " | ".join(head) + " |", "|" + "|".join(["---"] * len(head)) + "|"]
     for row in rows[1:]:
-        out.append("| " + " | ".join(str(cell) for cell in row) + " |")
+        out.append("| " + " | ".join(str(md_field(cell)) for cell in row) + " |")
     return "\n".join(out)
 
 
@@ -429,6 +518,8 @@ def analyze(data):
         days_remaining = Decimal(str((artifact["expires_at"].date() - as_of_local.date()).days))
         implied_expiry = artifact["created_at"] + timedelta(days=float(artifact["retention_days"]))
         flags = []
+        if artifact["injection_fields"]:
+            flags.append(PROMPT_INJECTION_FLAG)
         if days_remaining <= 0:
             flags.append("EXPIRED")
             expired.append(artifact["artifact_id"])
@@ -462,6 +553,20 @@ def analyze(data):
     else:
         overall = "MATCH"
 
+    injection_flagged = []
+    for index, line in enumerate(lines):
+        if line["injection_fields"]:
+            injection_flagged.append(safe_ref(line["line_id"], "billing_lines[%d]" % index))
+    for index, artifact in enumerate(artifacts):
+        if artifact["injection_fields"]:
+            injection_flagged.append(safe_ref(artifact["artifact_id"], "artifacts[%d]" % index))
+    if find_injection(plan["currency"]) or any(find_injection(sku) for sku in (plan["known_skus"] or ())):
+        injection_flagged.append("plan")
+    if find_injection(period["account_timezone"]):
+        injection_flagged.append("period")
+    if find_injection(policy["timezone"]):
+        injection_flagged.append("policy")
+
     result = {
         "as_of": as_of.isoformat(),
         "as_of_local": as_of_local.isoformat(),
@@ -472,6 +577,7 @@ def analyze(data):
         "line_count": len(rows),
         "in_period_countable_lines": len(countable),
         "status": overall,
+        "injection_flagged": sorted(set(injection_flagged)),
         "status_counts": status_counts,
         "lines": rows,
         "totals": {"net_total": quant(net_total), "gross_total": quant(sum(

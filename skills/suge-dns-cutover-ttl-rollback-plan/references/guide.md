@@ -54,7 +54,7 @@
 
 ```
 as_of, planned_cutover_at, planned_rollback_at, record_count, observation_count,
-status, status_counts, preconditions,
+status, status_counts, preconditions, injection_flagged[],
 records[] {record_id, name, type, old_value, new_value, current_ttl, provider_min_ttl,
            proxied, effective_ttl_seconds, status, latest_cache_expiry_at,
            earliest_safe_cutover_at, planned_cutover_at, ttl_lowering_lead_seconds,
@@ -68,7 +68,18 @@ recommended_cutover_order[], markdown_summary, note
 
 `timeline[]` 事件类型：`TTL_LOWERED`、`CACHE_THEORETICALLY_EXPIRED`、`PLANNED_CUTOVER`、`PLANNED_ROLLBACK`、`OBSERVED`，按时间升序。
 
-## 5. 边界与安全
+`injection_flagged[]` 记录疑似提示注入的来源定位：记录的 `record_id`、观测所属 `record_id`、`preconditions` 的键名、`policy`。定位符本身即注入源时回退为位置名（`records[i]` / `observations[i]`），不回声载荷。
+
+## 5. Markdown 安全渲染与提示注入
+
+`markdown_summary` 由脚本渲染，所有进入其中的用户自由文本都经统一处理：
+
+- **单行化**：控制字符与换行 → 空格，连续空白压缩，自由文本只占一行。
+- **结构转义**：`\` `|` 反引号 `[ ] ( ) # ! < >` 逐字符转义，输入无法拆分表格列、伪造标题、注入链接/图片或原始 HTML。
+- **注入检测**：中文/英文疑似提示注入（如"忽略以上所有指令"、"ignore all previous instructions"、"系统提示词"、"你现在是"）命中后，摘要渲染固定占位符「已隐藏疑似提示注入文本」；结构化 JSON 保留原值并在该记录 `review_flags` 标 `PROMPT_INJECTION_IGNORED`。
+- 该机制**不改变** TTL、时间线、状态与切换顺序口径；普通业务文字不误报。
+
+## 6. 边界与安全
 
 - **纯预演**：不执行 `dig`/`curl`、不访问域名、不连接解析器、不修改任何解析记录。
 - 不把理论过期时间当作全球传播完成；不使用"通常几分钟就生效"这类经验值。
