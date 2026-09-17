@@ -1,0 +1,104 @@
+{
+  "as_of": "2026-09-16T10:00:00+08:00",
+  "currency": "CNY",
+  "policy": {
+    "max_term_months": 36,
+    "min_deposit_pct": "20",
+    "max_revision_rounds": 2,
+    "require_kill_fee": true
+  },
+  "rate_card": [
+    {
+      "tier_id": "RC-01",
+      "usage": "social_media",
+      "term_months": 12,
+      "exclusive": false,
+      "buyout": false,
+      "ai_training": false,
+      "sublicense": false,
+      "price": "1500.00",
+      "currency": "CNY",
+      "unit": "per_asset",
+      "effective_from": "2026-01-01",
+      "expires_at": null
+    },
+    {
+      "tier_id": "RC-02",
+      "usage": "paid_ads",
+      "term_months": 12,
+      "exclusive": false,
+      "buyout": false,
+      "ai_training": false,
+      "sublicense": false,
+      "price": "3000.00",
+      "currency": "CNY",
+      "unit": "per_asset",
+      "effective_from": "2026-01-01",
+      "expires_at": null
+    },
+    {
+      "tier_id": "RC-03",
+      "usage": "social_media",
+      "term_months": 24,
+      "exclusive": true,
+      "buyout": false,
+      "ai_training": false,
+      "sublicense": false,
+      "price": "4500.00",
+      "currency": "CNY",
+      "unit": "per_asset",
+      "effective_from": "2026-01-01",
+      "expires_at": null
+    }
+  ],
+  "order": {
+    "order_id": "ORD-2026-0916-001",
+    "client_ref": "CLI-07",
+    "deliverables": [
+      {
+        "deliverable_id": "D-01",
+        "kind": "video",
+        "quantity": 3,
+        "duration_seconds": 60,
+        "revisions_included": 2,
+        "due_at": "2026-09-25T18:00:00+08:00"
+      },
+      {
+        "deliverable_id": "D-02",
+        "kind": "image",
+        "quantity": 10,
+        "duration_seconds": null,
+        "revisions_included": null,
+        "due_at": "2026-09-22T18:00:00+08:00"
+      }
+    ],
+    "usage": {
+      "media": ["social_media", "paid_ads"],
+      "tier_id": "RC-03",
+      "territory": ["CN"],
+      "term_months": 24,
+      "exclusive": true,
+      "sublicense": true,
+      "buyout": false,
+      "ai_training": true,
+      "credit_required": null
+    },
+    "commercial": {
+      "total_price": "20000.00",
+      "currency": "CNY",
+      "deposit_pct": "0",
+      "payment_terms": [],
+      "expenses_cap": null,
+      "kill_fee_pct": null,
+      "late_fee_pct": null,
+      "revision_rate": null
+    },
+    "constraints": {
+      "request_window_days": null,
+      "raw_files_included": null,
+      "source_files_included": null,
+      "delivery_format": null
+    },
+    "notes": "客户说先做，钱后面再说。"
+  }
+}
