@@ -1,0 +1,66 @@
+{
+  "as_of": "2026-09-19T10:00:00+08:00",
+  "vendor": {
+    "vendor_ref": "V-002",
+    "brand_name": "巷口小食",
+    "category": "FOOD_STALL",
+    "contact_ref": "市集联络微信 xk-snack",
+    "intro": "社区小食摊，主营自制调味酱与陶瓷小罐。",
+    "city": "上海"
+  },
+  "vendor_materials": [
+    {"material_id": "MB-01", "type": "LICENSE", "label": "营业执照", "status": "AVAILABLE", "expires_on": "2027-06-30"}
+  ],
+  "products": [
+    {"product_id": "PB-01", "name": "手作酱油（类别漏填）", "unit_price": "38.00", "currency": "CNY"},
+    {"product_id": "PB-02", "name": "陶瓷小罐", "category": "NON_FOOD", "unit_price": "58.00", "currency": "CNY"}
+  ],
+  "equipment": [
+    {"equipment_id": "EB-01", "label": "电磁炉", "power_watts": 1200}
+  ],
+  "markets": [
+    {
+      "market_id": "MKT-U01",
+      "name": "秋日食集（类别待补）",
+      "timezone": "Asia/Shanghai",
+      "accepts_food": true,
+      "application_deadline": "2026-10-10T18:00:00+08:00",
+      "event_start": "2026-10-24T10:00:00+08:00",
+      "event_end": "2026-10-25T20:00:00+08:00",
+      "booth_max_count": 1,
+      "booth_requested_count": 1,
+      "booth_size": "2m x 2m",
+      "booth_power_watts_limit": 2000,
+      "outdoor": true,
+      "requirements": [
+        {"req_id": "RB-01", "type": "LICENSE", "label": "营业执照", "mandatory": true},
+        {"req_id": "RB-02", "type": "FOOD_PERMIT", "label": "食品经营许可证", "mandatory": true, "applies_to": "FOOD"}
+      ],
+      "fees": [
+        {"fee_id": "FB-01", "label": "摊位费", "amount": "600.00", "currency": "CNY", "refundable": false}
+      ],
+      "rules_text": "主办方规则：食品摊位须提供食品经营许可证；不接受明火。",
+      "notes": "P0-4 边界：商品类别漏填，食品许可证不得判为不适用，必填项保持未满足"
+    },
+    {
+      "market_id": "MKT-U02",
+      "name": "周末市集（无食品要求）",
+      "timezone": "Asia/Shanghai",
+      "accepts_food": true,
+      "application_deadline": "2026-10-12T18:00:00+08:00",
+      "event_start": "2026-11-01T10:00:00+08:00",
+      "event_end": "2026-11-01T18:00:00+08:00",
+      "booth_max_count": 1,
+      "booth_requested_count": 1,
+      "booth_size": "3m x 3m",
+      "booth_power_watts_limit": 3000,
+      "outdoor": false,
+      "requirements": [
+        {"req_id": "RB-11", "type": "LICENSE", "label": "营业执照", "mandatory": true}
+      ],
+      "fees": [],
+      "rules_text": "主办方规则：摊位以抽签分配，收摊后自行清理。",
+      "notes": "P0-4 边界：即使该场次没有食品要求，未标注类别仍让场次停留在 INPUT_INCOMPLETE"
+    }
+  ]
+}
