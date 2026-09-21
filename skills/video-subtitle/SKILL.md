@@ -5,7 +5,7 @@ displayName: 视频字幕配音
 summary: 本地将视频转写为 SRT 字幕，并可从字幕文本生成独立 AI 配音音频。
 license: MIT
 description: 视频转写和字幕配音。用 ffmpeg 提取音频、用本地 Whisper 生成 SRT，并可用 macOS say 或需联网的 edge-tts 将字幕文本生成独立配音文件。用于视频转文字、SRT 生成、字幕提取和 AI 旁白音频制作；不负责翻译、烧录字幕或合成最终视频。
-version: 0.1.3
+version: 0.1.4
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/video-subtitle
 category: 内容创作
 tags: [视频字幕, 语音转文字, 字幕生成, 视频配音, whisper]
@@ -27,7 +27,7 @@ platforms: [workbuddy, claude-code, cursor]
 | 工具 | 用途 | 缺失时 |
 |---|---|---|
 | ffmpeg | 提取音频 | `brew install ffmpeg` |
-| whisper | 语音转文字（中文 srt） | `pip install -U openai-whisper` |
+| whisper | 语音转文字（中文 srt） | `pip install -U openai-whisper`；追求速度可换 `faster-whisper` 或 `brew install whisper-cpp`（v1.9.3） |
 | say | macOS 配音（婷婷=普通话） | Windows/Linux 用 `--tts edge-tts` |
 
 ## 工作流
@@ -64,16 +64,21 @@ python3 bin/subtitle.py voice 字幕.srt --voice Tingting
 | 实现 | 语言/引擎 | 2026-09 版本 | 特点 |
 |---|---|---|---|
 | openai-whisper | Python/PyTorch | OSS v20250625 | 参考实现，最慢、显存最高；适合对标论文基准 |
-| **faster-whisper** | Python/CTranslate2 | **v1.2.1**（已升级 Silero VAD v6） | 同权重、吞吐可达参考实现 4×；int8 量化省显存；**注意其上游维护趋缓** |
-| whisper.cpp | C/C++ (ggml) | **v1.9.2**（2026-08-04） | 无 Python 依赖、CPU/Metal 可跑，当前最活跃；需自行编译 |
-| whisperX | Python（faster-whisper + pyannote + wav2vec2） | — | 唯一开箱提供**词级时间戳 + 说话人分离**，做访谈/会议字幕首选 |
-| Whisper.net | C# | 1.9.1 | .NET 桌面应用嵌入 |
+| **faster-whisper** | Python/CTranslate2 | **v1.2.1**（已升级 Silero VAD v6） | 同权重、吞吐可达参考实现 4×；int8 量化省显存；**上游维护趋缓（2025-10 后无新版本，属稳定而非停滞）** |
+| **whisper.cpp** | C/C++ (ggml) | **v1.9.3**（2026-08-20） | 无 Python 依赖、CPU/Metal 可跑，当前最活跃；ggml 同步至 v0.20.2 |
+| whisperX | Python（faster-whisper + pyannote + wav2vec2） | v3.8.6（2026-06-26） | 唯一开箱提供**词级时间戳 + 说话人分离**，做访谈/会议字幕首选 |
+| Whisper.net | C# | 1.9.1 | .NET 桌面应用嵌入（其内置 whisper.cpp 仅同步到 1.8.5，落后上游） |
+
+> **v1.9.2 → v1.9.3 变化（2026-08-20）**：同步 ggml v0.20.2（Metal 新增 TQ2_0 量化支持、融合 CUDA/SYCL 内核、ARM/WASI 修复）；whisper.cpp 现已提供**官方 Debian 软件包**（`whisper.cpp` / `libwhisper-dev` / `libwhisper1`），不必再依赖非官方 Snap。注意：**2026 年没有任何新的 Whisper 基础模型**——large-v3 与 distil-large-v3 仍是最新权重，因此各实现的版本推进都属于运行时/工具链变化，不影响识别准确度。
+>
+> 另注：whisper.cpp 的 CLI 只接受 **16-bit WAV**，MP3/M4A 需先转码（`ffmpeg -i in.m4a -ar 16000 -ac 1 -c:a pcm_s16le out.wav`）；官方 quick start 用的可执行文件名为 `whisper-cli`（旧版叫 `main`）。
 
 **模型选择要点（中文场景）**：
 - 中文是多音字、连读、口音都重的语言，**tiny/base 转出来基本不能直接用**，建议 medium 起步、精度优先上 large。
 - **large-v3-turbo**（809M 参数）接近 large 精度、速度约 8×，是性价比首选。
 - 硬盘/内存吃紧时用 **large-v3 的 q5_0 量化版**（约 1.1 GiB），精度损失有限。
-- 长时间任务可开 `vad_filter`（faster-whisper 内置 Silero VAD）过滤静音段，明显提速。
+- 长时间任务可开 `vad_filter`（faster-whisper 内置 Silero VAD）过滤静音段，明显提速；whisper.cpp 近期版本也已内置原生 VAD。
+- 量化版本不同体积差异很大，**别把「参数数」当「文件体积」**（medium 与 large-v3-turbo 的 q5_0 文件体积接近，不代表速度或准确度相同）。
 
 > 本 skill 默认调用 `openai-whisper` 以保持零额外依赖。若你已自建 faster-whisper 环境，可在 `--tts`/转写参数外自行替换后端命令，输出格式保持 SRT 即可复用本 skill 的配音流程。
 

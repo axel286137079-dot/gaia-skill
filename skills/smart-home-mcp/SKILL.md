@@ -5,7 +5,7 @@ displayName: 智能家居控制
 summary: 通过 Home Assistant REST API 查询实体并预演或执行服务调用；写操作默认 dry-run，高风险域需二次确认。
 license: MIT
 description: Home Assistant REST CLI，用于列出或查询实体、调用服务和执行本地场景模板。凭据只从 HA_URL/HA_TOKEN 读取；控制命令默认仅打印计划，必须显式传入 --execute，高风险门锁、安防及自动化域还需 --confirm-dangerous。它不是 MCP server，但可作为受控后端封装。
-version: 0.1.3
+version: 0.1.4
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/smart-home-mcp
 category: 智能家居
 tags: [智能家居, HomeAssistant, MCP, 自动化]
@@ -33,6 +33,8 @@ platforms: [workbuddy, claude-code, cursor]
 export HA_URL="http://homeassistant.local:8123"
 export HA_TOKEN="你的长期访问令牌"
 ```
+
+> 若通过**反向代理**访问 HA（如 `https://ha.example.com`），注意 2026.10 起 `http:` 段已弃用，代理与外部 URL 配置改到 **设置 → 系统 → 网络 → HTTP 服务器**；只在本机直连 `:8123` 的用户无需处理。
 
 ## 工作流
 
@@ -71,9 +73,11 @@ python3 bin/ha_cli.py scene 回家 --execute   # 实际执行；含高风险域�
 
 本目录没有实现 MCP server。需要 MCP 时，可使用 Home Assistant 官方支持的集成，或另行把 `call/states/get` 封装成工具，并保留本脚本的 dry-run 与确认策略。
 
-## Home Assistant 版本校准（2026.9 核对）
+## Home Assistant 版本校准（2026.9 ~ 2026.10 核对）
 
-本 skill 依赖的 REST 核心接口（`GET /api/states`、`POST /api/services/<domain>/<service>`、`GET /api/states/<entity_id>`）在 2026.9 中**未变更**，脚本可继续使用。但以下 2026.9 变化会影响周边集成与自动化，使用前需知悉：
+本 skill 依赖的 REST 核心接口（`GET /api/states`、`POST /api/services/<domain>/<service>`、`GET /api/states/<entity_id>`）在 2026.9 / 2026.10 中**均未变更**，脚本可继续使用。但以下变化会影响周边集成、反向代理配置与自动化，使用前需知悉：
+
+### 2026.9 变化
 
 | 变化 | 影响 | 应对 |
 |---|---|---|
@@ -84,7 +88,15 @@ python3 bin/ha_cli.py scene 回家 --execute   # 实际执行；含高风险域�
 | **Modbus 配置从 YAML 移到 UI** | 逆变器/电表/热泵类寄存器映射改由集成托管 | 在 UI 中重新配置，配置项由集成维护而非手写 YAML |
 | **Configurator 集成弃用**；VLC 集成移除 | 相关集成不再可用（VLC via Telnet 不受影响） | 迁移到替代方案 |
 
-> 提示：HA 每月发布都会收紧 API 契约。本 skill 只依赖稳定的 REST 核心接口，因此不受集成级 breaking change 影响；但如果你把本脚本包装成 MCP server 或接入 LLM 对话，请每季度对照一次 [Home Assistant 发布说明](https://www.home-assistant.io/blog/categories/release-notes/)。
+### 2026.10 变化
+
+| 变化 | 影响 | 应对 |
+|---|---|---|
+| **`http:` YAML 配置弃用** ⚠️ | 反向代理、`use_x_forwarded_for`、`trusted_proxies`、外部 URL 等原写在 `configuration.yaml` 的 `http:` 段已弃用，改到 **设置 → 系统 → 网络 → HTTP 服务器（UI）** | **对本 skill 影响最直接**：若你靠反向代理把 HA 暴露给内网其他机器/容器来调 REST API，需把配置迁到 UI，否则代理头识别与外部 URL 可能失效（长期访问令牌本身不变） |
+| **OAuth2 错误处理移入 helper** | OAuth2 异常改为继承 config entry 异常（`OAuth2TokenRequestReauthError` → `ConfigEntryAuthFailed` 等），集成不再自行翻译；`ImplementationUnavailableError` 不再需要手动包成 `ConfigEntryNotReady` | 仅影响自研自定义集成；**调用 REST API 不受影响** |
+| **`modbus.get_hub` 弃用** | 2026.10 起弃用，**2027.10 移除**；改用 `async_get_unit` | 自研 Modbus 集成需迁移；仅用 UI 配置的用户无需处理 |
+
+> 提示：HA 每月发布都会收紧 API 契约。本 skill 只依赖稳定的 REST 核心接口，因此不受集成级 breaking change 影响；但如果你把本脚本包装成 MCP server、接入 LLM 对话，或通过反向代理访问 HA，请每季度对照一次 [Home Assistant 发布说明](https://www.home-assistant.io/blog/categories/release-notes/)。
 
 ## 边界与红线
 
