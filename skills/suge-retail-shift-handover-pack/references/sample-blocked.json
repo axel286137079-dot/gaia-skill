@@ -1,0 +1,76 @@
+{
+  "as_of": "2026-09-25T09:15:00+08:00",
+  "store": {
+    "store_id": "ST-204",
+    "name": "拾光宠物 · 二店",
+    "timezone": "Asia/Shanghai"
+  },
+  "shift": {
+    "shift_id": "SH-20260925-D",
+    "starts_at": "2026-09-25T09:00:00+08:00",
+    "ends_at": "2026-09-25T18:00:00+08:00"
+  },
+  "equipment": [
+    {
+      "asset_id": "EQ-11",
+      "name": "烘干机",
+      "state": "down",
+      "since": "2026-09-25T08:05:00+08:00"
+    },
+    {
+      "asset_id": "EQ-12",
+      "name": "吹水机",
+      "state": "shaky"
+    }
+  ],
+  "items": [
+    {
+      "item_id": "IT-07",
+      "summary": "寄养区清洁完成待复核",
+      "category": "other",
+      "status": "open",
+      "owner": "U-11",
+      "due_at": "2026-09-25T11:00:00+08:00",
+      "notes": "白班记录为未完成。"
+    },
+    {
+      "item_id": "IT-07",
+      "summary": "寄养区清洁完成待复核",
+      "category": "other",
+      "status": "done",
+      "owner": "U-11",
+      "due_at": "2026-09-25T11:00:00+08:00",
+      "notes": "夜班记录为已完成，与白班记录矛盾。"
+    },
+    {
+      "item_id": "IT-11",
+      "summary": "供应商对账单待归档",
+      "category": "ledger",
+      "status": "open",
+      "owner": "U-12",
+      "due_at": "2026-09-26T10:00:00+08:00",
+      "notes": "类别填写不在允许取值内。"
+    },
+    {
+      "item_id": "IT-12",
+      "summary": "",
+      "category": "cash",
+      "status": "open",
+      "owner": "U-12",
+      "due_at": "2026-09-26T10:00:00+08:00",
+      "amount": {"value": "-50.00", "currency": "CNY"},
+      "notes": "事项摘要缺失，且金额为负数。"
+    },
+    {
+      "item_id": "IT-13",
+      "summary": "前台备用金核对",
+      "category": "cash",
+      "status": "open",
+      "owner": "U-11",
+      "due_at": "2026/09/26 10:00",
+      "amount": {"value": "200.00", "currency": "CNY"},
+      "evidence_refs": ["PETTY-0925"],
+      "notes": "截止时间格式不含时区偏移。"
+    }
+  ]
+}

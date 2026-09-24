@@ -1,0 +1,101 @@
+{
+  "as_of": "2026-09-25T19:30:00+08:00",
+  "project": {
+    "project_id": "PRJ-4412",
+    "name": "云栖公寓 3 号楼翻新",
+    "timezone": "Asia/Shanghai"
+  },
+  "work_date": "2026-09-25",
+  "plan": [
+    {"task_id": "T-01", "title": "主卧墙面第二遍腻子", "owner": "Crew-A", "planned_hours": "6.00"},
+    {"task_id": "T-02", "title": "卫生间防水闭水试验", "owner": "Crew-B", "planned_hours": "3.00"},
+    {"task_id": "T-03", "title": "厨房瓷砖铺贴", "owner": "Crew-A", "planned_hours": "8.00"},
+    {"task_id": "T-04", "title": "全屋强弱电点位复核", "owner": "Crew-C", "planned_hours": "2.50"},
+    {"task_id": "T-05", "title": "阳台窗框安装", "owner": "Crew-B", "planned_hours": "4.00"}
+  ],
+  "progress": [
+    {
+      "task_id": "T-01",
+      "state": "done",
+      "note": "第二遍腻子已完成，待干透后打磨。",
+      "hours_spent": "5.50",
+      "photo_refs": ["IMG_2201.jpg", "IMG_2202.jpg"],
+      "occurred_at": "2026-09-25T17:10:00+08:00"
+    },
+    {
+      "task_id": "T-02",
+      "state": "partial",
+      "note": "闭水试验已注水，需 24 小时观察后再放水。",
+      "hours_spent": "1.50",
+      "photo_refs": ["IMG_2203.jpg"]
+    },
+    {
+      "task_id": "T-03",
+      "state": "blocked",
+      "note": "瓷砖到货批次存在色差，暂停铺贴等换货。",
+      "hours_spent": "2.00",
+      "photo_refs": ["IMG_2204.jpg"]
+    },
+    {
+      "task_id": "T-09",
+      "state": "partial",
+      "note": "临时增加的阳台排水坡度检查。",
+      "hours_spent": "1.00",
+      "photo_refs": ["IMG_2205.jpg"]
+    },
+    {
+      "task_id": "T-05",
+      "state": "not_started",
+      "note": "",
+      "hours_spent": "0"
+    }
+  ],
+  "photos": [
+    {"filename": "IMG_2201.jpg", "caption": "主卧西墙第二遍腻子"},
+    {"filename": "IMG_2202.jpg", "caption": "主卧东墙第二遍腻子"},
+    {"filename": "IMG_2203.jpg", "caption": "卫生间闭水试验水位线"},
+    {"filename": "IMG_2204.jpg", "caption": "厨房瓷砖批次色差对比"},
+    {"filename": "IMG_2204.jpg", "caption": "厨房瓷砖铺贴现状"},
+    {"filename": "IMG_2205.jpg", "caption": ""},
+    {"filename": "IMG_2299.jpg", "caption": "备用照片未在进度中引用"}
+  ],
+  "blockers": [
+    {
+      "blocker_id": "B-01",
+      "kind": "material",
+      "description": "厨房瓷砖批次色差，待供应商换货",
+      "owner": "Vendor-X",
+      "eta": "2026-09-24T18:00:00+08:00"
+    },
+    {
+      "blocker_id": "B-02",
+      "kind": "personnel",
+      "description": "防水班组一名工人请假，闭水观察人力不足",
+      "owner": "Crew-B",
+      "eta": "2026-09-26T09:00:00+08:00"
+    },
+    {
+      "blocker_id": "B-03",
+      "kind": "customer",
+      "description": "业主未确认阳台窗框颜色",
+      "owner": "Owner-Rep",
+      "eta": null
+    }
+  ],
+  "customer_pending": [
+    {
+      "item_id": "CP-01",
+      "question": "阳台窗框颜色最终确认（深灰或白色）",
+      "raised_at": "2026-09-25T09:00:00+08:00"
+    },
+    {
+      "item_id": "CP-02",
+      "question": "厨房瓷砖是否接受同色系相近批次",
+      "raised_at": null
+    }
+  ],
+  "next_day_plan": [
+    {"task_id": "N-01", "title": "主卧墙面打磨与底漆", "owner": "Crew-A"},
+    {"task_id": "N-02", "title": "卫生间闭水观察与放水", "owner": "Crew-B"}
+  ]
+}
