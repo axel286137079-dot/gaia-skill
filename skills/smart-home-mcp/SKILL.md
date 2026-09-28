@@ -4,8 +4,8 @@ slug: smart-home-mcp
 displayName: 智能家居控制
 summary: 通过 Home Assistant REST API 查询实体并预演或执行服务调用；写操作默认 dry-run，高风险域需二次确认。
 license: MIT
-description: Home Assistant REST CLI，用于列出或查询实体、调用服务和执行本地场景模板。凭据只从 HA_URL/HA_TOKEN 读取；控制命令默认仅打印计划，必须显式传入 --execute，高风险门锁、安防及自动化域还需 --confirm-dangerous。它不是 MCP server，但可作为受控后端封装。
-version: 0.1.4
+description: Home Assistant REST CLI，用于列出或查询实体、调用服务和执行本地场景模板。凭据只从 HA_URL/HA_TOKEN 读取；控制命令默认仅打印计划，必须显式传入 --execute，高风险门锁、安防及自动化域还需 --confirm-dangerous。它不是 MCP server，但可作为受控后端封装。已核对至 HA 2026.10（REST 核心接口未变；2026.10 起 `http:` YAML 配置弃用，反代用户需迁到 UI）。
+version: 0.1.5
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/smart-home-mcp
 category: 智能家居
 tags: [智能家居, HomeAssistant, MCP, 自动化]
@@ -90,11 +90,17 @@ python3 bin/ha_cli.py scene 回家 --execute   # 实际执行；含高风险域�
 
 ### 2026.10 变化
 
+> 说明：2026.10 稳定版发布晚于本 skill 核对时点（最新稳定版为 2026.9），以下条目依据 HA 开发者博客 2026-09 系列公告整理；**REST 核心接口未受影响**。
+
 | 变化 | 影响 | 应对 |
 |---|---|---|
 | **`http:` YAML 配置弃用** ⚠️ | 反向代理、`use_x_forwarded_for`、`trusted_proxies`、外部 URL 等原写在 `configuration.yaml` 的 `http:` 段已弃用，改到 **设置 → 系统 → 网络 → HTTP 服务器（UI）** | **对本 skill 影响最直接**：若你靠反向代理把 HA 暴露给内网其他机器/容器来调 REST API，需把配置迁到 UI，否则代理头识别与外部 URL 可能失效（长期访问令牌本身不变） |
 | **OAuth2 错误处理移入 helper** | OAuth2 异常改为继承 config entry 异常（`OAuth2TokenRequestReauthError` → `ConfigEntryAuthFailed` 等），集成不再自行翻译；`ImplementationUnavailableError` 不再需要手动包成 `ConfigEntryNotReady` | 仅影响自研自定义集成；**调用 REST API 不受影响** |
 | **`modbus.get_hub` 弃用** | 2026.10 起弃用，**2027.10 移除**；改用 `async_get_unit` | 自研 Modbus 集成需迁移；仅用 UI 配置的用户无需处理 |
+| **LLM 工具返回 `llm.ToolResult`** | 工具不再返回裸 JSON，改返回带 `data` 与 `error` 标志的 `ToolResult`；`ToolResultContent.tool_result` → `.result`；工具须声明 `title` / `annotations`（`read_only`/`destructive`/`idempotent`/`open_world`）与 `integration` | 仅影响自研 LLM 工具；**免费版 REST 调用不受影响**。⚠️ 若你按本 skill 的通用 MCP 模板自建 HA MCP server 并注册 LLM 工具，需按新签名迁移（旧写法告警可用至 2027.11） |
+| **`DeviceEntry.config_entries` 弃用转为强制** | `config_entries` / `config_entries_subentries` / `primary_config_entry` 读取即报错（core 抛 `RuntimeError`，自定义集成记警告）；改用 `config_entry_id` / `config_subentry_id` | 仅影响自研集成；REST API 无关（自定义集成宽限至 2027.10） |
+| **割草机新增 `stop` 动作与 `IDLE` 活动** | `LawnMowerEntity` 支持 `stop`（取消当前任务但不返航）与 `IDLE`；原先映射为 `PAUSED`/`ERROR` 的集成应改 `IDLE` | 用到割草机实体/服务的自动化可关注；`lawn_mower.stop` 服务可经 REST 调用 |
+| **`async_migrate_entry` 可用 config entry 异常** | 迁移方法可抛 `ConfigEntryNotReady` 以自动重试（原仅能返回 `False`） | 仅影响自研集成 |
 
 > 提示：HA 每月发布都会收紧 API 契约。本 skill 只依赖稳定的 REST 核心接口，因此不受集成级 breaking change 影响；但如果你把本脚本包装成 MCP server、接入 LLM 对话，或通过反向代理访问 HA，请每季度对照一次 [Home Assistant 发布说明](https://www.home-assistant.io/blog/categories/release-notes/)。
 
