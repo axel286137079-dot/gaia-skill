@@ -1,0 +1,186 @@
+{
+  "as_of": "2026-09-27T20:00:00+08:00",
+  "collaboration": {
+    "collab_id": "COLLAB-2026-041",
+    "brand": "山雾手作",
+    "creator": "@阿澈的厨房"
+  },
+  "assets": [
+    {
+      "asset_id": "AS-01",
+      "basename": "shanwu_launch_main_v3.mp4",
+      "kind": "video",
+      "source_note": "主片成片，已过审"
+    },
+    {
+      "asset_id": "AS-02",
+      "basename": "shanwu_launch_vertical_v1.mp4",
+      "kind": "video",
+      "source_note": "主片竖版切条"
+    },
+    {
+      "asset_id": "AS-03",
+      "basename": "shanwu_launch_bts_raw_v1.mp4",
+      "kind": "video",
+      "source_note": "花絮原片，未单独约定用途"
+    },
+    {
+      "asset_id": "AS-04",
+      "basename": "shanwu_launch_still_01.jpg",
+      "kind": "image",
+      "source_note": "产品静帧"
+    },
+    {
+      "asset_id": "AS-05",
+      "basename": "shanwu_store_reel_v2.mp4",
+      "kind": "video",
+      "source_note": "门店实拍短片"
+    }
+  ],
+  "grants": [
+    {
+      "grant_id": "GR-01",
+      "asset_id": "AS-01",
+      "authorized_parties": ["品牌方自有账号", "品牌方委托的代理商 A"],
+      "channels": ["小红书", "抖音"],
+      "territory": ["中国大陆"],
+      "purposes": ["organic", "paid_ads"],
+      "modifications": ["crop", "caption"],
+      "starts_on": "2026-09-20",
+      "ends_on": "2026-11-30",
+      "attribution_required": true,
+      "attribution_text": "@阿澈的厨房",
+      "renewal_note": "到期前 15 天讨论是否续期",
+      "source_evidence": "2026-09-18 合作确认邮件"
+    },
+    {
+      "grant_id": "GR-02",
+      "asset_id": "AS-02",
+      "authorized_parties": ["品牌方自有账号"],
+      "channels": ["小红书"],
+      "territory": [],
+      "purposes": ["paid_ads"],
+      "modifications": ["crop"],
+      "starts_on": "2026-09-25",
+      "ends_on": "2026-10-20",
+      "attribution_required": false,
+      "renewal_note": null,
+      "source_evidence": "2026-09-24 微信沟通记录"
+    },
+    {
+      "grant_id": "GR-03",
+      "asset_id": "AS-04",
+      "authorized_parties": ["品牌方自有账号"],
+      "channels": ["小红书"],
+      "territory": ["中国大陆"],
+      "purposes": ["organic"],
+      "modifications": ["crop"],
+      "starts_on": "2026-08-01",
+      "ends_on": "2026-09-10",
+      "attribution_required": null,
+      "renewal_note": null,
+      "source_evidence": "2026-08-01 合同附件二"
+    },
+    {
+      "grant_id": "GR-04",
+      "asset_id": "AS-05",
+      "authorized_parties": ["品牌方自有账号", "品牌方委托的代理商 A"],
+      "channels": ["小红书", "抖音"],
+      "territory": ["中国大陆"],
+      "purposes": ["organic", "paid_ads"],
+      "modifications": ["crop"],
+      "starts_on": "2026-08-15",
+      "ends_on": "2026-12-15",
+      "attribution_required": true,
+      "attribution_text": "@阿澈的厨房",
+      "renewal_note": "12 月中再讨论",
+      "source_evidence": "2026-08-14 补充确认"
+    },
+    {
+      "grant_id": "GR-05",
+      "asset_id": "AS-05",
+      "authorized_parties": ["品牌方自有账号"],
+      "channels": ["抖音"],
+      "territory": ["中国大陆"],
+      "purposes": ["organic"],
+      "modifications": ["crop"],
+      "starts_on": "2026-08-15",
+      "ends_on": "2026-12-15",
+      "attribution_required": false,
+      "renewal_note": "到期即停用",
+      "source_evidence": "2026-08-20 二次沟通记录"
+    },
+    {
+      "grant_id": "GR-06",
+      "asset_id": "AS-02",
+      "authorized_parties": ["品牌方自有账号"],
+      "channels": ["抖音"],
+      "territory": ["中国大陆"],
+      "purposes": ["organic"],
+      "modifications": ["crop"],
+      "starts_on": "2026-10-25",
+      "ends_on": "2026-11-30",
+      "attribution_required": false,
+      "renewal_note": "到期即停用",
+      "source_evidence": "2026-09-26 口头确认待书面"
+    }
+  ],
+  "requests": [
+    {
+      "request_id": "RQ-01",
+      "asset_id": "AS-01",
+      "party": "品牌方自有账号",
+      "channel": "抖音",
+      "territory": "中国大陆",
+      "purpose": "paid_ads",
+      "modifications": ["crop"],
+      "planned_on": "2026-10-05",
+      "note": "品牌方投流计划里的常规复用"
+    },
+    {
+      "request_id": "RQ-02",
+      "asset_id": "AS-01",
+      "party": "品牌方自有账号",
+      "channel": "视频号",
+      "territory": "中国大陆",
+      "purpose": "organic",
+      "planned_on": "2026-10-05"
+    },
+    {
+      "request_id": "RQ-03",
+      "asset_id": "AS-02",
+      "party": "品牌方自有账号",
+      "channel": "小红书",
+      "territory": "中国大陆",
+      "purpose": "paid_ads",
+      "planned_on": "2026-10-05"
+    },
+    {
+      "request_id": "RQ-04",
+      "asset_id": "AS-04",
+      "party": "品牌方自有账号",
+      "channel": "小红书",
+      "territory": "中国大陆",
+      "purpose": "organic",
+      "planned_on": "2026-10-05"
+    },
+    {
+      "request_id": "RQ-05",
+      "asset_id": "AS-99",
+      "party": "品牌方自有账号",
+      "channel": "小红书",
+      "territory": "中国大陆",
+      "purpose": "organic",
+      "planned_on": "2026-10-05"
+    },
+    {
+      "request_id": "RQ-06",
+      "asset_id": "AS-05",
+      "party": "品牌方自有账号",
+      "channel": "抖音",
+      "territory": "中国大陆",
+      "purpose": "paid_ads",
+      "planned_on": "2026-10-05"
+    }
+  ]
+}

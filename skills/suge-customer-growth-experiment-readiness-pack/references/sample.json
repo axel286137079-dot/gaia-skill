@@ -1,0 +1,182 @@
+{
+  "as_of": "2026-09-30T07:30:00+08:00",
+  "business": {
+    "name": "青禾设计工作室",
+    "timezone": "Asia/Shanghai"
+  },
+  "experiments": [
+    {
+      "experiment_id": "EXP-1001",
+      "goal": "让官网咨询表单的提交量在 4 周内从每周 12 条提高到 18 条",
+      "audience": "官网访客与公众号落地页访客",
+      "channel": "content",
+      "offer": "免费设计风格自测表",
+      "baseline": 12,
+      "target": 18,
+      "metric": {
+        "name": "weekly_form_submissions",
+        "definition": "每周一 00:00 至周日 24:00 官网表单成功提交的条数，去重后计数"
+      },
+      "budget_cap": {"amount": 0, "currency": "CNY"},
+      "start_at": "2026-10-01T00:00:00+08:00",
+      "end_at": "2026-10-29T00:00:00+08:00",
+      "owner": "市场-赵",
+      "outreach_required": false,
+      "consent_basis": "",
+      "evidence_refs": ["analytics-export-2026-09.csv"],
+      "stop_conditions": [
+        "连续两周提交量低于基线 12 就停",
+        "单周投入超过 6 小时就停"
+      ],
+      "notes": "只改落地页文案与表单长度，不动投放"
+    },
+    {
+      "experiment_id": "EXP-1002",
+      "goal": "把沉睡 90 天的老客户唤醒，4 周内让 10% 回访并完成一次咨询",
+      "audience": "过去 12 个月内成交过、近 90 天无互动的客户",
+      "channel": "email",
+      "offer": "老客户专属的免费版式体检",
+      "baseline": 40,
+      "target": 52,
+      "metric": {
+        "name": "reactivated_customers",
+        "definition": "收到邀请后 14 天内回信或回拨，并在本月完成一次咨询的老客户数"
+      },
+      "budget_cap": {"amount": 300, "currency": "CNY"},
+      "start_at": "2026-10-04T09:00:00+08:00",
+      "end_at": "2026-11-01T18:00:00+08:00",
+      "owner": "客户-吴",
+      "outreach_required": true,
+      "consent_basis": "客户成交时在合同中勾选了「愿意接收后续服务信息」，逐条可回溯到签约记录",
+      "evidence_refs": ["crm-task-export-2026-09.csv"],
+      "stop_conditions": [
+        "任何一条回信要求停止联系就立刻从名单移除",
+        "退信率超过 5% 就暂停并检查名单"
+      ],
+      "notes": "名单先去重，发件动作由人工执行"
+    },
+    {
+      "experiment_id": "EXP-1003",
+      "goal": "让到店客户加微信，4 周内把添加率从 8% 提高到 15%",
+      "audience": "本月到店的首次客户",
+      "channel": "in_store",
+      "offer": "加微信送一次免费版式微调",
+      "baseline": 8,
+      "target": 15,
+      "metric": {
+        "name": "add_wechat_rate_pct",
+        "definition": "当月新增微信好友数 ÷ 当月到店首次客户数，按月末快照计算"
+      },
+      "budget_cap": {"amount": 500, "currency": "CNY"},
+      "start_at": "2026-10-05T09:00:00+08:00",
+      "end_at": "2026-11-02T18:00:00+08:00",
+      "owner": "门店-陈",
+      "outreach_required": true,
+      "consent_basis": "",
+      "evidence_refs": ["frontdesk-log-2026-09.xlsx"],
+      "stop_conditions": ["到店客户明确拒绝就当场停止邀请"],
+      "notes": "要在收银台加一张提示卡"
+    },
+    {
+      "experiment_id": "EXP-1004",
+      "goal": "复核上月门店复购活动是否值得再做一次",
+      "audience": "上月参与过复购活动的客户",
+      "channel": "sms",
+      "offer": "老客户复购九折",
+      "baseline": 25,
+      "target": 30,
+      "metric": "门店复购率",
+      "budget_cap": {"amount": 200, "currency": "USD"},
+      "start_at": "2026-09-01T00:00:00+08:00",
+      "end_at": "2026-09-15T00:00:00+08:00",
+      "owner": "门店-陈",
+      "outreach_required": false,
+      "consent_basis": "",
+      "evidence_refs": ["repeat-visit-2026-09.xlsx"],
+      "stop_conditions": ["活动成本超过预算上限就停"],
+      "notes": "活动已经跑完，需要复盘口径"
+    },
+    {
+      "experiment_id": "EXP-1005",
+      "goal": "把公众号推文的平均阅读完成率从 21% 提高到 28%",
+      "audience": "公众号现有订阅者",
+      "channel": "content",
+      "offer": "每周一篇拆解式长文",
+      "target": 28,
+      "metric": {
+        "name": "read_completion_rate_pct",
+        "definition": "后台「阅读完成率」字段的周均值"
+      },
+      "budget_cap": {"amount": 0, "currency": "CNY"},
+      "start_at": "2026-10-06T00:00:00+08:00",
+      "end_at": "2026-11-03T00:00:00+08:00",
+      "outreach_required": false,
+      "consent_basis": "",
+      "evidence_refs": ["wechat-stats-2026-09.csv"],
+      "stop_conditions": ["连续三篇完成率低于 18% 就停"],
+      "notes": "基线要从后台导，还没导"
+    },
+    {
+      "experiment_id": "EXP-1006",
+      "goal": "把设计咨询的预约转化率从 30% 提高到 40%",
+      "audience": "提交过咨询表单但未预约的访客",
+      "channel": "social",
+      "offer": "一次 20 分钟免费诊断",
+      "baseline": 30,
+      "target": 40,
+      "budget_cap": {"amount": 400},
+      "start_at": "2026-10-07T09:00:00+08:00",
+      "end_at": "2026-11-04T18:00:00+08:00",
+      "owner": "市场-赵",
+      "outreach_required": false,
+      "consent_basis": "",
+      "evidence_refs": ["form-export-2026-09.csv"],
+      "stop_conditions": ["预约爽约超过三分之一就停"],
+      "notes": "指标口径还没和同事对齐"
+    },
+    {
+      "experiment_id": "EXP-1007",
+      "goal": "把现场签约率提上来",
+      "audience": "已经到店咨询过的客户",
+      "channel": "phone",
+      "offer": "当天签约减 200 元",
+      "baseline": 20,
+      "target": 15,
+      "metric": {
+        "name": "onsite_sign_rate_pct",
+        "definition": "当日到店咨询并当场签约的比例"
+      },
+      "budget_cap": {"amount": 100, "currency": "CNY"},
+      "start_at": "2026-10-08T09:00:00+08:00",
+      "end_at": "2026-11-05T18:00:00+08:00",
+      "owner": "门店-陈",
+      "outreach_required": false,
+      "consent_basis": "",
+      "evidence_refs": ["sign-log-2026-09.xlsx"],
+      "stop_conditions": ["折扣申请超过 20 单就停"],
+      "notes": "目标数字是随手写的，需要改"
+    },
+    {
+      "experiment_id": "EXP-1008",
+      "goal": "测试周末上门服务套餐的接受度",
+      "audience": "近半年报修过的客户",
+      "channel": "event",
+      "offer": "周末上门检修五折",
+      "baseline": 6,
+      "target": 10,
+      "metric": {
+        "name": "weekend_accept_count",
+        "definition": "周末时段被接受并完成的服务单数"
+      },
+      "budget_cap": {"amount": 150, "currency": "CNY"},
+      "start_at": "2026-10-25T09:00:00+08:00",
+      "end_at": "2026-10-18T18:00:00+08:00",
+      "owner": "服务-孙",
+      "outreach_required": false,
+      "consent_basis": "",
+      "evidence_refs": ["repair-log-2026-09.xlsx"],
+      "stop_conditions": ["周末人力排不开就停"],
+      "notes": "时间写反了，需要重报窗口"
+    }
+  ]
+}

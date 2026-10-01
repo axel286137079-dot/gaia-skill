@@ -1,0 +1,83 @@
+{
+  "as_of": "2026-09-27T20:00:00+08:00",
+  "project": {
+    "project_id": "PRJ-2026-102",
+    "name": "门店春季宣传短片",
+    "platform": "视频号",
+    "aspect_ratio": "16:9",
+    "version": "v1",
+    "editor": "剪辑-李",
+    "due_at": "2026-09-30T18:00:00+08:00"
+  },
+  "handoff": {
+    "by": "拍摄-王",
+    "to": "剪辑-李"
+  },
+  "shots": [
+    {
+      "shot_id": "S-01",
+      "description": "门头全景，清晨",
+      "narrative_order": 1,
+      "status": "shot",
+      "take_ids": ["A-101"],
+      "duration_sec": 5,
+      "owner": "拍摄-王",
+      "due_at": "2026-09-27T09:00:00+08:00",
+      "subtitles_required": false,
+      "audio_note": "环境声",
+      "brand_elements": []
+    },
+    {
+      "shot_id": "S-02",
+      "description": "店内动线跟拍",
+      "narrative_order": 2,
+      "status": "shot",
+      "take_ids": ["A-999"],
+      "duration_sec": 10,
+      "owner": "拍摄-王",
+      "due_at": "2026-09-27T09:00:00+08:00",
+      "subtitles_required": true,
+      "audio_note": "同期声",
+      "brand_elements": []
+    }
+  ],
+  "assets": [
+    {
+      "asset_id": "A-101",
+      "basename": "A101_storefront_v1.mp4",
+      "kind": "video",
+      "version": "v1",
+      "status": "available",
+      "shot_refs": ["S-01"],
+      "owner": "拍摄-王"
+    },
+    {
+      "asset_id": "A-101",
+      "basename": "A101_storefront_v3.mp4",
+      "kind": "video",
+      "version": "v3",
+      "status": "available",
+      "shot_refs": ["S-01"],
+      "owner": "拍摄-王"
+    },
+    {
+      "asset_id": "A-201",
+      "basename": "../raw/A-201_final.mp4",
+      "kind": "video",
+      "version": "v1",
+      "status": "available",
+      "shot_refs": [],
+      "owner": "拍摄-赵"
+    },
+    {
+      "asset_id": "A-202",
+      "basename": "https://example.com/delivery/A-202_clip.mp4",
+      "kind": "video",
+      "version": "v1",
+      "status": "available",
+      "shot_refs": [],
+      "owner": "拍摄-赵"
+    }
+  ],
+  "brand_elements": []
+}

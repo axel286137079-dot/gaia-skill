@@ -1,0 +1,144 @@
+{
+  "as_of": "2026-09-29T07:30:00+08:00",
+  "team": {
+    "name": "青禾设计工作室",
+    "timezone": "Asia/Shanghai"
+  },
+  "items": [
+    {
+      "item_id": "ADM-1001",
+      "category": "客户合同",
+      "status": "open",
+      "due_at": "2026-09-28T18:00:00+08:00",
+      "impacts": {"customer": true, "cash": true, "operations": false},
+      "owner": "财务-林",
+      "depends_on": [],
+      "decision_needed": "",
+      "effort_hours": 0.5,
+      "evidence_ref": "contract-a-2026.pdf",
+      "notes": "客户已催过两次"
+    },
+    {
+      "item_id": "ADM-1002",
+      "category": "发票与收款",
+      "status": "open",
+      "due_at": "2026-09-29T17:00:00+08:00",
+      "impacts": {"customer": false, "cash": true, "operations": false},
+      "owner": "财务-林",
+      "depends_on": ["ADM-1001"],
+      "decision_needed": "",
+      "effort_hours": 1.25,
+      "evidence_ref": "invoice-batch-09.pdf",
+      "notes": "要等合同盖章件才能开票"
+    },
+    {
+      "item_id": "ADM-1003",
+      "category": "社保与用工",
+      "status": "open",
+      "due_at": "2026-10-01T12:00:00+08:00",
+      "impacts": {"customer": false, "cash": false, "operations": true},
+      "owner": "行政-周",
+      "depends_on": [],
+      "decision_needed": "新同事社保基数按哪一档报",
+      "decision_owner": "internal",
+      "effort_hours": 2,
+      "evidence_ref": "hr-2026-09.xlsx",
+      "notes": ""
+    },
+    {
+      "item_id": "ADM-1004",
+      "category": "供应商结算",
+      "status": "open",
+      "due_at": "2026-10-06T18:00:00+08:00",
+      "impacts": {"customer": false, "cash": true, "operations": false},
+      "owner": "财务-林",
+      "depends_on": [],
+      "decision_needed": "",
+      "external_commitment": {
+        "made_to": "印刷供应商 甲",
+        "due_at": "2026-10-06T18:00:00+08:00"
+      },
+      "effort_hours": 1,
+      "evidence_ref": "supplier-statement-09.pdf",
+      "notes": "已在电话里承诺月初结清"
+    },
+    {
+      "item_id": "ADM-1005",
+      "category": "资质年检",
+      "status": "waiting",
+      "due_at": "2026-10-15T18:00:00+08:00",
+      "impacts": {"customer": false, "cash": false, "operations": true},
+      "owner": "行政-周",
+      "depends_on": [],
+      "decision_needed": "",
+      "effort_hours": 3,
+      "evidence_ref": "license-renewal.pdf",
+      "notes": "等主管部门开放窗口"
+    },
+    {
+      "item_id": "ADM-1006",
+      "category": "月度对账",
+      "status": "open",
+      "due_at": "2026-09-25T18:00:00+08:00",
+      "impacts": {"customer": false, "cash": true, "operations": true},
+      "owner": "财务-林",
+      "depends_on": [],
+      "decision_needed": "",
+      "effort_hours": 4,
+      "evidence_ref": "reconcile-09.xlsx",
+      "notes": ""
+    },
+    {
+      "item_id": "ADM-1007",
+      "category": "客户回访",
+      "status": "open",
+      "due_at": "2026-10-20T18:00:00+08:00",
+      "impacts": {"customer": true, "cash": false, "operations": false},
+      "owner": "客户-吴",
+      "depends_on": [],
+      "decision_needed": "",
+      "effort_hours": 1.5,
+      "evidence_ref": "crm-export-09.csv",
+      "notes": "季度回访，时间还早"
+    },
+    {
+      "item_id": "ADM-1008",
+      "category": "房租与物业",
+      "status": "done",
+      "due_at": "2026-09-20T18:00:00+08:00",
+      "impacts": {"customer": false, "cash": true, "operations": false},
+      "owner": "行政-周",
+      "depends_on": [],
+      "decision_needed": "",
+      "effort_hours": 0.25,
+      "evidence_ref": "rent-receipt-09.pdf",
+      "notes": "已付清"
+    },
+    {
+      "item_id": "ADM-1009",
+      "category": "办公采购",
+      "status": "open",
+      "due_at": null,
+      "impacts": {"customer": false, "cash": false, "operations": false},
+      "owner": "行政-周",
+      "depends_on": [],
+      "decision_needed": "",
+      "effort_hours": null,
+      "evidence_ref": "purchase-list.txt",
+      "notes": "还没定什么时候买"
+    },
+    {
+      "item_id": "ADM-1010",
+      "category": "团队流程",
+      "status": "open",
+      "due_at": "2026-10-04T18:00:00+08:00",
+      "impacts": {"customer": false, "cash": false, "operations": true},
+      "owner": null,
+      "depends_on": [],
+      "decision_needed": "",
+      "effort_hours": 2.5,
+      "evidence_ref": "sop-draft.docx",
+      "notes": "还没定谁负责"
+    }
+  ]
+}

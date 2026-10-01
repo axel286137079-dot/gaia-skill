@@ -1,0 +1,131 @@
+{
+  "as_of": "2026-09-29T07:30:00+08:00",
+  "work_orders": [
+    {
+      "work_order_id": "WO-1001",
+      "visit_type": "diagnosis",
+      "appointment": {
+        "start": "2026-09-29T09:00:00+08:00",
+        "end": "2026-09-29T10:30:00+08:00",
+        "timezone": "Asia/Shanghai"
+      },
+      "site": {
+        "contact": "李工 13800000001",
+        "access_notes": "园区南门登记后进入，需携带工牌",
+        "access_confirmed": true
+      },
+      "approved_scope": "现场诊断空调不制冷原因，出具初步诊断结论，不含维修施工",
+      "approval": {
+        "scope_approved": true,
+        "approved_by": "客服主管",
+        "approval_ref": "AP-2026-0912"
+      },
+      "equipment": [
+        {"equipment_id": "EQ-01", "label": "中央空调室外机", "model": "MC-500", "known": true}
+      ],
+      "required_skills": ["空调诊断"],
+      "assigned_technician": {
+        "technician_id": "T-01",
+        "skills": ["空调诊断", "高空作业"],
+        "available_windows": [
+          {"start": "2026-09-29T08:00:00+08:00", "end": "2026-09-29T12:00:00+08:00"}
+        ]
+      },
+      "parts": [
+        {"part_id": "P-900", "description": "待定配件（诊断后确定）", "state": "ordered", "required": true}
+      ],
+      "tools": [
+        {"tool_id": "TL-01", "name": "压力表组", "required": true, "available": true}
+      ],
+      "documents": [
+        {"doc_id": "DOC-01", "basename": "so-2026-0912.pdf", "required": true, "available": true}
+      ],
+      "owner": "调度-王",
+      "due_at": "2026-09-29T08:30:00+08:00"
+    },
+    {
+      "work_order_id": "WO-1002",
+      "visit_type": "installation",
+      "appointment": {
+        "start": "2026-09-29T13:00:00+08:00",
+        "end": "2026-09-29T16:00:00+08:00",
+        "timezone": "Asia/Shanghai"
+      },
+      "site": {
+        "contact": "张女士 13900000002",
+        "access_notes": "到楼下电话联系开门",
+        "access_confirmed": true
+      },
+      "approved_scope": "安装整套新风主机并完成调试",
+      "approval": {
+        "scope_approved": true,
+        "approved_by": "项目经理",
+        "approval_ref": "AP-2026-0913"
+      },
+      "equipment": [
+        {"equipment_id": "EQ-02", "label": "新风主机", "model": "FX-200", "known": true}
+      ],
+      "required_skills": ["新风安装"],
+      "assigned_technician": {
+        "technician_id": "T-02",
+        "skills": ["新风安装", "电气"],
+        "available_windows": [
+          {"start": "2026-09-29T12:00:00+08:00", "end": "2026-09-29T18:00:00+08:00"}
+        ]
+      },
+      "parts": [
+        {"part_id": "P-201", "description": "新风主机固定支架", "state": "ordered", "required": true}
+      ],
+      "tools": [
+        {"tool_id": "TL-02", "name": "冲击钻", "required": true, "available": true}
+      ],
+      "documents": [
+        {"doc_id": "DOC-02", "basename": "install-manual-fx200.pdf", "required": true, "available": true}
+      ],
+      "owner": "调度-王",
+      "due_at": "2026-09-29T12:00:00+08:00"
+    },
+    {
+      "work_order_id": "WO-1003",
+      "visit_type": "maintenance",
+      "appointment": {
+        "start": "2026-09-30T09:00:00+08:00",
+        "end": "2026-09-30T11:00:00+08:00",
+        "timezone": "Asia/Shanghai"
+      },
+      "site": {
+        "contact": "赵经理 13700000003",
+        "access_notes": "前台领取临时门禁卡",
+        "access_confirmed": true
+      },
+      "approved_scope": "季度保养：滤网清洗、冷媒检测、运行记录归档",
+      "approval": {
+        "scope_approved": true,
+        "approved_by": "客服主管",
+        "approval_ref": "AP-2026-0914"
+      },
+      "equipment": [
+        {"equipment_id": "EQ-03", "label": "多联机室内机", "model": "VR-90", "known": true}
+      ],
+      "required_skills": ["空调保养"],
+      "assigned_technician": {
+        "technician_id": "T-03",
+        "skills": ["空调保养", "冷媒检测"],
+        "available_windows": [
+          {"start": "2026-09-30T08:00:00+08:00", "end": "2026-09-30T12:00:00+08:00"}
+        ]
+      },
+      "parts": [
+        {"part_id": "P-301", "description": "滤网耗材包", "state": "reserved", "required": true}
+      ],
+      "tools": [
+        {"tool_id": "TL-03", "name": "冷媒检漏仪", "required": true, "available": true}
+      ],
+      "documents": [
+        {"doc_id": "DOC-03", "basename": "maintenance-log-q3.csv", "required": true, "available": true}
+      ],
+      "owner": "调度-陈",
+      "due_at": "2026-09-30T08:00:00+08:00"
+    }
+  ]
+}

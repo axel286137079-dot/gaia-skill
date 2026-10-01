@@ -1,0 +1,175 @@
+{
+  "as_of": "2026-09-27T20:00:00+08:00",
+  "project": {
+    "project_id": "PRJ-2026-101",
+    "name": "秋季新品开箱短片",
+    "platform": "抖音",
+    "aspect_ratio": "9:16",
+    "version": "v3",
+    "editor": "剪辑-李",
+    "due_at": "2026-10-02T18:00:00+08:00"
+  },
+  "handoff": {
+    "by": "拍摄-王",
+    "to": "剪辑-李"
+  },
+  "shots": [
+    {
+      "shot_id": "S-01",
+      "description": "开场产品特写，桌面打光",
+      "narrative_order": 1,
+      "status": "shot",
+      "take_ids": ["A-101", "A-102"],
+      "duration_sec": 6.5,
+      "owner": "拍摄-王",
+      "due_at": "2026-09-27T12:00:00+08:00",
+      "subtitles_required": true,
+      "audio_note": "同期声",
+      "brand_elements": ["BE-01"]
+    },
+    {
+      "shot_id": "S-02",
+      "description": "使用演示中景，手部动作",
+      "narrative_order": 2,
+      "status": "shot",
+      "take_ids": ["A-103"],
+      "duration_sec": 12,
+      "owner": "拍摄-王",
+      "due_at": "2026-09-27T12:00:00+08:00",
+      "subtitles_required": true,
+      "audio_note": "后期配音",
+      "brand_elements": ["BE-01"]
+    },
+    {
+      "shot_id": "S-03",
+      "description": "成分说明特写，包装盒背面",
+      "narrative_order": 3,
+      "status": "reshoot",
+      "take_ids": [],
+      "duration_sec": 8,
+      "owner": "拍摄-王",
+      "due_at": "2026-09-29T12:00:00+08:00",
+      "subtitles_required": true,
+      "audio_note": "同期声",
+      "brand_elements": ["BE-01"],
+      "notes": "上一版反光太重，需重拍。"
+    },
+    {
+      "shot_id": "S-04",
+      "description": "场景过渡空镜，窗边",
+      "narrative_order": 4,
+      "status": "planned",
+      "take_ids": [],
+      "duration_sec": 4,
+      "owner": "拍摄-赵",
+      "due_at": "2026-09-28T18:00:00+08:00",
+      "subtitles_required": false,
+      "audio_note": "无音频",
+      "brand_elements": []
+    },
+    {
+      "shot_id": "S-05",
+      "description": "结尾行动号召，产品全貌加口播",
+      "narrative_order": 5,
+      "status": "shot",
+      "take_ids": ["A-104"],
+      "duration_sec": null,
+      "owner": "拍摄-王",
+      "due_at": "2026-09-27T18:00:00+08:00",
+      "subtitles_required": true,
+      "audio_note": "同期声加片尾音乐",
+      "brand_elements": ["BE-02"]
+    },
+    {
+      "shot_id": "S-06",
+      "description": "用户实拍投稿片段，待确认是否可用",
+      "narrative_order": 6,
+      "status": "unknown",
+      "take_ids": [],
+      "owner": null,
+      "due_at": "2026-09-25T10:00:00+08:00",
+      "subtitles_required": null,
+      "brand_elements": [],
+      "notes": "投稿人还没回消息。"
+    }
+  ],
+  "assets": [
+    {
+      "asset_id": "A-101",
+      "basename": "A101_open_box_wide_v2.mp4",
+      "kind": "video",
+      "version": "v2",
+      "status": "available",
+      "shot_refs": ["S-01"],
+      "owner": "拍摄-王"
+    },
+    {
+      "asset_id": "A-102",
+      "basename": "A102_open_box_close_v2.mp4",
+      "kind": "video",
+      "version": "v2",
+      "status": "available",
+      "shot_refs": ["S-01"],
+      "owner": "拍摄-王"
+    },
+    {
+      "asset_id": "A-103",
+      "basename": "A103_demo_mid_v1.mp4",
+      "kind": "video",
+      "version": "v1",
+      "status": "available",
+      "shot_refs": ["S-02"],
+      "owner": "拍摄-王"
+    },
+    {
+      "asset_id": "A-104",
+      "basename": "A104_cta_end_v1.mp4",
+      "kind": "video",
+      "version": "v1",
+      "status": "available",
+      "shot_refs": ["S-05"],
+      "owner": "拍摄-王"
+    },
+    {
+      "asset_id": "A-105",
+      "basename": "A105_score_bed_v1.wav",
+      "kind": "audio",
+      "version": "v1",
+      "status": "available",
+      "shot_refs": [],
+      "owner": "混音-周"
+    },
+    {
+      "asset_id": "A-106",
+      "basename": "A106_transition_plate_v1.mov",
+      "kind": "video",
+      "version": "v1",
+      "status": "unknown",
+      "shot_refs": [],
+      "owner": "拍摄-赵"
+    }
+  ],
+  "brand_elements": [
+    {
+      "element_id": "BE-01",
+      "name": "品牌 Logo 角标",
+      "required": true,
+      "available": true,
+      "version": "v2"
+    },
+    {
+      "element_id": "BE-02",
+      "name": "片尾二维码卡",
+      "required": true,
+      "available": false,
+      "version": "v1"
+    },
+    {
+      "element_id": "BE-03",
+      "name": "字幕字体包",
+      "required": false,
+      "available": true,
+      "version": "v1"
+    }
+  ]
+}

@@ -1,0 +1,193 @@
+{
+  "as_of": "2026-09-29T07:30:00+08:00",
+  "business": {
+    "name": "顺达家电服务（上海）",
+    "timezone": "Asia/Shanghai",
+    "no_show_policy": "连续爽约两次需预付订金，具体以门店公示为准"
+  },
+  "appointments": [
+    {
+      "appointment_id": "AP-1001",
+      "service_name": "空调深度清洗",
+      "mode": "on_site",
+      "start": "2026-09-29T09:00:00+08:00",
+      "end": "2026-09-29T10:30:00+08:00",
+      "timezone": "Asia/Shanghai",
+      "customer": {
+        "name": "李女士",
+        "contact_channel": "phone",
+        "contact_consent": true,
+        "confirmed": true
+      },
+      "reminders": [
+        {
+          "reminder_id": "RM-1001",
+          "channel": "sms",
+          "state": "delivered",
+          "sent_at": "2026-09-27T18:00:00+08:00",
+          "receipt_basename": "sms-1001-receipt.log"
+        }
+      ],
+      "preparation": [
+        {"item_id": "PR-1001", "label": "清洗剂与滤网备件", "required": true, "ready": true}
+      ],
+      "policy_acknowledged": true,
+      "policy_ref": "POLICY-2026-01",
+      "owner": "前台-陈",
+      "notes": "老客户，已服务三次"
+    },
+    {
+      "appointment_id": "AP-1002",
+      "service_name": "油烟机上门拆洗",
+      "mode": "in_store",
+      "start": "2026-09-29T13:00:00+08:00",
+      "end": "2026-09-29T14:00:00+08:00",
+      "timezone": "Asia/Shanghai",
+      "customer": {
+        "name": "王先生",
+        "contact_channel": "phone",
+        "contact_consent": true,
+        "confirmed": false
+      },
+      "reminders": [
+        {
+          "reminder_id": "RM-1002",
+          "channel": "sms",
+          "state": "sent",
+          "sent_at": "2026-09-28T10:00:00+08:00",
+          "receipt_basename": "sms-1002-receipt.log"
+        }
+      ],
+      "preparation": [
+        {"item_id": "PR-1002", "label": "高压清洗设备", "required": true, "ready": true}
+      ],
+      "policy_acknowledged": true,
+      "policy_ref": "POLICY-2026-01",
+      "standby": {
+        "start": "2026-09-29T15:00:00+08:00",
+        "end": "2026-09-29T16:00:00+08:00"
+      },
+      "owner": "前台-陈",
+      "notes": "客户上周改过一次时间"
+    },
+    {
+      "appointment_id": "AP-1003",
+      "service_name": "热水器安装",
+      "mode": "on_site",
+      "start": "2026-09-30T10:00:00+08:00",
+      "end": "2026-09-30T12:00:00+08:00",
+      "timezone": "Asia/Shanghai",
+      "customer": {
+        "name": "赵先生",
+        "contact_channel": "wechat",
+        "contact_consent": false,
+        "confirmed": false
+      },
+      "reminders": [
+        {
+          "reminder_id": "RM-1003",
+          "channel": "wechat",
+          "state": "sent",
+          "sent_at": "2026-09-28T09:30:00+08:00"
+        }
+      ],
+      "preparation": [
+        {"item_id": "PR-1003", "label": "膨胀螺栓与进水软管", "required": true, "ready": true}
+      ],
+      "policy_acknowledged": true,
+      "policy_ref": "POLICY-2026-01",
+      "owner": "技师-孙",
+      "notes": "客户明确要求不要电话联系"
+    },
+    {
+      "appointment_id": "AP-1004",
+      "service_name": "洗衣机季度保养",
+      "mode": "in_store",
+      "start": "2026-09-28T15:00:00+08:00",
+      "end": "2026-09-28T16:00:00+08:00",
+      "timezone": "Asia/Shanghai",
+      "customer": {
+        "name": "周女士",
+        "contact_channel": "phone",
+        "contact_consent": true,
+        "confirmed": true
+      },
+      "reminders": [
+        {
+          "reminder_id": "RM-1004",
+          "channel": "sms",
+          "state": "delivered",
+          "sent_at": "2026-09-27T09:00:00+08:00",
+          "receipt_basename": "sms-1004-receipt.log"
+        }
+      ],
+      "preparation": [
+        {"item_id": "PR-1004", "label": "保养工具包", "required": true, "ready": true}
+      ],
+      "policy_acknowledged": true,
+      "policy_ref": "POLICY-2026-01",
+      "owner": "前台-陈",
+      "notes": "昨日时段已过，处理方式待人工决定"
+    },
+    {
+      "appointment_id": "AP-1005",
+      "service_name": "新装净水器",
+      "mode": "on_site",
+      "start": "2026-09-29T16:00:00+08:00",
+      "end": "2026-09-29T17:30:00+08:00",
+      "timezone": "Asia/Shanghai",
+      "customer": {
+        "name": "吴先生",
+        "contact_channel": "phone",
+        "contact_consent": true,
+        "confirmed": true
+      },
+      "reminders": [
+        {
+          "reminder_id": "RM-1005",
+          "channel": "sms",
+          "state": "sent",
+          "sent_at": "2026-09-28T08:00:00+08:00",
+          "receipt_basename": "sms-1005-receipt.log"
+        }
+      ],
+      "preparation": [
+        {"item_id": "PR-1005", "label": "净水器主机", "required": true, "ready": false},
+        {"item_id": "PR-1006", "label": "安装单打印", "required": true, "ready": true}
+      ],
+      "policy_acknowledged": false,
+      "policy_ref": "POLICY-2026-01",
+      "owner": "技师-孙",
+      "notes": "主机还在等仓库调货"
+    },
+    {
+      "appointment_id": "AP-1006",
+      "service_name": "空调加氟",
+      "mode": "on_site",
+      "start": "2026-09-30T14:00:00+08:00",
+      "end": "2026-09-30T15:00:00+08:00",
+      "timezone": "Asia/Shanghai",
+      "customer": {
+        "name": "郑女士",
+        "contact_channel": "phone",
+        "contact_consent": true,
+        "confirmed": true
+      },
+      "reminders": [
+        {
+          "reminder_id": "RM-1006",
+          "channel": "sms",
+          "state": "unknown",
+          "sent_at": null
+        }
+      ],
+      "preparation": [
+        {"item_id": "PR-1007", "label": "冷媒", "required": true, "ready": true}
+      ],
+      "policy_acknowledged": true,
+      "policy_ref": "POLICY-2026-01",
+      "owner": "技师-孙",
+      "notes": "短信通道昨天异常，是否发出未确认"
+    }
+  ]
+}

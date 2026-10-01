@@ -1,0 +1,263 @@
+{
+  "as_of": "2026-09-27T20:00:00+08:00",
+  "business": {
+    "name": "晨光烘焙（湖滨店）",
+    "kind": "烘焙零售",
+    "timezone": "Asia/Shanghai"
+  },
+  "peak": {
+    "label": "国庆首日早高峰",
+    "starts_at": "2026-10-01T08:00:00+08:00",
+    "ends_at": "2026-10-01T14:00:00+08:00"
+  },
+  "inventory": [
+    {
+      "item_id": "IT-01",
+      "name": "现烤吐司",
+      "unit": "条",
+      "on_hand": 40,
+      "reorder_point": 30,
+      "supplier_lead_days": 1
+    },
+    {
+      "item_id": "IT-02",
+      "name": "招牌蛋糕",
+      "unit": "个",
+      "on_hand": 12,
+      "reorder_point": 20,
+      "supplier_lead_days": 2,
+      "note": "节前还会有一批到店"
+    },
+    {
+      "item_id": "IT-03",
+      "name": "冷萃原料",
+      "unit": "桶",
+      "on_hand": null,
+      "reorder_point": 5,
+      "supplier_lead_days": 3
+    },
+    {
+      "item_id": "IT-04",
+      "name": "中杯纸杯",
+      "unit": "个",
+      "on_hand": 0,
+      "reorder_point": 200,
+      "supplier_lead_days": 5
+    },
+    {
+      "item_id": "IT-05",
+      "name": "国庆限量礼盒",
+      "unit": "盒",
+      "on_hand": 8,
+      "reorder_point": 10,
+      "supplier_lead_days": 6
+    }
+  ],
+  "staffing": {
+    "staff": [
+      {
+        "staff_id": "ST-01",
+        "role": "收银",
+        "available_from": "2026-10-01T07:30:00+08:00",
+        "available_to": "2026-10-01T15:00:00+08:00",
+        "max_hours": 8
+      },
+      {
+        "staff_id": "ST-02",
+        "role": "烘焙",
+        "available_from": "2026-10-01T07:00:00+08:00",
+        "available_to": "2026-10-01T12:00:00+08:00",
+        "max_hours": 6
+      },
+      {
+        "staff_id": "ST-03",
+        "role": "打包",
+        "available_from": "2026-10-01T09:00:00+08:00",
+        "available_to": "2026-10-01T18:00:00+08:00",
+        "max_hours": 8
+      },
+      {
+        "staff_id": "ST-04",
+        "role": "打包",
+        "available_from": null,
+        "available_to": null,
+        "max_hours": 4
+      },
+      {
+        "staff_id": "ST-05",
+        "role": "收银",
+        "available_from": "2026-10-01T07:00:00+08:00",
+        "available_to": "2026-10-01T20:00:00+08:00",
+        "max_hours": 8
+      }
+    ],
+    "shifts": [
+      {
+        "shift_id": "SH-01",
+        "role": "收银",
+        "starts_at": "2026-10-01T08:00:00+08:00",
+        "ends_at": "2026-10-01T14:00:00+08:00",
+        "assigned_staff_ids": ["ST-01"]
+      },
+      {
+        "shift_id": "SH-02",
+        "role": "烘焙",
+        "starts_at": "2026-10-01T10:00:00+08:00",
+        "ends_at": "2026-10-01T14:00:00+08:00",
+        "assigned_staff_ids": ["ST-02"]
+      },
+      {
+        "shift_id": "SH-03",
+        "role": "打包",
+        "starts_at": "2026-10-01T12:00:00+08:00",
+        "ends_at": "2026-10-01T18:00:00+08:00",
+        "assigned_staff_ids": []
+      },
+      {
+        "shift_id": "SH-04",
+        "role": "打包",
+        "starts_at": "2026-10-01T18:00:00+08:00",
+        "ends_at": "2026-10-01T20:00:00+08:00",
+        "assigned_staff_ids": ["ST-04"]
+      },
+      {
+        "shift_id": "SH-05",
+        "role": "收银",
+        "starts_at": "2026-10-01T15:00:00+08:00",
+        "ends_at": "2026-10-01T20:00:00+08:00",
+        "assigned_staff_ids": ["ST-05"]
+      }
+    ],
+    "required_coverage": [
+      {
+        "role": "收银",
+        "needed_count": 2,
+        "starts_at": "2026-10-01T08:00:00+08:00",
+        "ends_at": "2026-10-01T14:00:00+08:00"
+      },
+      {
+        "role": "烘焙",
+        "needed_count": 1,
+        "starts_at": "2026-10-01T10:00:00+08:00",
+        "ends_at": "2026-10-01T12:00:00+08:00"
+      }
+    ]
+  },
+  "equipment": [
+    {
+      "asset_id": "EQ-01",
+      "name": "前台收银机",
+      "kind": "pos",
+      "state": "degraded",
+      "spares_available": false
+    },
+    {
+      "asset_id": "EQ-02",
+      "name": "手持扫码枪",
+      "kind": "terminal",
+      "state": "ok",
+      "spares_available": false
+    },
+    {
+      "asset_id": "EQ-03",
+      "name": "冷藏柜",
+      "kind": "fridge",
+      "state": "unknown",
+      "spares_available": null
+    },
+    {
+      "asset_id": "EQ-04",
+      "name": "展示柜射灯",
+      "kind": "display",
+      "state": "ok",
+      "spares_available": true
+    }
+  ],
+  "payments": [
+    {
+      "method": "微信收款",
+      "status": "active",
+      "fallback": "支付宝收款"
+    },
+    {
+      "method": "POS 刷卡",
+      "status": "issue",
+      "fallback": null
+    }
+  ],
+  "signage": [
+    {
+      "sign_id": "SG-01",
+      "purpose": "排队指引",
+      "placement": "入口",
+      "text_ready": true
+    },
+    {
+      "sign_id": "SG-02",
+      "purpose": "限购说明",
+      "placement": "货架",
+      "text_ready": false
+    },
+    {
+      "sign_id": "SG-03",
+      "purpose": "高峰营业时间",
+      "placement": "门口",
+      "text_ready": null
+    }
+  ],
+  "flow": {
+    "entrance_plan": "入口左进右出，地面贴单向箭头",
+    "queue_plan": null,
+    "exit_plan": "侧门单向出，专人引导"
+  },
+  "contingency": {
+    "required_plans": ["POS_FAILURE", "STAFF_SHORTAGE", "POWER_OUTAGE"],
+    "plans": [
+      {
+        "risk_id": "POS_FAILURE",
+        "plan": "启用备用收款码与纸质点单，事后补录",
+        "owner": "店长-陈"
+      },
+      {
+        "risk_id": "STAFF_SHORTAGE",
+        "plan": "调用二店两名兼职支援两小时",
+        "owner": null
+      }
+    ]
+  },
+  "tasks": [
+    {
+      "task_id": "T-01",
+      "title": "完成节前全店盘点",
+      "phase": "d_minus_7",
+      "owner": "店长-陈",
+      "due_at": "2026-09-28T18:00:00+08:00",
+      "status": "open",
+      "evidence_refs": ["INV-2026-09-27"]
+    },
+    {
+      "task_id": "T-02",
+      "title": "确认兼职排班并与二店对齐",
+      "phase": "d_minus_1",
+      "owner": "店长-陈",
+      "due_at": "2026-09-26T18:00:00+08:00",
+      "status": "open"
+    },
+    {
+      "task_id": "T-03",
+      "title": "标识与小卡打印到店",
+      "phase": "d_minus_1",
+      "owner": null,
+      "due_at": "2026-09-30T18:00:00+08:00",
+      "status": "unknown"
+    },
+    {
+      "task_id": "T-04",
+      "title": "开门前设备试刷与零钱准备",
+      "phase": "opening",
+      "owner": "收银-林",
+      "due_at": "2026-10-01T07:30:00+08:00",
+      "status": "open"
+    }
+  ]
+}

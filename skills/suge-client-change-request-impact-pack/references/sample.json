@@ -1,0 +1,130 @@
+{
+  "as_of": "2026-09-29T09:00:00+08:00",
+  "project": {
+    "project_id": "PRJ-2026-014",
+    "name": "官网改版一期",
+    "baseline_version": "BL-3",
+    "scope_baseline": [
+      {"deliverable_id": "D-01", "name": "首页视觉稿", "revision_included": true},
+      {"deliverable_id": "D-02", "name": "内页模板", "revision_included": true},
+      {"deliverable_id": "D-03", "name": "移动端适配", "revision_included": false}
+    ],
+    "revision_allowance": {"included": 2, "used": 1}
+  },
+  "change_requests": [
+    {
+      "request_id": "CR-01",
+      "raw_text": "客户希望首页主视觉的背景色再浅一点，其他不变。",
+      "requested_by": "客户-市场部",
+      "target_outcome": "首页视觉稿第二轮微调",
+      "baseline_refs": ["D-01"],
+      "new_deliverables": [],
+      "removes_deliverables": [],
+      "affected_assets": ["首页视觉稿"],
+      "impact": {
+        "effort_hours": 4,
+        "schedule_days": 1,
+        "cost": {"amount": "2000", "currency": "CNY"},
+        "dependencies": []
+      },
+      "within_revision_allowance": null,
+      "decision_maker": "客户-项目负责人",
+      "approval": {"status": "approved", "decided_by": "客户-项目负责人", "decided_at": "2026-09-28T16:20:00+08:00"}
+    },
+    {
+      "request_id": "CR-02",
+      "raw_text": "首页整体再出一版，用于国庆活动氛围。",
+      "requested_by": "客户-市场部",
+      "target_outcome": "首页视觉稿追加一版",
+      "baseline_refs": ["D-01"],
+      "new_deliverables": ["首页视觉稿第二轮"],
+      "removes_deliverables": [],
+      "affected_assets": ["首页视觉稿"],
+      "impact": {
+        "effort_hours": 8,
+        "schedule_days": 3,
+        "cost": {"amount": "1500", "currency": "CNY"},
+        "dependencies": ["国庆主视觉素材"]
+      },
+      "within_revision_allowance": true,
+      "decision_maker": "客户-项目负责人",
+      "approval": {"status": "pending", "decided_by": null, "decided_at": null}
+    },
+    {
+      "request_id": "CR-03",
+      "raw_text": "把内页模板换成活动落地页模板，页数不变。",
+      "requested_by": "客户-运营",
+      "target_outcome": "以内页模板替换为活动落地页模板",
+      "baseline_refs": ["D-02"],
+      "new_deliverables": ["活动落地页模板"],
+      "removes_deliverables": ["内页模板"],
+      "affected_assets": ["内页模板"],
+      "impact": {
+        "effort_hours": 6,
+        "schedule_days": 2,
+        "cost": {"amount": "0", "currency": "CNY"},
+        "dependencies": []
+      },
+      "within_revision_allowance": null,
+      "decision_maker": "客户-项目负责人",
+      "approval": {"status": "approved", "decided_by": "客户-项目负责人", "decided_at": "2026-09-28T17:05:00+08:00"}
+    },
+    {
+      "request_id": "CR-04",
+      "raw_text": "希望同时发布多语言版本，覆盖东南亚三个市场。",
+      "requested_by": "客户-海外业务",
+      "target_outcome": "新增多语言站点版本",
+      "baseline_refs": [],
+      "new_deliverables": ["多语言版本"],
+      "removes_deliverables": [],
+      "affected_assets": [],
+      "impact": {
+        "effort_hours": 40,
+        "schedule_days": 12,
+        "cost": {"amount": "500", "currency": "USD"},
+        "dependencies": ["翻译供应商", "多语言 CDN"]
+      },
+      "within_revision_allowance": false,
+      "decision_maker": "客户-项目负责人",
+      "approval": {"status": "pending", "decided_by": null, "decided_at": null}
+    },
+    {
+      "request_id": "CR-05",
+      "raw_text": "把之前说的那个页脚再调一下。",
+      "requested_by": "客户-市场部",
+      "target_outcome": "调整页脚",
+      "baseline_refs": ["D-09"],
+      "new_deliverables": [],
+      "removes_deliverables": [],
+      "affected_assets": [],
+      "impact": {
+        "effort_hours": null,
+        "schedule_days": null,
+        "cost": {"amount": null, "currency": null},
+        "dependencies": []
+      },
+      "within_revision_allowance": null,
+      "decision_maker": null,
+      "approval": {"status": "unknown", "decided_by": null, "decided_at": null}
+    },
+    {
+      "request_id": "CR-06",
+      "raw_text": "想加一套会员积分体系。",
+      "requested_by": "客户-运营",
+      "target_outcome": "新增会员积分体系",
+      "baseline_refs": [],
+      "new_deliverables": ["会员积分体系"],
+      "removes_deliverables": [],
+      "affected_assets": [],
+      "impact": {
+        "effort_hours": 20,
+        "schedule_days": 8,
+        "cost": {"amount": null, "currency": null},
+        "dependencies": ["积分规则文档"]
+      },
+      "within_revision_allowance": null,
+      "decision_maker": "客户-项目负责人",
+      "approval": {"status": "pending", "decided_by": null, "decided_at": null}
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "as_of": "2026-09-30T07:30:00+08:00",
+  "business": {
+    "name": "青禾设计工作室",
+    "timezone": "Asia/Shanghai"
+  },
+  "items": [
+    {
+      "item_id": "COST-1001",
+      "supplier": "耗材供应商 甲",
+      "unit_cost_before": 12.00,
+      "unit_cost_after": 13.80,
+      "currency": "CNY",
+      "monthly_volume": 300,
+      "current_price": 29.90,
+      "effective_at": "2026-10-01T00:00:00+08:00",
+      "evidence_refs": ["supplier-quote-a.pdf"],
+      "notes": "供应商邮件通知涨 15%"
+    },
+    {
+      "item_id": "COST-1002",
+      "supplier": "包材供应商 乙",
+      "unit_cost_before": 8.50,
+      "unit_cost_after": 8.50,
+      "currency": "CNY",
+      "monthly_volume": 120,
+      "current_price": 19.00,
+      "effective_at": "2026-09-15T00:00:00+08:00",
+      "evidence_refs": ["packaging-price-2026-09.pdf"],
+      "notes": "这次没变"
+    },
+    {
+      "item_id": "COST-1003",
+      "supplier": "物流承运 丙",
+      "unit_cost_before": 30,
+      "unit_cost_after": 27,
+      "currency": "CNY",
+      "monthly_volume": 60,
+      "current_price": 45,
+      "gross_margin_before": 0.4,
+      "effective_at": "2026-10-01T00:00:00+08:00",
+      "evidence_refs": ["logistics-quote-b.pdf"],
+      "notes": "换了线路之后单价降了"
+    },
+    {
+      "item_id": "COST-1004",
+      "supplier": "耗材供应商 甲",
+      "unit_cost_before": 5.20,
+      "unit_cost_after": 6.10,
+      "currency": "CNY",
+      "monthly_volume": null,
+      "current_price": 12.00,
+      "effective_at": "2026-10-05T00:00:00+08:00",
+      "evidence_refs": ["ink-quote.pdf"],
+      "notes": "用量还没统计出来"
+    },
+    {
+      "item_id": "COST-1005",
+      "supplier": "打包服务 丁",
+      "unit_cost_before": 3.00,
+      "unit_cost_after": 3.60,
+      "currency": "CNY",
+      "monthly_volume": 0,
+      "current_price": 8.00,
+      "effective_at": "2026-10-01T00:00:00+08:00",
+      "evidence_refs": ["packing-quote.pdf"],
+      "notes": "这项这个月没有单"
+    },
+    {
+      "item_id": "COST-1006",
+      "supplier": "海外parts 供应商",
+      "unit_cost_before": 4.10,
+      "unit_cost_after": 4.35,
+      "currency": "",
+      "monthly_volume": 40,
+      "current_price": 9.00,
+      "effective_at": "2026-10-01T00:00:00+08:00",
+      "evidence_refs": ["import-quote.pdf"],
+      "notes": "报价是美元还是人民币记不清了"
+    },
+    {
+      "item_id": "COST-1007",
+      "supplier": "印刷外协 戊",
+      "unit_cost_before": 2.50,
+      "unit_cost_after": 2.50,
+      "currency": "CNY",
+      "monthly_volume": 500,
+      "current_price": 6.00,
+      "effective_at": "2026-09-01T00:00:00+08:00",
+      "evidence_refs": [],
+      "notes": "老价格，没有书面报价单"
+    },
+    {
+      "item_id": "COST-1008",
+      "supplier": "快递 己",
+      "unit_cost_before": 1.20,
+      "unit_cost_after": 1.35,
+      "currency": "CNY",
+      "monthly_volume": 200,
+      "current_price": 3.00,
+      "evidence_refs": ["courier-notice.pdf"],
+      "notes": "通知里没写从哪天开始"
+    },
+    {
+      "item_id": "COST-1009",
+      "supplier": "辅料供应商 庚",
+      "unit_cost_before": 0.10,
+      "unit_cost_after": 0.335,
+      "currency": "CNY",
+      "monthly_volume": 3,
+      "current_price": 1.00,
+      "effective_at": "2026-10-01T00:00:00+08:00",
+      "evidence_refs": ["edge-quote.pdf"],
+      "notes": "金额很小，用来核对舍入口径"
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "SC-01",
+      "type": "absorb",
+      "absorb_ratio": 0.5
+    },
+    {
+      "scenario_id": "SC-02",
+      "type": "price_adjust",
+      "applies_to": ["COST-1001", "COST-1003"],
+      "price_change_pct": 8,
+      "constraints": {"max_price_change_pct": 10}
+    },
+    {
+      "scenario_id": "SC-03",
+      "type": "substitute_supplier",
+      "applies_to": ["COST-1001"],
+      "new_unit_cost": 13.10,
+      "new_supplier": "供应商-乙"
+    },
+    {
+      "scenario_id": "SC-04",
+      "type": "reduce_volume",
+      "applies_to": ["COST-1007"],
+      "volume_change_pct": -20,
+      "constraints": {"max_residual_exposure": 100}
+    },
+    {
+      "scenario_id": "SC-05",
+      "type": "discontinue",
+      "applies_to": ["COST-1001"]
+    },
+    {
+      "scenario_id": "SC-06",
+      "type": "price_adjust",
+      "applies_to": ["COST-1005"],
+      "price_change_pct": 25,
+      "constraints": {"max_price_change_pct": 10, "min_gross_margin_pct": 30}
+    },
+    {
+      "scenario_id": "SC-07",
+      "type": "absorb",
+      "applies_to": ["COST-1006"],
+      "absorb_ratio": 0.3
+    }
+  ]
+}
