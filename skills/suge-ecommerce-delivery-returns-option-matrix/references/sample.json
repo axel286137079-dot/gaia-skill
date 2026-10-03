@@ -1,0 +1,361 @@
+{
+  "as_of": "2026-10-01T19:05:00+08:00",
+  "store": {
+    "name": "青禾生活选物",
+    "default_currency": "CNY",
+    "sales_channels": ["web", "marketplace", "offline"]
+  },
+  "regions": [
+    {
+      "region_id": "R-EAST",
+      "country_or_area": "中国大陆 华东",
+      "postal_scope": "200000-299999",
+      "channels": ["web", "marketplace"],
+      "customer_segments": ["零售", "小批量批发"]
+    },
+    {
+      "region_id": "R-NORTH",
+      "country_or_area": "中国大陆 华北",
+      "postal_scope": "100000-199999",
+      "channels": ["web"],
+      "customer_segments": ["零售"]
+    },
+    {
+      "region_id": "R-SOUTH",
+      "country_or_area": "中国大陆 华南",
+      "postal_scope": "500000-599999",
+      "channels": ["web"],
+      "customer_segments": ["零售"]
+    },
+    {
+      "region_id": "R-WEST",
+      "country_or_area": "中国大陆 西南",
+      "postal_scope": "600000-699999",
+      "channels": ["web"],
+      "customer_segments": ["零售"]
+    },
+    {
+      "region_id": "R-ISLE",
+      "country_or_area": "中国 海南离岛",
+      "postal_scope": "570000-579999",
+      "channels": ["web"],
+      "customer_segments": ["零售"]
+    },
+    {
+      "region_id": "R-HK",
+      "country_or_area": "中国香港",
+      "postal_scope": "全境",
+      "channels": ["web", "offline"],
+      "customer_segments": ["零售", "自提"]
+    }
+  ],
+  "delivery_options": [
+    {
+      "option_id": "D-1001",
+      "regions": ["R-EAST"],
+      "channels": [],
+      "provider": "承运商甲",
+      "service_level": "标准陆运",
+      "fee": 12,
+      "currency": "CNY",
+      "min_days": 2,
+      "max_days": 4,
+      "cutoff_time": "18:00",
+      "tracking": true,
+      "pickup_type": "door",
+      "evidence_ref": "carrier-rate-card-2026-09.pdf",
+      "effective_from": "2026-01-01T00:00:00+08:00",
+      "effective_to": "2026-12-31T23:59:59+08:00",
+      "notes": "华东上门件，揽收截单 18:00"
+    },
+    {
+      "option_id": "D-1002",
+      "regions": ["R-SOUTH"],
+      "channels": ["web"],
+      "provider": "承运商甲",
+      "service_level": "次日达",
+      "fee": 0,
+      "currency": "CNY",
+      "min_days": 1,
+      "max_days": 1,
+      "cutoff_time": "15:00",
+      "tracking": true,
+      "pickup_type": "door",
+      "evidence_ref": "carrier-rate-card-2026-09.pdf",
+      "effective_from": "2026-01-01T00:00:00+08:00",
+      "effective_to": "2026-12-31T23:59:59+08:00",
+      "notes": "华南满额包邮，费用 0 是实际配置值，不是未知"
+    },
+    {
+      "option_id": "D-1003",
+      "regions": ["R-SOUTH"],
+      "channels": ["web"],
+      "provider": "自提服务乙",
+      "service_level": "网点自提",
+      "fee": 0,
+      "currency": "CNY",
+      "min_days": 1,
+      "max_days": 3,
+      "tracking": false,
+      "pickup_type": "pickup_point",
+      "evidence_ref": "pickup-network-list-2026-09.csv",
+      "effective_from": "2026-01-01T00:00:00+08:00",
+      "effective_to": "2026-12-31T23:59:59+08:00",
+      "notes": "华南网点自提，无追踪"
+    },
+    {
+      "option_id": "D-1004",
+      "regions": ["R-HK"],
+      "channels": [],
+      "provider": "承运商丁",
+      "service_level": "跨境标准",
+      "fee": 35,
+      "currency": "HKD",
+      "min_days": 2,
+      "max_days": 5,
+      "tracking": true,
+      "pickup_type": "door",
+      "evidence_ref": "hk-carrier-rate-2026-09.pdf",
+      "effective_from": "2026-01-01T00:00:00+08:00",
+      "notes": "香港地区以港币计价，与店铺默认币种不一致"
+    },
+    {
+      "option_id": "D-1005",
+      "regions": ["R-EAST"],
+      "channels": [],
+      "provider": "承运商甲",
+      "service_level": "经济件",
+      "fee": 8,
+      "currency": "CNY",
+      "min_days": 5,
+      "max_days": 3,
+      "tracking": true,
+      "pickup_type": "door",
+      "evidence_ref": "carrier-rate-card-2026-09.pdf",
+      "effective_from": "2026-01-01T00:00:00+08:00",
+      "notes": "时效上下限填反了，需要重报"
+    },
+    {
+      "option_id": "D-1006",
+      "regions": ["R-EAST"],
+      "channels": [],
+      "provider": "承运商甲",
+      "service_level": "同城急送",
+      "fee": 10,
+      "currency": "CNY",
+      "min_days": 2,
+      "max_days": 3,
+      "tracking": true,
+      "pickup_type": "drone",
+      "evidence_ref": "carrier-rate-card-2026-09.pdf",
+      "effective_from": "2026-01-01T00:00:00+08:00",
+      "notes": "自提方式写了一个词表外的值"
+    },
+    {
+      "option_id": "D-1007",
+      "regions": ["R-NORTH"],
+      "channels": ["web"],
+      "provider": "承运商甲",
+      "service_level": "标准陆运",
+      "currency": "CNY",
+      "min_days": 2,
+      "max_days": 3,
+      "tracking": true,
+      "pickup_type": "door",
+      "evidence_ref": "carrier-rate-card-2026-09.pdf",
+      "effective_from": "2026-01-01T00:00:00+08:00",
+      "notes": "运费还没问清楚，暂不填"
+    },
+    {
+      "option_id": "D-1008",
+      "regions": ["R-NORTH"],
+      "channels": ["web"],
+      "provider": "承运商甲",
+      "service_level": "标准陆运",
+      "fee": 15,
+      "currency": "CNY",
+      "min_days": 2,
+      "max_days": 3,
+      "cutoff_time": "17:30",
+      "tracking": true,
+      "pickup_type": "door",
+      "evidence_ref": "carrier-rate-card-2026-09.pdf",
+      "effective_from": "2026-01-01T00:00:00+08:00",
+      "effective_to": "2026-12-31T23:59:59+08:00",
+      "notes": "华北标准上门件"
+    },
+    {
+      "option_id": "D-1009",
+      "regions": ["R-EAST", "R-WEST"],
+      "channels": ["web"],
+      "provider": "承运商甲",
+      "service_level": "标准陆运",
+      "fee": 9,
+      "currency": "CNY",
+      "min_days": 3,
+      "max_days": 5,
+      "tracking": true,
+      "pickup_type": "door",
+      "evidence_ref": "carrier-rate-card-2026-08.pdf",
+      "effective_from": "2026-01-01T00:00:00+08:00",
+      "effective_to": "2026-09-01T00:00:00+08:00",
+      "notes": "老价目表，已过期需要续期或下架"
+    },
+    {
+      "option_id": "D-1010",
+      "regions": ["R-EAST"],
+      "channels": [],
+      "provider": "承运商甲",
+      "service_level": "大件物流",
+      "fee": 9,
+      "currency": "CNY",
+      "min_days": 3,
+      "max_days": 5,
+      "tracking": true,
+      "pickup_type": "door",
+      "effective_from": "2026-01-01T00:00:00+08:00",
+      "notes": "大件报价口头问的，没有单据"
+    },
+    {
+      "option_id": "D-1011",
+      "regions": ["R-NORTH"],
+      "channels": ["marketplace"],
+      "provider": "承运商甲",
+      "service_level": "平台仓配",
+      "fee": 11,
+      "currency": "CNY",
+      "min_days": 2,
+      "max_days": 3,
+      "tracking": true,
+      "pickup_type": "door",
+      "evidence_ref": "carrier-rate-card-2026-09.pdf",
+      "effective_from": "2026-01-01T00:00:00+08:00",
+      "notes": "华北只在 web 开卖，这个 marketplace 渠道不成立"
+    },
+    {
+      "option_id": "D-1012",
+      "regions": ["R-HK"],
+      "channels": ["offline"],
+      "provider": "承运商丁",
+      "service_level": "门店自提",
+      "fee": 40,
+      "currency": "HKD",
+      "min_days": 1,
+      "max_days": 2,
+      "tracking": true,
+      "pickup_type": "store_pickup",
+      "evidence_ref": "hk-carrier-rate-2026-09.pdf",
+      "effective_from": "2026-01-01T00:00:00+08:00",
+      "notes": "香港门店自提，以港币计价"
+    }
+  ],
+  "return_options": [
+    {
+      "return_id": "RT-1001",
+      "regions": ["R-SOUTH"],
+      "channels": ["web"],
+      "window_days": 30,
+      "fee_payer": "seller",
+      "dropoff_type": "dropoff_point",
+      "provider": "自提服务乙",
+      "condition_scope": "未拆封可退，已拆封需拍照确认",
+      "evidence_ref": "return-policy-2026-09.pdf",
+      "effective_from": "2026-01-01T00:00:00+08:00",
+      "effective_to": "2026-12-31T23:59:59+08:00",
+      "notes": "华南退货走网点寄回"
+    },
+    {
+      "return_id": "RT-1002",
+      "regions": ["R-WEST"],
+      "channels": ["web"],
+      "window_days": 14,
+      "fee_payer": "buyer",
+      "dropoff_type": "mail_back",
+      "provider": "承运商甲",
+      "condition_scope": "不影响二次销售",
+      "evidence_ref": "return-policy-2026-09.pdf",
+      "effective_from": "2026-01-01T00:00:00+08:00",
+      "notes": "西南退货由买家寄回"
+    },
+    {
+      "return_id": "RT-1003",
+      "regions": ["R-ISLE"],
+      "channels": ["web"],
+      "window_days": 7,
+      "fee_payer": "shared",
+      "dropoff_type": "dropoff_point",
+      "provider": "承运商甲",
+      "condition_scope": "离岛件仅支持质量问题退货",
+      "evidence_ref": "return-policy-2026-09.pdf",
+      "effective_from": "2026-01-01T00:00:00+08:00",
+      "notes": "离岛只有退货方案，没有配送方案"
+    },
+    {
+      "return_id": "RT-1004",
+      "regions": ["R-EAST"],
+      "channels": [],
+      "window_days": 7,
+      "fee_payer": "seller",
+      "dropoff_type": "dropoff_point",
+      "provider": "自提服务乙",
+      "condition_scope": "不影响二次销售",
+      "evidence_ref": "return-policy-2026-09.pdf",
+      "effective_from": "2026-01-01T00:00:00+08:00",
+      "notes": "华东退货窗只有 7 天"
+    }
+  ],
+  "promises": [
+    {
+      "promise_id": "P-1001",
+      "surface": "checkout",
+      "region_id": "R-EAST",
+      "text": "华东区 1 日内送达，全场包邮",
+      "stated_min_days": 1,
+      "stated_max_days": 1,
+      "stated_fee": 0
+    },
+    {
+      "promise_id": "P-1002",
+      "surface": "faq",
+      "region_id": "R-EAST",
+      "text": "华东区支持 30 天无理由退货",
+      "stated_return_window_days": 30
+    },
+    {
+      "promise_id": "P-1003",
+      "surface": "product",
+      "region_id": "R-SOUTH",
+      "text": "华南区 3 日内送达，运费 0 元起",
+      "stated_min_days": 1,
+      "stated_max_days": 3,
+      "stated_fee": 0
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "REQ-1001",
+      "region_id": "R-SOUTH",
+      "channel": "web",
+      "max_days": 3,
+      "max_fee": 0
+    },
+    {
+      "requirement_id": "REQ-1002",
+      "region_id": "R-NORTH",
+      "channel": "web",
+      "max_days": 2
+    },
+    {
+      "requirement_id": "REQ-1003",
+      "region_id": "R-HK",
+      "channel": "web",
+      "currency": "USD"
+    },
+    {
+      "requirement_id": "REQ-1004",
+      "region_id": "R-WEST",
+      "channel": "web",
+      "min_return_window_days": 30
+    }
+  ]
+}

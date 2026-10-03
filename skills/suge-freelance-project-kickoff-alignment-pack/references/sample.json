@@ -1,0 +1,99 @@
+{
+  "as_of": "2026-10-02T19:05:00+08:00",
+  "project": {
+    "project_id": "PRJ-2026-1002",
+    "name": "秋季品牌官网改版",
+    "start_at": "2026-10-05T09:00:00+08:00",
+    "target_delivery_at": "2026-11-06T18:00:00+08:00",
+    "timezone": "Asia/Shanghai"
+  },
+  "parties": [
+    {"party_id": "P-01", "role": "freelancer", "decision_authority": true, "contact_consent": true},
+    {"party_id": "P-02", "role": "client_project_lead", "decision_authority": true, "contact_consent": true},
+    {"party_id": "P-03", "role": "client_marketing", "decision_authority": false, "contact_consent": false},
+    {"party_id": "P-04", "role": "vendor_illustrator", "decision_authority": false}
+  ],
+  "deliverables": [
+    {
+      "deliverable_id": "D-1001",
+      "description": "品牌主页视觉设计稿",
+      "format": "Figma 源文件 + PNG 导出",
+      "quantity": 1,
+      "due_at": "2026-10-16T18:00:00+08:00",
+      "acceptance_criteria": ["两张首页方案，客户选定其一", "栅格与配色与品牌手册一致"],
+      "approver_party_id": "P-02",
+      "dependencies": [],
+      "out_of_scope": ["不包含前端切图", "不包含动效"]
+    },
+    {
+      "deliverable_id": "D-1002",
+      "description": "落地页文案撰写",
+      "format": "Markdown + 最终 Word",
+      "quantity": 3,
+      "due_at": "2026-11-10T18:00:00+08:00",
+      "acceptance_criteria": ["三篇文案各不超过 800 字"],
+      "approver_party_id": "P-02",
+      "dependencies": ["D-1001"],
+      "out_of_scope": ["不包含投放素材"]
+    },
+    {
+      "deliverable_id": "D-1003",
+      "description": "产品摄影棚拍",
+      "format": "RAW + 精修 JPG",
+      "quantity": 40,
+      "due_at": "2026-10-30T18:00:00+08:00",
+      "acceptance_criteria": ["每款产品主图 2 张，白底"],
+      "approver_party_id": "P-02",
+      "dependencies": [],
+      "out_of_scope": ["不包含模特"]
+    },
+    {
+      "deliverable_id": "D-1004",
+      "description": "品牌插画系列",
+      "format": "AI 源文件 + PNG",
+      "quantity": 5,
+      "due_at": "2026-10-24T18:00:00+08:00",
+      "acceptance_criteria": [],
+      "approver_party_id": "P-02",
+      "dependencies": [],
+      "out_of_scope": []
+    },
+    {
+      "deliverable_id": "D-1005",
+      "description": "宣传片剪辑",
+      "format": "MP4 1080p",
+      "quantity": 1,
+      "due_at": "2026-11-03T18:00:00+08:00",
+      "acceptance_criteria": ["成片 60 秒，含中英字幕"],
+      "approver_party_id": "P-02",
+      "dependencies": ["D-9999"],
+      "out_of_scope": ["不包含配音演员"]
+    }
+  ],
+  "approvals": [
+    {"approval_id": "A-1001", "subject": "D-1001 品牌主页视觉设计稿", "owner_party_id": "P-02", "deliverable_id": "D-1001", "status": "approved", "due_at": "2026-10-14T18:00:00+08:00", "evidence_ref": "design-approval.pdf"},
+    {"approval_id": "A-1002", "subject": "D-1002 落地页文案", "owner_party_id": "P-02", "deliverable_id": "D-1002", "status": "pending", "due_at": "2026-10-07T18:00:00+08:00", "evidence_ref": "copy-approval.pdf"},
+    {"approval_id": "A-1003", "subject": "D-1003 产品摄影", "owner_party_id": "P-02", "deliverable_id": "D-1003", "status": "approved", "due_at": "2026-10-28T18:00:00+08:00", "evidence_ref": "photo-approval.pdf"},
+    {"approval_id": "A-1004", "subject": "D-1004 品牌插画", "owner_party_id": "P-02", "deliverable_id": "D-1004", "status": "approved", "due_at": "2026-10-22T18:00:00+08:00", "evidence_ref": "illustration-approval.pdf"},
+    {"approval_id": "A-1005", "subject": "D-1005 宣传片剪辑", "owner_party_id": "P-02", "deliverable_id": "D-1005", "status": "approved", "due_at": "2026-11-01T18:00:00+08:00", "evidence_ref": "video-approval.pdf"}
+  ],
+  "client_inputs": [
+    {"input_id": "C-1001", "kind": "photo_assets", "description": "产品实物与拍摄清单", "owner_party_id": "P-02", "deliverable_id": "D-1003", "status": "not_received", "due_at": "2026-10-05T18:00:00+08:00", "evidence_ref": "asset-list.pdf"},
+    {"input_id": "C-1002", "kind": "brand_text", "description": "品牌故事原始文本", "owner_party_id": "P-01", "deliverable_id": "D-1001", "status": "received", "due_at": "2026-10-03T18:00:00+08:00", "evidence_ref": "brand-story.docx"},
+    {"input_id": "C-1003", "kind": "logo_files", "description": "品牌 Logo 源文件", "deliverable_id": null, "status": "not_received", "due_at": "2026-10-08T18:00:00+08:00"}
+  ],
+  "communication": {
+    "channel": "邮件 + 每周视频会",
+    "cadence": "每周一 10:00 同步一次进度",
+    "response_target": "工作日内 24 小时内回复",
+    "urgent_escalation": "邮件标题加【紧急】，2 小时未回复则电话联系 P-02"
+  },
+  "change_process": {
+    "propose": "由任一方邮件提出变更点与理由",
+    "estimate": "P-01 在 2 个工作日内给出工期与费用影响",
+    "approve": "P-02 邮件书面确认后才生效",
+    "schedule": "P-01 更新排期并回传确认"
+  },
+  "evidence_refs": ["brand-guideline.pdf", "../archive/old.pdf", "https://example.com/spec"],
+  "notes": "启动会已开，等待客户素材与文案审批。"
+}
