@@ -1,0 +1,127 @@
+{
+  "as_of": "2026-10-03T19:05:00+08:00",
+  "business": {
+    "business_id": "BIZ-1003",
+    "timezone": "Asia/Shanghai",
+    "product_scope": ["家用净水器安装", "滤芯更换"],
+    "service_area": ["徐汇区", "静安区"],
+    "out_of_scope": ["商用大型设备"],
+    "channels": ["电话", "微信"]
+  },
+  "leads": [
+    {
+      "lead_id": "L-2001",
+      "source": "官网表单",
+      "received_at": "2026-10-03T09:00:00+08:00",
+      "requested_outcome": "希望尽快上门安装净水器",
+      "product_or_service": "家用净水器安装",
+      "service_area": "徐汇区",
+      "deadline": "2026-10-04T12:00:00+08:00",
+      "budget_status": "provided",
+      "decision_timing": "本周内决定",
+      "evidence_refs": ["form-2001.pdf"],
+      "contact_consent": true
+    },
+    {
+      "lead_id": "L-2002",
+      "source": "微信咨询",
+      "received_at": "2026-10-02T14:30:00+08:00",
+      "requested_outcome": "半年后再次更换滤芯",
+      "product_or_service": "滤芯更换",
+      "service_area": "静安区",
+      "deadline": "2026-10-20T18:00:00+08:00",
+      "budget_status": "provided",
+      "decision_timing": "本月内决定",
+      "evidence_refs": ["chat-2002.pdf"],
+      "contact_consent": true
+    },
+    {
+      "lead_id": "L-2003",
+      "source": "老客户转介绍",
+      "received_at": "2026-10-01T11:00:00+08:00",
+      "requested_outcome": "厨房净水器安装报价",
+      "product_or_service": "家用净水器安装",
+      "service_area": "徐汇区",
+      "deadline": "2026-10-25T18:00:00+08:00",
+      "budget_status": "not_provided",
+      "decision_timing": "下月决定",
+      "evidence_refs": ["referral-2003.pdf"],
+      "contact_consent": true
+    },
+    {
+      "lead_id": "L-2004",
+      "source": "电话来访",
+      "received_at": "2026-10-02T09:15:00+08:00",
+      "requested_outcome": "商用净水系统安装",
+      "product_or_service": "商用大型设备",
+      "service_area": "徐汇区",
+      "deadline": "2026-10-18T18:00:00+08:00",
+      "budget_status": "provided",
+      "decision_timing": "本季度内决定",
+      "evidence_refs": ["call-2004.pdf"],
+      "contact_consent": true
+    },
+    {
+      "lead_id": "L-2005",
+      "source": "海报扫码",
+      "received_at": "2026-10-03T08:40:00+08:00",
+      "requested_outcome": "更换滤芯",
+      "product_or_service": "滤芯更换",
+      "service_area": "上海市徐汇区",
+      "deadline": "2026-10-22T18:00:00+08:00",
+      "budget_status": "provided",
+      "decision_timing": "本月内决定",
+      "evidence_refs": ["poster-2005.pdf"],
+      "contact_consent": true
+    },
+    {
+      "lead_id": "L-2006",
+      "source": "朋友介绍",
+      "received_at": "2026-10-02T16:20:00+08:00",
+      "requested_outcome": "新房装修后安装净水器",
+      "product_or_service": "家用净水器安装",
+      "service_area": "静安区",
+      "deadline": "2026-10-28T18:00:00+08:00",
+      "budget_status": "provided",
+      "decision_timing": "月末决定",
+      "evidence_refs": ["intro-2006.pdf"]
+    },
+    {
+      "lead_id": "L-2007",
+      "received_at": "2026-10-01T09:30:00+08:00",
+      "product_or_service": "滤芯更换",
+      "service_area": "静安区",
+      "deadline": "2026-10-27T18:00:00+08:00",
+      "budget_status": "not_applicable",
+      "decision_timing": "本月内决定",
+      "evidence_refs": ["walkin-2007.pdf"],
+      "contact_consent": true
+    },
+    {
+      "lead_id": "L-2008",
+      "source": "短信留言",
+      "received_at": "2026-10-02T10:05:00+08:00",
+      "requested_outcome": "安装净水器",
+      "product_or_service": "家用净水器安装",
+      "service_area": "静安区",
+      "deadline": "本周末",
+      "budget_status": "provided",
+      "decision_timing": "本周内决定",
+      "evidence_refs": ["sms-2008.pdf"],
+      "contact_consent": true
+    }
+  ],
+  "qualification_rules": {
+    "product_service_terms": ["净水器上门检测"],
+    "service_area_terms": ["浦东新区"],
+    "minimum_required_facts": ["requested_outcome", "product_or_service", "source"],
+    "timeliness": {"urgent_within_hours": 48, "note": "48 小时内到期的线索按紧急处理"},
+    "priority_order": ["deadline", "received_at", "lead_id"]
+  },
+  "capacity": {
+    "available_slots": 1,
+    "windows": ["工作日 09:00-18:00"]
+  },
+  "evidence_refs": ["intake-batch-20261003.csv"],
+  "notes": "本批线索来自四个渠道，等待人工按优先带复核。"
+}
