@@ -1,0 +1,156 @@
+{
+  "as_of": "2026-10-04T19:00:00+08:00",
+  "organization": {
+    "organization_id": "ORG-1004",
+    "work_mode": "混合办公",
+    "timezone": "Asia/Shanghai",
+    "working_days": [1, 2, 3, 4, 5],
+    "first_week_availability": ["工作日 09:00-18:00"]
+  },
+  "new_hire": {
+    "role_instance_id": "NH-1004",
+    "role_title": "客服专员",
+    "start_date": "2026-10-07",
+    "timezone": "Asia/Shanghai",
+    "work_location_mode": "混合办公"
+  },
+  "owners": [
+    {
+      "owner_id": "O-IT",
+      "responsibilities": ["设备与账号准备"],
+      "availability": ["工作日 10:00-12:00"]
+    },
+    {
+      "owner_id": "O-HR",
+      "responsibilities": ["入职材料与政策确认"],
+      "availability": ["工作日 14:00-17:00"]
+    },
+    {
+      "owner_id": "O-LEAD",
+      "responsibilities": ["业务培训与首周目标"],
+      "availability": ["入职周每天 09:00-11:00"]
+    }
+  ],
+  "equipment": [
+    {
+      "id": "EQ-1",
+      "label": "笔记本电脑",
+      "status": "DONE",
+      "owner_id": "O-IT",
+      "due_at": "2026-10-06T18:00:00+08:00",
+      "evidence_refs": ["equipment-order-1004.pdf"]
+    },
+    {
+      "id": "EQ-2",
+      "label": "工位与外设",
+      "status": "SCHEDULED",
+      "owner_id": "O-IT",
+      "due_at": "2026-10-06T18:00:00+08:00",
+      "evidence_refs": ["workstation-assign-1004.pdf"]
+    }
+  ],
+  "access_items": [
+    {
+      "id": "AC-1",
+      "label": "基础账号",
+      "status": "DONE",
+      "owner_id": "O-IT",
+      "due_at": "2026-10-06T18:00:00+08:00",
+      "evidence_refs": ["account-create-1004.pdf"]
+    },
+    {
+      "id": "AC-2",
+      "label": "内网访问与 VPN",
+      "status": "WAITING_ON_OWNER",
+      "owner_id": "O-IT",
+      "due_at": "2026-10-07T09:00:00+08:00",
+      "evidence_refs": ["vpn-request-1004.pdf"]
+    }
+  ],
+  "training_items": [
+    {
+      "id": "TR-1",
+      "label": "产品与流程培训",
+      "status": "SCHEDULED",
+      "owner_id": "O-LEAD",
+      "due_at": "2026-10-08T11:00:00+08:00",
+      "evidence_refs": ["training-plan-1004.pdf"]
+    },
+    {
+      "id": "TR-2",
+      "label": "带教人陪跑安排",
+      "status": "PENDING",
+      "owner_id": "O-LEAD",
+      "due_at": "2026-10-07T11:00:00+08:00",
+      "evidence_refs": ["buddy-plan-1004.pdf"]
+    }
+  ],
+  "meetings": [
+    {
+      "id": "MT-1",
+      "label": "首日欢迎会",
+      "status": "SCHEDULED",
+      "owner_id": "O-LEAD",
+      "start_at": "2026-10-07T09:30:00+08:00",
+      "end_at": "2026-10-07T10:00:00+08:00",
+      "evidence_refs": ["agenda-day1-1004.pdf"]
+    },
+    {
+      "id": "MT-2",
+      "label": "账号与工具说明会",
+      "status": "SCHEDULED",
+      "owner_id": "O-IT",
+      "start_at": "2026-10-07T09:45:00+08:00",
+      "end_at": "2026-10-07T10:15:00+08:00",
+      "evidence_refs": ["agenda-tools-1004.pdf"]
+    },
+    {
+      "id": "MT-3",
+      "label": "业务培训",
+      "status": "SCHEDULED",
+      "owner_id": "O-LEAD",
+      "start_at": "2026-10-08T10:00:00+08:00",
+      "end_at": "2026-10-08T10:30:00+08:00",
+      "evidence_refs": ["agenda-training-1004.pdf"]
+    }
+  ],
+  "first_week_outcomes": [
+    {
+      "id": "OC-1",
+      "label": "首日完成设备与账号确认",
+      "status": "DONE",
+      "owner_id": "O-LEAD",
+      "due_at": "2026-10-09T18:00:00+08:00",
+      "evidence_refs": ["outcome-day1-1004.pdf"]
+    },
+    {
+      "id": "OC-2",
+      "label": "首周结束完成一次实操",
+      "status": "DONE",
+      "owner_id": "O-LEAD",
+      "due_at": "2026-10-10T18:00:00+08:00",
+      "evidence_refs": ["outcome-week1-1004.pdf"]
+    }
+  ],
+  "policy_acknowledgements": [
+    {
+      "id": "PL-1",
+      "label": "员工手册确认",
+      "status": "DONE",
+      "owner_id": "O-HR",
+      "due_at": "2026-10-06T18:00:00+08:00",
+      "evidence_refs": ["policy-ack-1004.pdf"]
+    },
+    {
+      "id": "PL-2",
+      "label": "信息安全须知确认",
+      "status": "PENDING",
+      "owner_id": "O-HR",
+      "due_at": "2026-10-07T18:00:00+08:00",
+      "evidence_refs": ["infosec-ack-1004.pdf"]
+    }
+  ],
+  "communication_consent": true,
+  "evidence_refs": ["first-week-plan-1004.pdf"],
+  "notes": "首位新员工的首周准备，等待人工按分区复核。"
+}
