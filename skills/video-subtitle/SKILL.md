@@ -4,8 +4,8 @@ slug: video-subtitle
 displayName: 视频字幕配音
 summary: 本地将视频转写为 SRT 字幕，并可从字幕文本生成独立 AI 配音音频。
 license: MIT
-description: 视频转写和字幕配音。用 ffmpeg 提取音频、用本地 Whisper 生成 SRT，并可用 macOS say 或需联网的 edge-tts 将字幕文本生成独立配音文件。用于视频转文字、SRT 生成、字幕提取和 AI 旁白音频制作；不负责翻译、烧录字幕或合成最终视频。
-version: 0.1.4
+description: 视频转写和字幕配音。用 ffmpeg 提取音频、用本地 Whisper 生成 SRT，并可用 macOS say 或需联网的 edge-tts 将字幕文本生成独立配音文件。内含 Whisper 生态版本校准（whisper.cpp v1.9.4 / faster-whisper v1.2.1 / WhisperX v3.8.6）与中文模型选择要点。用于视频转文字、SRT 生成、字幕提取和 AI 旁白音频制作；不负责翻译、烧录字幕或合成最终视频。
+version: 0.1.5
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/video-subtitle
 category: 内容创作
 tags: [视频字幕, 语音转文字, 字幕生成, 视频配音, whisper]
@@ -27,7 +27,7 @@ platforms: [workbuddy, claude-code, cursor]
 | 工具 | 用途 | 缺失时 |
 |---|---|---|
 | ffmpeg | 提取音频 | `brew install ffmpeg` |
-| whisper | 语音转文字（中文 srt） | `pip install -U openai-whisper`；追求速度可换 `faster-whisper` 或 `brew install whisper-cpp`（v1.9.3） |
+| whisper | 语音转文字（中文 srt） | `pip install -U openai-whisper`；追求速度可换 `faster-whisper` 或 `brew install whisper-cpp`（v1.9.4） |
 | say | macOS 配音（婷婷=普通话） | Windows/Linux 用 `--tts edge-tts` |
 
 ## 工作流
@@ -61,15 +61,17 @@ python3 bin/subtitle.py voice 字幕.srt --voice Tingting
 
 同一个 Whisper 模型权重，换推理实现只影响速度/显存，**不影响识别准确度**——中文准不准取决于选多大的模型，与选哪个工具无关。
 
-| 实现 | 语言/引擎 | 2026-09 版本 | 特点 |
+| 实现 | 语言/引擎 | 2026-10 版本 | 特点 |
 |---|---|---|---|
 | openai-whisper | Python/PyTorch | OSS v20250625 | 参考实现，最慢、显存最高；适合对标论文基准 |
 | **faster-whisper** | Python/CTranslate2 | **v1.2.1**（已升级 Silero VAD v6） | 同权重、吞吐可达参考实现 4×；int8 量化省显存；**上游维护趋缓（2025-10 后无新版本，属稳定而非停滞）** |
-| **whisper.cpp** | C/C++ (ggml) | **v1.9.3**（2026-08-20） | 无 Python 依赖、CPU/Metal 可跑，当前最活跃；ggml 同步至 v0.20.2 |
-| whisperX | Python（faster-whisper + pyannote + wav2vec2） | v3.8.6（2026-06-26） | 唯一开箱提供**词级时间戳 + 说话人分离**，做访谈/会议字幕首选 |
+| **whisper.cpp** | C/C++ (ggml) | **v1.9.4**（2026-09-11） | 无 Python 依赖、CPU/Metal 可跑，当前最活跃；ggml 同步至 v0.23.0 |
+| whisperX | Python（faster-whisper + pyannote + wav2vec2） | v3.8.6（2026-06-26；3.8.7rc1 预览中） | 唯一开箱提供**词级时间戳 + 说话人分离**，做访谈/会议字幕首选 |
 | Whisper.net | C# | 1.9.1 | .NET 桌面应用嵌入（其内置 whisper.cpp 仅同步到 1.8.5，落后上游） |
 
-> **v1.9.2 → v1.9.3 变化（2026-08-20）**：同步 ggml v0.20.2（Metal 新增 TQ2_0 量化支持、融合 CUDA/SYCL 内核、ARM/WASI 修复）；whisper.cpp 现已提供**官方 Debian 软件包**（`whisper.cpp` / `libwhisper-dev` / `libwhisper1`），不必再依赖非官方 Snap。注意：**2026 年没有任何新的 Whisper 基础模型**——large-v3 与 distil-large-v3 仍是最新权重，因此各实现的版本推进都属于运行时/工具链变化，不影响识别准确度。
+> **v1.9.3 → v1.9.4 变化（2026-09-11）**：同步 **ggml v0.23.0**；**启用 Metal 4.0 tensor API（仅 M5+/A19+ 芯片）**、新增 **sparse flash attention**，并为 M2 Pro / M2 Max / M3 / M3 Max / A18 Pro 补充 flash-attention-vec 调优；修复 Metal 上缺失 autorelease pool 导致的内存泄漏；release job 新增 **Windows on ARM** 目标；`encoder_begin_callback` 改为在语言自动检测**之前**触发，server 的 detect 响应返回检测到的语言。
+>
+> **v1.9.2 → v1.9.3 变化（2026-08-20）**：同步 ggml v0.20.2（Metal 新增 TQ2_0 量化支持、融合 CUDA/SYCL 内核、ARM/WASI 修复）；whisper.cpp 现已提供**官方 Debian 软件包**（`whisper.cpp` / `libwhisper-dev` / `libwhisper1`），不必再依赖非官方 Snap。注意：**2026 年没有任何新的 Whisper 基础模型**——large-v3 与 distil-large-v3 仍是最新权重，因此各实现的版本推进都属于运行时/工具链变化，**不影响识别准确度**；1.9.4 的 Metal 4.0 加速只对 M5+/A19+ 生效，M1~M4 设备升级后**不会**因此变快（但可获内存泄漏修复）。
 >
 > 另注：whisper.cpp 的 CLI 只接受 **16-bit WAV**，MP3/M4A 需先转码（`ffmpeg -i in.m4a -ar 16000 -ac 1 -c:a pcm_s16le out.wav`）；官方 quick start 用的可执行文件名为 `whisper-cli`（旧版叫 `main`）。
 
