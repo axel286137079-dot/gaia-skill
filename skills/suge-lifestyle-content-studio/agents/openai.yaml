@@ -1,0 +1,4 @@
+interface:
+  display_name: "生活方式内容工作室"
+  short_description: "生成生活方式图文草稿，并用离线词库提示常见高风险措辞。"
+  default_prompt: "使用 $suge-lifestyle-content-studio 按技能说明完成任务；只使用用户提供的事实，交付草稿、风险提示和发布前检查清单。"
