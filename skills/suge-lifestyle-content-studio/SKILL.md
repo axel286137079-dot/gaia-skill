@@ -2,10 +2,14 @@
 name: suge-lifestyle-content-studio
 slug: suge-lifestyle-content-studio
 displayName: 生活方式内容工作室
+display_name: 生活方式内容工作室
+display_name_en: Lifestyle Content Studio
 summary: 生成生活方式图文的选题、标题、正文、封面字和排版草稿，并用离线词库提示常见高风险措辞。
 license: MIT
 description: 面向个人创作者、小商家和内容团队的生活方式图文创作工作流：把产品事实、受众和场景整理为选题、标题、正文、封面文字和标签，再通过离线词库检查极限词、医疗绝对化、金融诱导、站外导流、教培夸大、竞品拉踩和焦虑营销等高风险措辞。检查结果仅是启发式提示，不是法律意见或任何平台的审核结论。本技能不代发、不承诺流量或审核结果。
-version: 0.1.8
+description_zh: 面向个人创作者、小商家和内容团队的生活方式图文创作工作流，生成选题、标题、正文、封面文字和标签，并用离线词库提示常见高风险措辞。
+description_en: A lifestyle content workflow for creators and small teams that drafts topics, titles, body copy, cover text and tags, then flags common high-risk wording with an offline rule set.
+version: 0.1.9
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/suge-lifestyle-content-studio
 category: 内容创作
 tags: [生活方式内容, 图文创作, 敏感词自查, 种草文案, 内容合规]
