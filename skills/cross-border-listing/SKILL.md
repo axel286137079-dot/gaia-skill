@@ -5,7 +5,7 @@ displayName: 跨境Listing优化
 summary: 将商品信息整理成跨境电商 Listing 草稿，并离线检查常见违禁词、标题与五点长度、禁止符号和全大写问题。
 license: MIT
 description: 用于起草亚马逊、独立站或 TikTok Shop 商品标题、五点描述和 Search Terms，并用离线脚本检查常见违禁词、绝对化或疗效宣称、75 字符标题与 Item Highlights（2026-07 亚马逊新政）长度、Search Terms 字节上限、描述长度与 HTML 残留、禁止符号及全大写；同时提示 2026-09-30 起生效的捆绑销售全品类政策与 B2B 营业时段送达率（BHDR）、2026-10 起的危险品新增问询（四类目组）、处理时间自动化（英国站）与大件 LTL 物流、美国站旺季附加费，以及 2026-11-02 起增强安全类目商业责任险的「上架即触发」规则与**中国大陆主体新单只认 AIA 渠道**。平台类目规则会变化，发布前仍须按目标站点和类目复核。
-version: 0.1.7
+version: 0.1.8
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/cross-border-listing
 category: 电商
 tags: [跨境电商, 亚马逊Listing, 产品文案, SEO, 合规自查]
