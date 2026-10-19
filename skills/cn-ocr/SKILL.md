@@ -4,8 +4,8 @@ slug: cn-ocr
 displayName: 中文OCR
 summary: 用 Tesseract 本地提取中文文本和词级坐标/置信度，支持竖排、繁体与目录批量处理。
 license: MIT
-description: 中文 OCR 和结构化文字提取。使用 Tesseract 输出纯文本或带词级坐标与置信度的 JSON，支持简体、繁体、竖排和目录批量处理，数据保留在本机。用于图片文字识别、扫描件转文字、截图 OCR、繁体/竖排识别和批量提取。
-version: 0.1.2
+description: 中文 OCR 和结构化文字提取。使用 Tesseract 输出纯文本或带词级坐标与置信度的 JSON，支持简体、繁体、竖排和目录批量处理，数据保留在本机。用于图片文字识别、扫描件转文字、截图 OCR、繁体/竖排识别和批量提取。含版本与安全说明（5.5.3 为当前版本；2026-08~10 披露的 Tesseract 漏洞风险面为恶意 .traineddata 模型文件，勿加载来源不明模型）。
+version: 0.1.8
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/cn-ocr
 category: 工具效率
 tags: [OCR, 文字识别, 图片转文字, 结构化, 中文识别]
@@ -51,6 +51,16 @@ python3 bin/ocr.py batch 图片目录/ --out ocr_out/
 | `--format` | text（纯文本）/ json（坐标+置信度） | text |
 | `--clean` | 清洗中文间多余空格、全角归一化 | 关 |
 | `--out` | 批量输出目录 | ocr_out |
+
+## 版本与安全（2026-10 核对）
+
+| 项 | 现状 | 结论 |
+|---|---|---|
+| 最新发布版 | **5.5.3**（2026-07-24） | 当前应使用的版本 |
+| 中文语言包 | `chi_sim` / `chi_sim_vert` / `chi_tra` / `chi_tra_vert` 在 tessdata 中自 2018 年起**未再更新**，参数与语言包用法稳定 | 无需因语言包升级 |
+| 已知安全公告（2026-08~10 集中披露） | 多数为**恶意构造的 `.traineddata` 模型文件**触发的越界读写（`GENERIC_2D_ARRAY` 负维度绕过、`IntSimdMatrix::Init` 越界读、`ReadIntTemplates` 堆越界写、`ADAPT_CLASS_STRUCT` 析构等） | **风险面是「模型文件」而非「图片」**：只加载 tessdata 官方语言包即无实际暴露；**切勿使用来源不明的 .traineddata**（第三方训练包/网盘分享的「高精度中文模型」是主要攻击面） |
+
+> 说明：部分公告标注的受影响范围为 `<= 5.5.3` 且尚无 patched 版本——这是披露流程中的常态标注，不代表 5.5.3 有可利用的远程攻击面。本 skill 只把**用户提供的图片**喂给官方语言包，不加载外部模型，因此按官方渠道安装即可。
 
 ## 边界与红线
 

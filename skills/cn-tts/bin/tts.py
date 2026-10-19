@@ -24,6 +24,7 @@ tts.py — 中文语音合成（文本转语音 TTS）
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -75,12 +76,29 @@ def resolve_voice(name):
     return None
 
 
+def edge_tts_version(edge):
+    """读 edge-tts 版本号（用于 403 排障提示）；失败返回 None。"""
+    try:
+        out = subprocess.run([edge, "--version"], capture_output=True, text=True, timeout=20)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    raw = (out.stdout or "") + (out.stderr or "")
+    m = re.search(r"(\d+)\.(\d+)\.(\d+)", raw)
+    if not m:
+        return None
+    return tuple(int(x) for x in m.groups())
+
+
 def synth_edge_tts(text, voice, rate, pitch, volume, out):
     edge = find_tool("edge-tts")
     if not edge:
-        print("✗ 未找到 edge-tts。安装：pip install edge-tts", file=sys.stderr)
+        print('✗ 未找到 edge-tts。安装：pip install -U "edge-tts>=7.3.1"', file=sys.stderr)
         print("  或加 --engine say 用 macOS 本地 say 回退。", file=sys.stderr)
         return None
+    ver = edge_tts_version(edge)
+    if ver and ver < (7, 3, 1):
+        print(f"⚠ 当前 edge-tts {'.'.join(map(str, ver))} 低于 7.3.1：微软 2026-10 起强制二代 Sec-MS-GEC 验证，"
+              f"7.2.x 及更早会全部 403。请先升级：pip install -U \"edge-tts>=7.3.1\"", file=sys.stderr)
     cmd = [edge, "--voice", voice, "--text", text,
            "--rate=" + rate, "--pitch=" + pitch, "--volume=" + volume,
            "--write-media", out]
@@ -88,6 +106,11 @@ def synth_edge_tts(text, voice, rate, pitch, volume, out):
         subprocess.run(cmd, check=True)
     except (OSError, subprocess.CalledProcessError) as exc:
         print(f"⚠ edge-tts 失败：{exc}", file=sys.stderr)
+        # 403 时给出代际/版本排障指引（subprocess 捕获了子进程 stderr，需主动提示）
+        if (ver and ver < (7, 3, 1)) or "403" in str(exc):
+            print("  403 多为版本代际不匹配：pip install -U \"edge-tts>=7.3.1\"，"
+                  "再用 python3 -c \"import edge_tts;print(edge_tts.__version__)\" 确认生效；"
+                  "版本已对仍失败则查代理改写/系统时钟，详见 SKILL.md 排障表。", file=sys.stderr)
         return None
     return out
 
