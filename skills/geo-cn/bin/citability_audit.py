@@ -4,8 +4,7 @@
 citability_audit.py — 可引用度审计（GEO 九法打分）
 
 纯 Python 标准库实现，无需任何第三方依赖，离线可跑。
-复刻 Princeton GEO-bench 的九方法（arXiv:2311.09735），
-对一段中文/英文内容打分，输出「被生成式引擎引用的概率」报告。
+按本地九项内容启发式给复核建议，不复刻论文测量，也不是引用概率。
 
 用法：
     python3 citability_audit.py 文件.md
@@ -70,7 +69,7 @@ def score_quotation(text: str) -> tuple:
     """① 专家引言"""
     quotes = QUOTATION_PAT.findall(text)
     if not quotes:
-        return 0, "开头放一句有出处的权威引言（如「某研究院某主任指出：……」），引用概率可提升约三成"
+        return 0, "如有真实可核引言，可补说话者与原出处；不要为评分虚构专家或引语"
     # 引言中是否含权威头衔/人名
     has_authority = any(w in text for w in AUTHORITY_TITLES)
     # 引言的完整度
@@ -104,7 +103,7 @@ def score_statistics(text: str) -> tuple:
     score = min(score, 20)
     if score >= 16:
         return score, None
-    return score, "植入 3 处以上可验证数字（百分比/年份/金额），数据是被 AI 转述的头号素材"
+    return score, "如有实际证据可补可验证数字；不要为评分凑数或编造百分比/年份/金额"
 
 
 def score_sources(text: str) -> tuple:
@@ -155,7 +154,7 @@ def score_terms(text: str) -> tuple:
     score = min(6, hits)
     if score >= 4:
         return score, None
-    return score, "用准确专业名词（如「归因/检索/转化率」）替代大白话，提升权威感"
+    return score, "仅在含义准确且读者需要时使用专业名词，不为权威感堆术语"
 
 
 def score_simplify(text: str) -> tuple:
@@ -189,7 +188,7 @@ def score_stuffing(text: str) -> tuple:
     stuffing = [w for w, c in worst if c >= KEYWORD_STUFFING_THRESHOLD]
     if stuffing:
         penalty = -10
-        msg = f"检测到关键词堆砌：{', '.join(f'{w}(×{c})' for w, c in worst if c >= KEYWORD_STUFFING_THRESHOLD)} —— 堆砌会降低 AI 引用意愿，请替换同义词"
+        msg = f"检测到高频重复：{', '.join(f'{w}(×{c})' for w, c in worst if c >= KEYWORD_STUFFING_THRESHOLD)} —— 请人工核对是否机械堆词，不要为多样性改变专业事实"
         return penalty, msg
     return 0, None
 
@@ -199,7 +198,11 @@ def main():
         print("用法：python3 citability_audit.py <文件>  或  echo '内容' | python3 citability_audit.py -")
         sys.exit(1)
     path = sys.argv[1]
-    text = read_text(path)
+    try:text = read_text(path)
+    except (OSError,UnicodeError) as e:
+        print('输入读取失败：'+type(e).__name__,file=sys.stderr);sys.exit(2)
+    if not text.strip():
+        print('内容为空。',file=sys.stderr);sys.exit(1)
     clean = strip_markdown(text)
 
     checks = [

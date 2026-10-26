@@ -1,0 +1,8 @@
+{
+  "engine": "owned local fake executable; SYNTHETIC-NOT-AUDIO, not playable audio; say WAV requires WAVE/LEI16 parameters",
+  "format_parameters": [],
+  "exit": 1,
+  "stdout": "  合成中（音色=晓晓, 语速=+0%）→ failed.mp3\n",
+  "stderr": "⚠ edge-tts 失败：退出码 7\n✗ 处理失败：未提交；ValueError\n",
+  "generated": {}
+}

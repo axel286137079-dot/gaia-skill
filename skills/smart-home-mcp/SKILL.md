@@ -4,8 +4,8 @@ slug: smart-home-mcp
 displayName: 智能家居控制
 summary: 通过 Home Assistant REST API 查询实体并预演或执行服务调用；写操作默认 dry-run，高风险域需二次确认。
 license: MIT
-description: Home Assistant REST CLI，用于列出或查询实体、调用服务和执行本地场景模板。凭据只从 HA_URL/HA_TOKEN 读取；控制命令默认仅打印计划，必须显式传入 --execute，高风险门锁、安防及自动化域还需 --confirm-dangerous。它不是 MCP server，但可作为受控后端封装。已核对至 HA 2026.10.2（2026-10-16；REST 核心接口自 2026.9 起未变）。需注意：`http:` YAML 配置弃用（反代用户需迁 UI）、旧版认证模式移除且用户名统一小写、`mqtt.publish`/`mqtt.dump` 与群晖重启关机收紧为管理员权限、`for` 状态条件校验不再接受属性/列表组合；新增一键启用 MCP Server。
-version: 0.1.10
+description: Home Assistant REST CLI，用于列出或查询实体、调用服务和执行本地场景模板。凭据只从 HA_URL/HA_TOKEN 读取；控制命令默认仅打印计划，必须显式传入 --execute，高风险门锁、安防及自动化域还需 --confirm-dangerous。它不是 MCP server，但可作为受控后端封装。已核对至 HA 2026.10.4（2026-10-24；REST 核心接口自 2026.9 起未变）。需注意：`http:` YAML 配置弃用（反代用户需迁 UI）、旧版认证模式移除且用户名统一小写、`mqtt.publish`/`mqtt.dump` 与群晖重启关机收紧为管理员权限、`for` 状态条件校验不再接受属性/列表组合；新增一键启用 MCP Server。
+version: 0.1.11
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/smart-home-mcp
 category: 智能家居
 tags: [智能家居, HomeAssistant, MCP, 自动化]
@@ -90,9 +90,9 @@ python3 bin/ha_cli.py scene 回家 --execute   # 实际执行；含高风险域�
 
 ### 2026.10 变化
 
-> **状态更新（2026-10-19 核对）**：2026.10 已于 2026-10-07 正式 GA，**当前稳定补丁版为 2026.10.2（2026-10-16）**；2026.11 已进入测试周期（`2026.11.0b0` 里程碑定于 2026-10-28）。以下条目依据正式发布说明确认；**REST 核心接口自 2026.9 起连续两个版本未变**。
+> **状态更新（2026-10-26 核对）**：2026.10 已于 2026-10-07 正式 GA，**当前稳定补丁版为 2026.10.4（2026-10-24）**；2026.11 仍在测试周期（`2026.11.0b0` 里程碑 2026-10-28），尚未 GA。以下条目依据正式发布说明确认；**REST 核心接口自 2026.9 起连续两个版本未变**。
 >
-> 补丁版（2026.10.1 / 2026.10.2）为集成级修复，与本 skill 相关度低，仅此记录以便对账：MQTT 设备触发器与标签在集成 reload 后**重复触发**已被修复（2026.10.2，`klejejs`）；`aiohttp` 升至 3.14.5；`google_generative_ai_conversation` 修复 Gemini 生成参数与 WAV TTS 响应完整性。**无 REST/服务调用契约变更**。
+> 补丁版（2026.10.1 ~ 2026.10.4）为集成级修复，与本 skill 相关度低，仅此记录以便对账：2026.10.2 修复 MQTT 设备触发器与标签在集成 reload 后**重复触发**、`aiohttp` 升至 3.14.5、Gemini 生成参数与 WAV TTS；2026.10.3 修复 Proxmox VE 更新版本识别、UniFi Access 重复门禁事件（10 秒内去重）、TP-Link Omada 缺失字段、Synology DSM action 报错可读性、SMTP 独立 SSL 上下文、KNX telegram store 迁移期启动超时，并升 Python 3.14.8 / runner Ubuntu 26.04；2026.10.4 将 `aiohttp` 客户端请求头上限提到 64 KiB，`pylutron-casera` 升 0.30.0。**四个补丁均无 REST / 服务调用契约变更**。
 
 | 变化 | 影响 | 应对 |
 |---|---|---|
@@ -102,7 +102,6 @@ python3 bin/ha_cli.py scene 回家 --execute   # 实际执行；含高风险域�
 | **Synology DSM 重启/关机需管理员权限** | 群晖集成的 reboot / shutdown action 同样收紧为管理员 | 同上；非管理员令牌调这两个服务会失败 |
 | **`for` 状态条件校验收紧** | 状态条件中把 `for` 与状态属性（attribute）、状态列表、或另一实体状态组合使用，现在**校验失败** | 检查含此类写法的自动化；本 skill 只调 REST，不解析条件，不受影响 |
 | **`DeviceEntry.config_entries` 弃用转强制** | 该弃用已升级为**强制**，core 会抛 `RuntimeError` | 仅影响自研自定义集成开发者 |
-| **LLM 工具返回 `llm.ToolResult`** | 工具返回结构化 `ToolResult`（含 title / annotations：read_only、destructive、idempotent、open_world / integration 声明），旧写法告警但可用至 2027.11 | 自研 LLM 工具需适配；**REST 调用不受影响** |
 | **一键启用 MCP Server（新功能）** | 新增 AI 设置页，一键开启 Model Context Protocol server 访问并生成可复制 URL，可直接粘进 Claude / ChatGPT / Cursor 等外部客户端 | **对本 skill 有正面意义**：想接 LLM 对话时，可优先用官方 MCP server 而非自建封装（自建封装见下文「MCP 化接入」仍可用） |
 | **OAuth2 错误处理移入 helper** | OAuth2 异常改为继承 config entry 异常（`OAuth2TokenRequestReauthError` → `ConfigEntryAuthFailed` 等），集成不再自行翻译；`ImplementationUnavailableError` 不再需要手动包成 `ConfigEntryNotReady` | 仅影响自研自定义集成；**调用 REST API 不受影响** |
 | **`modbus.get_hub` 弃用** | 2026.10 起弃用，**2027.10 移除**；改用 `async_get_unit` | 自研 Modbus 集成需迁移；仅用 UI 配置的用户无需处理 |

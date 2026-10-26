@@ -1,0 +1,5 @@
+{
+  "name": "normal",
+  "engine": "deepseek",
+  "text": "样本量为314，成功率为95%。天花板高度为3.2米。\n甲\n乙\n丙\n来源：https://example.invalid/report/2026/12\n代码：`v2=10`。\n```python\nx = 2026\n```"
+}

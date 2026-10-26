@@ -1,77 +1,27 @@
-# GEO-CN · 懂国产引擎的生成式引擎优化
+# GEO内容保真改写与审计0.1.13
 
-让内容被 **ChatGPT / DeepSeek / 豆包 / Kimi / 元宝 / 文心 / 通义** 检索、引用、归因——而不是只被搜索引擎收录。
+两款标准库CLI，支持现成UTF8文稿/stdin：离线九项内容启发式与18种本地风格模板。不是搜索排名或实际引用概率测量，也不是任何平台官方工具。
 
-## 一句话定位
+## 起步
 
-海外 GEO 工具只懂 ChatGPT/Perplexity，本 skill 专攻**国产引擎的引用机制差异**，做「可引用度审计 + 分诊式改写 + 信源布局」。
+`python3 -B bin/citability_audit.py examples/sample_good.md`
 
-## 为什么值得做
+`python3 -B bin/multi_engine_rewrite.py examples/sample_good.md --engine deepseek`
 
-- 生成式引擎正在替代传统搜索：越来越多用户直接问 AI「该买什么 / 哪个好」，AI 的回答会「点名」某些品牌、产品、观点。
-- **被 AI 引用 = 新形态的流量入口**，且目前几乎没有竞品覆盖国产引擎。
-- Princeton 实证（KDD 2024）：只要给内容加「专家引言 + 数据 + 引用来源」，被 AI 引用概率可提升 **30~40%**，小站收益更可达 **+115%**。
+改为doubao可见结论/FAQ、tongyi可见操作编号、kimi可见普通长段小标题，其余原18入口和专属提示见SKILL表。局部复杂结构原样保护，普通前后叙述仍转换；不是全文原文+同一建议。清楚区分实际改写与需要用户补充的引用/表格/媒体提示。
 
-## 目录结构
+## 本次联网可选
 
-```
-geo-cn/
-├── SKILL.md                      # 路由逻辑 + GEO 九法 + 国产引擎矩阵
-├── README.md                     # 本文件
-├── bin/
-│   ├── citability_audit.py       # 可引用度审计（9 法打分，纯标准库，离线可跑）
-│   └── multi_engine_rewrite.py   # 多引擎分诊式改写（规则化 + 可选 LLM）
-└── examples/
-    ├── sample_bad.md             # 反例（0 分，含关键词堆砌）
-    └── sample_good.md            # 正例（78 分，高可引用）
-```
+默认即使环境中有key也离线且不读取任何联网配置。只有本次明确加`--allow-online-rewrite`，并同时显式提供`--api-key`、`--base-url`和`--model`，才会把全文发送到用户指定的HTTPS端点。没有默认端点、默认模型或环境回退。不要在文稿或聊天贴密钥；命令行key也可能暴露于进程列表。
 
-## 快速开始
+只接受HTTPS；HTTPS也仍需可信服务和材料授权，本工具不做网络沙箱。POST所有重定向拒跟随，失败只报类别，诚实回退规则版，不拿规则exit0当LLM成功。
 
-### 1. 可引用度审计（无需任何 key）
+## 保真与限制
 
-```bash
-python3 bin/citability_audit.py examples/sample_good.md
-# 输出：总分 / 100 + 逐项缺失建议 + 等级（高/中/低可引用）
-```
+代码块/行内代码/链接/裸URL、原表格列表引文等保字面；未知复杂结构局部保留，非完整Markdown解析。普通数字只强调、不新增事实；单字符不因字数过滤消失。营销只删有限明确修饰，实义不猜。检查分数不验证来源和用户意图，不为加分伪造引语/数字。
 
-### 2. 分诊式改写
+原对平台偏好、百分比提升、首引用天数等未核宏观说法在此版不作为有效保证，九项本地启发式仍有可用建议。C/D人工对比和信源方案按可见证据/未知记录，不自动搜索或发布。没有真实LLM请求/实际排名引用效果验证。
 
-```bash
-# 规则化改写（无 key，离线）
-python3 bin/multi_engine_rewrite.py examples/sample_good.md --engine doubao
+所有样例为纯合成；旧样例原件留维护baseline，本版不沿用虚构金融业统计作真实来源。测试额外YAML解析依赖不进生产包。离线运行不需key或第三方Python包。
 
-# LLM 改写（自动读本机 DEEPSEEK_API_KEY / OPENAI_API_KEY）
-python3 bin/multi_engine_rewrite.py examples/sample_good.md --engine deepseek
-
-# 指定 key 与自定义 OpenAI 兼容接口
-python3 bin/multi_engine_rewrite.py 内容.md --engine kimi \
-  --api-key sk-xxx --base-url https://api.deepseek.com/v1 --model deepseek-v4-flash
-```
-
-支持的引擎（18 个）：`doubao`豆包 / `deepseek` / `kimi` / `tongyi`通义千问Qwen / `wenxin`文心 / `hunyuan`腾讯混元 / `zhipu`智谱清言 / `xunfei`讯飞星火 / `minimax`MiniMax海螺 / `xiaomi`小米MiMo / `pangu`华为盘古 / `step`阶跃星辰 / `baichuan`百川 / `yi`零一万物 / `sensenova`商汤日日新 / `skywork`昆仑天工 / `metaso`秘塔AI搜索 / `nano360`360纳米搜索。
-
-### 3. 竞品 AI 引用对比
-
-无国产引擎开放 API，此流程用 WebSearch 模拟：检索「竞品品牌 + 关键词」，观察各引擎结果页中竞品是否被引用、以什么姿态被引用，输出对比表（见 SKILL.md 流程 C）。
-
-## 核心方法论速览
-
-| 方法 | 效果 | 中文实操 |
-|---|---|---|
-| 专家引言 | +30~41% | 开头放有出处的权威引言 |
-| 数据植入 | +31~40% | 可验证的数字/百分比/年份 |
-| 引用来源 | +27~42% | 文末列来源链接 + 机构名 |
-| 流畅度 | +15~28% | 短句、衔接词 |
-| 权威语气 | +10~18% | 肯定式结论 |
-| 术语 | +8~18% | 准确专业名词 |
-| 关键词堆砌 | **-8~10%（有害）** | **严禁** |
-
-## 合规红线
-
-- 严禁造假引用、编造数据、虚构引言——AI 会追溯来源，造假会反噬。
-- 不做「保证被 AI 引用」的承诺，只做「提升概率」的工程。
-
-## License
-
-MIT
+MIT。使用者仍需核文稿权利、保密、素材/来源准确性；不把此工具当安全或法律结论。

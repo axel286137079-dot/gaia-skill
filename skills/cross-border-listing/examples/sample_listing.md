@@ -8,4 +8,4 @@ Bullet 3: DURABLE - Made of food-grade stainless steel, medical grade coating.
 
 Search Terms: water bottle, insulated bottle, gym bottle, sports bottle, stainless water bottle, leak proof bottle
 
-> 本示例故意埋了多处违规（best/#1/100%/amazing/cures/guaranteed/free shipping/medical grade 等），用于演示自查。
+> 本示例故意加入多处需复核措辞（best/#1/100%/amazing/cures/guaranteed/free shipping/medical grade 等），用于演示离线提示；是否违反特定平台规则必须结合事实依据、字段和类目判断，不可直接发布。

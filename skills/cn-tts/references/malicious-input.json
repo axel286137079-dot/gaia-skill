@@ -1,0 +1,1 @@
+{"argv":["FAIL ECHO SYNTHETIC_PRIVATE_TEXT","--engine","edge-tts","--out","failed.mp3"],"fixture":"owned fake echoes synthetic text and fails; CLI must not repeat it"}

@@ -1,0 +1,16 @@
+{
+  "fixture": "SYNTHETIC_OFFLINE_NOT_REAL_LLM",
+  "argv": [
+    "python3",
+    "-B",
+    "bin/multi_engine_rewrite.py",
+    "<RUN_ROOT>/19/input.md",
+    "--engine",
+    "deepseek"
+  ],
+  "exit": 2,
+  "stdout": "",
+  "stderr": "输入读取失败：UnicodeDecodeError\n",
+  "fake_request_count": 0,
+  "input_unchanged": true
+}
