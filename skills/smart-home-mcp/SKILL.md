@@ -4,8 +4,8 @@ slug: smart-home-mcp
 displayName: 智能家居控制
 summary: 通过 Home Assistant REST API 查询实体并预演或执行服务调用；写操作默认 dry-run，高风险域需二次确认。
 license: MIT
-description: Home Assistant REST CLI，用于列出或查询实体、调用服务和执行本地场景模板。凭据只从 HA_URL/HA_TOKEN 读取；控制命令默认仅打印计划，必须显式传入 --execute，高风险门锁、安防及自动化域还需 --confirm-dangerous。它不是 MCP server，但可作为受控后端封装。已核对至 HA 2026.10.4（2026-10-24；REST 核心接口自 2026.9 起未变）。需注意：`http:` YAML 配置弃用（反代用户需迁 UI）、旧版认证模式移除且用户名统一小写、`mqtt.publish`/`mqtt.dump` 与群晖重启关机收紧为管理员权限、`for` 状态条件校验不再接受属性/列表组合；新增一键启用 MCP Server。
-version: 0.1.11
+description: Home Assistant REST CLI，用于列出或查询实体、调用服务和执行本地场景模板。凭据只从 HA_URL/HA_TOKEN 读取；控制命令默认仅打印计划，必须显式传入 --execute，高风险门锁、安防及自动化域还需 --confirm-dangerous。它不是 MCP server，但可作为受控后端封装。已核对至 HA 2026.10.4（2026-11-02 复核，无新补丁；2026.11 处于 b0~b2 未 GA；REST 核心接口自 2026.9 起未变）。需注意：`http:` YAML 配置弃用（反代用户需迁 UI）、旧版认证模式移除且用户名统一小写、`mqtt.publish`/`mqtt.dump` 与群晖重启关机收紧为管理员权限、`for` 状态条件校验不再接受属性/列表组合；新增一键启用 MCP Server。
+version: 0.1.12
 homepage: https://github.com/axel286137079-dot/gaia-skill/tree/main/skills/smart-home-mcp
 category: 智能家居
 tags: [智能家居, HomeAssistant, MCP, 自动化]
@@ -90,7 +90,7 @@ python3 bin/ha_cli.py scene 回家 --execute   # 实际执行；含高风险域�
 
 ### 2026.10 变化
 
-> **状态更新（2026-10-26 核对）**：2026.10 已于 2026-10-07 正式 GA，**当前稳定补丁版为 2026.10.4（2026-10-24）**；2026.11 仍在测试周期（`2026.11.0b0` 里程碑 2026-10-28），尚未 GA。以下条目依据正式发布说明确认；**REST 核心接口自 2026.9 起连续两个版本未变**。
+> **状态更新（2026-11-02 核对）**：2026.10 已于 2026-10-07 正式 GA，**当前稳定补丁版仍为 2026.10.4（2026-10-24）**，本轮无新补丁；2026.11 已进入 beta（`2026.11.0b0` 10-28 / `b1` 10-29 / `b2` 10-30），**尚未 GA**，按惯例正式版在 11 月首个周三前后，其中 `b1` 的改动为集成级修复与依赖升级（Overkiz / Control4 / Shelly / Withings / ZHA / Nord Pool 等）加 UI 细节，**未见 REST 契约变更**。以下条目依据正式发布说明确认；**REST 核心接口自 2026.9 起连续两个版本未变**。
 >
 > 补丁版（2026.10.1 ~ 2026.10.4）为集成级修复，与本 skill 相关度低，仅此记录以便对账：2026.10.2 修复 MQTT 设备触发器与标签在集成 reload 后**重复触发**、`aiohttp` 升至 3.14.5、Gemini 生成参数与 WAV TTS；2026.10.3 修复 Proxmox VE 更新版本识别、UniFi Access 重复门禁事件（10 秒内去重）、TP-Link Omada 缺失字段、Synology DSM action 报错可读性、SMTP 独立 SSL 上下文、KNX telegram store 迁移期启动超时，并升 Python 3.14.8 / runner Ubuntu 26.04；2026.10.4 将 `aiohttp` 客户端请求头上限提到 64 KiB，`pylutron-casera` 升 0.30.0。**四个补丁均无 REST / 服务调用契约变更**。
 

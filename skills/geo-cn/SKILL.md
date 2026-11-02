@@ -9,7 +9,7 @@ description_zh: "面向授权文稿的离线内容复核与结构改写，提供
 description_en: "Review authorized UTF-8 drafts offline with nine heuristics and 18 rewrite-style templates. Preserve literal URLs, code, structure blocks, six quote pairs and short facts while rewriting ordinary prose; this is a finite Markdown subset, not fact verification. Read files or stdin and print results only. Scores are not citation probabilities, rankings or income predictions; labels imply no official platform preference. The CLI never reads ambient network credentials or endpoints. Online rewriting requires an explicit consent flag, API key, HTTPS endpoint and model in the same run. Never follow POST redirects. Remote failures report safe error classes and transparently fall back to local rules, not LLM success. No invented sources, browsing, publishing or output-file writes. Real model fidelity, availability, privacy terms and arbitrary input/resource safety are not guaranteed."
 summary: 离线启发式检查来源、数据与表达，按18种本地风格模板改写普通叙述，保留URL、代码和结构块。
 description: 面向授权文稿的离线内容复核与结构改写，提供九项启发式审计、18种风格模板和可选明确同意后的OpenAI兼容接口。风格名不是平台官方引用偏好，分数不是引用概率。支持直接UTF8文件或stdin，默认不读取环境联网配置或发送文稿；联网必须显式提供允许开关、密钥、HTTPS端点和模型。缺失来源由用户补真实依据，不编造事实、引言或数字。
-version: 0.1.13
+version: 0.1.14
 license: MIT
 category: 工具效率
 tags: [GEO, 内容审计, 保真改写, 来源复核, 离线工具]
@@ -68,13 +68,15 @@ C：若用户另行授权公开搜索，记录问题/平台端/时间、真实�
 
 D：给布局方案时列已有真实核心事实、可核出处、作者/实体一致口径、更新责任和验证时间；独立来源数量依实际材料，不臆造“某平台至少三源/占比上限/引用天数”。没有固定必然见效周期，不承诺上线后被推荐。原历史宏观百分比/引擎矩阵没有本维护版可核实证，不能继续作为当前官方规则。
 
-## 流程E：2026 下半年已生效的三条结构性变化（方案建议用，非平台承诺）
+## 流程E：2026 下半年已生效的结构性变化（方案建议用，非平台承诺）
 
 这三条是内容侧关于「为什么现在拼可信度」的行业判断，可在方案与自查中用来说明取舍；它们不是任何平台的官方条文，也不能折算成引用概率。
 
 1. **结构化数据从加分项变为基础项。** Schema 标记、知识图谱关系、FAQ 结构化、实体—属性—关系标注在向量检索阶段辨识度和匹配精度更高，纯描述性长文更容易被语义噪声淹没。实操优先级：先把「实体名—定义句—关键事实—出处」做成可直接摘取的稳定句式与结构化块，再谈篇幅。注意本工具只做 Markdown 子集改写，**不生成 schema JSON-LD**，需要时由用户另行提供或由开发侧落地。
 2. **模板化伪原创与榜单/测评类内容持续失分。** 批量改写、套话灌水、批量「十大品牌/行业测评/横向对比」的收录表现明显下滑；这类物料在部分引擎已不止降权，而是不进答案候选池。自查口径：同一事实是否换了十种说法在多个账号重复出现——在算法侧等同重复出现。
 3. **信源交叉校验在更多平台落地。** 跨信源实体对齐、多源一致性检测、权威信源权重分级成为准入条件：只在单一来源出现的信息，交叉验证时拿不到足够信任分。因此「发得多」不再等价于「被信任」，需要至少两个彼此独立、可核实、口径一致的来源。
+4. **视频成为主力信源之一，标题字面匹配的权重高于语义相似。** 多家第三方监测显示，豆包对抖音的引用权重从 5 月的约 10.8% 升至 8 月的约 31.8%（约每 3 条引用有 1 条来自抖音）；百度 6 月起把 B 站与好看视频纳入信源库。可操作口径两条：**提问词要出现在标题里**（关键词覆盖度与引用次数的相关系数约 0.149，高于语义相似度的约 0.117），再让整句读法贴近用户问法。同理，元宝优先调微信公众号、文心对百度系内容引用占比高、DeepSeek 偏官网/官方媒体/白皮书、Kimi 偏用户手册与开发文档、千问与电商生态打通——**同一组事实须按平台改写形态（一稿多版），但核心数据必须跨平台一致**，否则过不了交叉校验。注意这些是第三方测算而非平台公布的官方规则，只能用于排序取舍，不能折算成引用概率。
+5. **「买曝光」买不到「被引用」。** 实测显示付费广告主中仅约一成出现在 AI 答案的引用来源里；投流买的是入口，被引用靠的是可核验内容。方案里须把这两笔预算分开算，不要用投放数据论证 GEO 效果。
 
 配套的红线（属合规问题，不是效果问题）：批量生产同质化低质内容投喂模型；篡改或隐藏内容向量、干扰检索结果；伪造权威信源或编造机构背书；恶意投放竞品负面；承接「保证第一 / 锁定前三 / 必然被大模型引用」类承诺。这些说法一旦出现在交付方案里，本身就是风险信号。
 

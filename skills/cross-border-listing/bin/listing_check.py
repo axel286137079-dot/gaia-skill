@@ -77,7 +77,17 @@ POLICY_NOTES_2026 = [
     "系统自动启用 90 天处理时间调整。填备货时间应按真实出库能力，不要留安全余量。",
     "美国站危险品（Hazmat）新增问询：制冷/悬挂减震/书写工具/泳池与 SPA 四个相关类目组，"
     "在新建或编辑 listing 时须依实际产品资料（规格书、SDS、成分、包装）作答，不得按类目或标题推测。",
-    "这些是 2026-10-26 核对的部分官方公告，不包含全部站点、类目和费用；"
+    "欧盟 B2C 跨境货件双重要求（2026-11-01 起）：① 价值 ≤€150 的货件，报关单须逐件提供商品编码 PID，"
+    "缺失或无效会被驳回，并可能影响该商品在欧盟的跨境销售权限；② 无论货件价值多少，每件商品/每个税则号列"
+    "另计 €2 海关处理费，与 2026-07-01 起的 €3 关税叠加收取（均为欧盟海关规则，非亚马逊费用）。"
+    "PID 优先级：S-PID = UPC/EAN/GTIN；制造商未分配编号时可用 NS-PID（型号/部件编号）；"
+    "手工/手工艺商品（HS 4420/4602/4802/5702/5804/5805/7013 系列）免 S-PID 但仍需 NS-PID。"
+    "用「购买配送服务」买标时，即使目录已有 PID 仍须逐件输入零件号或型号，否则无法完成标签购买。",
+    "欧盟 FBM 报关申报人限制：不得将消费者列为申报人（会被驳回并可能影响跨境销售权限，"
+    "亦不符合 DDP 政策）；价值高于 €150 的 FBM 货件也不得将亚马逊列为申报人。"
+    "价值 ≤€150 的货件须使用亚马逊批准的 IOSS 承运人，自由文本承运人输入已取消；"
+    "无论货件价值如何均须继续 DDP 配送。FBA 跨境货件由亚马逊从目录取 PID，但仍须保证目录数据准确。",
+    "这些是 2026-11-02 核对的部分官方公告，不包含全部站点、类目和费用；"
     "发布前必须复核目标站点 Seller Central、承运商和海关官方页面。"
 ]
 
@@ -102,6 +112,17 @@ EMOJI_RE = re.compile("[\U0001F000-\U0001FAFF\u2600-\u27BF\u2B00-\u2BFF\uFE0F]")
 REPEATED_PUNCT_RE = re.compile(r"([!?.])\1{2,}")
 # HTML 标签
 HTML_TAG_RE = re.compile(r"<[a-zA-Z/][^>]*>")
+
+# 欧盟跨境 PID（商品标识符）自查：2026-11-01 起价值 ≤€150 的 B2C 货件报关须逐件 PID。
+# 强标识符 = 可作 S-PID 的 UPC/EAN/GTIN；弱标识符 = 部件编号 / 型号（NS-PID 可用，但官方优先 S-PID）。
+PID_STRONG_RE = re.compile(
+    r"(?<![a-z])(?:upc|ean|gtin)(?:\s*[-_ ]?(?:13|14|8))?\s*[:：=]?\s*([0-9][0-9\-\s]{7,20}[0-9])",
+    re.I)
+PID_WEAK_RE = re.compile(
+    r"(?<![a-z])(?:part\s*(?:number|no\.?)|model(?:\s*(?:number|no\.?))?|型号|部件编号|零件号)\s*[:：=]\s*([A-Za-z0-9][A-Za-z0-9\-_./]{2,40})",
+    re.I)
+# 手工/手工艺豁免类目（HS 4420/4602/4802/5702/5804/5805/7013 系列）可免 S-PID，但仍需 NS-PID
+CRAFT_HS_RE = re.compile(r"\bHS\s*(?:code)?\s*[:：=]?\s*(4420|4602|4802|5702|5804|5805|7013)", re.I)
 
 # 对实词重复三次及以上给出启发式提示；冠词/介词/连词豁免
 TITLE_STOP_WORDS = {
@@ -246,6 +267,24 @@ def check(text, title_max=TITLE_MAX_LEN, bullet_max=BULLET_MAX_LEN,
             issues.append({"type": "五点", "word": f"第 {lineno} 行长度 {len(bullet)}",
                            "category": "长度启发式规则",
                            "suggest": f"→ 超过当前设定 {bullet_max} 字符"})
+
+    # 4) 欧盟跨境 PID 自查（2026-11-01 起价值 ≤€150 的 B2C 货件须逐件 PID）
+    strong = [m.group(1).strip() for m in PID_STRONG_RE.finditer(text)]
+    weak = [m.group(1).strip() for m in PID_WEAK_RE.finditer(text)]
+    is_craft = bool(CRAFT_HS_RE.search(text))
+    if not strong and not weak:
+        issues.append({"type": "欧盟合规", "word": "未见 PID（UPC/EAN/GTIN 或型号/部件编号）",
+                       "category": "欧盟跨境 PID",
+                       "suggest": "→ 2026-11-01 起价值 ≤€150 的欧盟 B2C 跨境货件报关须逐件 PID；"
+                                  "缺失或无效会被驳回。请在目录补 S-PID（UPC/EAN/GTIN），"
+                                  "无制造商编号时才用 NS-PID（型号/部件编号）"})
+    elif not strong:
+        hint = "；手工/手工艺豁免类目（HS 4420/4602/4802/5702/5804/5805/7013）可免 S-PID" if is_craft else ""
+        issues.append({"type": "欧盟合规", "word": f"仅见非标准 PID：{weak[0][:20]}",
+                       "category": "欧盟跨境 PID",
+                       "suggest": "→ 官方优先 S-PID（UPC/EAN/GTIN）；"
+                                  "仅当制造商未分配编号时才以型号/部件编号作 NS-PID" + hint})
+    # Buy Shipping 侧：即使目录已有 PID，购买标签时仍须逐件手输零件号或型号
     return issues
 
 
